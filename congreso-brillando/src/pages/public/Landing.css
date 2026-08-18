@@ -1,154 +1,502 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,700;0,900;1,900&display=swap');
+/* ============================================================
+   AUTÉNTICOS — Pre-Congreso I.C.E.B. 2026
+   Brutalista / póster de calle / fanzine impreso.
+   ============================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Caveat:wght@600;700&display=swap");
 
 :root {
-  --blue-cobalt: #5167e8;
-  --cream-paper: #e9edd8;
-  --black-ink: #111111;
+  --azul: #5167e8;
+  --azul-oscuro: #2d3aa8;
+  --crema: #e9edd8;
+  --tinta: #111111;
+  --amarillo: #ffcc00;
+
+  --font-display: "Poppins", "Helvetica Neue", Arial, sans-serif;
+  /* Neulis Cursive no está disponible en CDNs públicos —
+     Caveat es el reemplazo tipográfico más cercano en espíritu manuscrito. */
+  --font-cursive: "Neulis Cursive", "Caveat", "Segoe Script", cursive;
+
+  --hard-shadow: 8px 8px 0 var(--tinta);
+  --hard-shadow-sm: 4px 4px 0 var(--tinta);
 }
 
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
-body {
-  font-family: 'Poppins', sans-serif;
+.landing {
+  background: var(--tinta);
+  color: var(--tinta);
+  font-family: var(--font-display);
   overflow-x: hidden;
-  background-color: var(--blue-cobalt);
+  -webkit-font-smoothing: antialiased;
 }
 
-.noise-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+.landing section {
+  position: relative;
+  padding: clamp(24px, 6vw, 64px);
+}
+
+/* ---------- ruido / grano analógico ---------- */
+.grain {
+  position: absolute;
+  inset: 0;
   pointer-events: none;
-  z-index: 9999;
-  background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
-  opacity: 0.25; /* Subimos el ruido para que se vea más sucio */
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'>\
+<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/>\
+<feColorMatrix type='saturate' values='0'/></filter>\
+<rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 160px 160px;
+  z-index: 5;
 }
 
-/* --- HERO SECTION --- */
-.hero-section {
-  min-height: 100vh;
-  background-color: var(--blue-cobalt);
+/* ============================================================
+   SECCIÓN 1 — HERO
+   ============================================================ */
+.hero {
+  min-height: 100svh;
+  background: var(--azul);
+  color: var(--tinta);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 2rem;
-  position: relative;
-  z-index: 1;
+  gap: clamp(18px, 3vw, 28px);
+  isolation: isolate;
 }
 
-.hero-tagline {
-  font-weight: 700;
-  letter-spacing: 2px;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  color: var(--cream-paper);
-  margin-bottom: 0.5rem;
-}
-
-.hero-title {
-  font-size: clamp(6rem, 20vw, 15rem);
+.hero__spiral {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  color: rgba(17, 17, 17, 0.14);
   font-weight: 900;
-  line-height: 0.8; /* Letras aplastadas verticalmente */
-  letter-spacing: -2px; /* Letras pegadas horizontalmente */
-  color: var(--cream-paper);
+  font-size: clamp(11px, 1.4vw, 15px);
+  letter-spacing: 0.35em;
   text-transform: uppercase;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-right: 10px;
+  text-align: right;
+  pointer-events: none;
+}
+
+.hero__top {
   position: relative;
   z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.cursive-highlight {
-  font-family: 'Neulis Cursive', 'Caveat', cursive;
-  font-size: clamp(3rem, 10vw, 5rem);
-  color: var(--black-ink);
-  transform: rotate(-5deg) translateY(-40px); /* Atraviesa el título principal */
-  position: relative;
-  z-index: 3;
-  mix-blend-mode: multiply; /* Simula tinta impresa sobre el color de fondo */
-}
-
-.brutalist-button {
-  background-color: var(--cream-paper);
-  color: var(--black-ink);
-  font-size: 1.2rem;
-  font-weight: 900;
-  padding: 1.2rem 3rem;
-  margin-top: 2rem;
-  text-decoration: none;
+.hero__eyebrow {
+  font-weight: 700;
+  font-size: clamp(11px, 1.6vw, 15px);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  border: 2px solid var(--black-ink);
-  transition: all 0.2s ease;
+  background: var(--tinta);
+  color: var(--crema);
+  padding: 6px 12px;
+  display: inline-block;
+}
+
+.hero__stamp {
+  font-weight: 800;
+  font-size: clamp(10px, 1.4vw, 13px);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 2px solid var(--tinta);
+  padding: 6px 10px;
+  transform: rotate(6deg) scale(0.85);
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.2), opacity 0.4s ease;
+}
+.hero__stamp.is-in {
+  transform: rotate(6deg) scale(1);
+  opacity: 1;
+}
+
+.hero__title {
   position: relative;
-  z-index: 10;
+  z-index: 2;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(3.6rem, 15vw, 11rem);
+  line-height: 0.82;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: var(--tinta);
 }
 
-.brutalist-button:hover {
-  background-color: var(--black-ink);
-  color: var(--cream-paper);
+.hero__title-line {
+  display: block;
+  position: relative;
 }
 
-/* --- MANIFESTO SECTION --- */
-.manifesto-section {
-  /* En vez de una caja chiquita, ahora toda la sección es color crema */
-  background-color: var(--cream-paper);
-  color: var(--black-ink);
-  padding: 8rem 2rem; 
+.hero__title-line--pushed {
+  margin-left: clamp(0.4em, 6vw, 1.4em);
+  -webkit-text-stroke: 2px var(--tinta);
+  color: var(--azul);
+  text-shadow: 6px 6px 0 var(--tinta);
+}
+
+.hero__cursive-inline {
+  position: absolute;
+  left: 100%;
+  top: 0.15em;
+  margin-left: 0.18em;
+  font-family: var(--font-cursive);
+  font-weight: 700;
+  font-size: 0.34em;
+  letter-spacing: 0;
+  color: var(--tinta);
+  white-space: nowrap;
+  transform: rotate(-6deg);
+}
+.hero__cursive-inline::before {
+  content: "";
+  position: absolute;
+  left: -0.5em;
+  top: 55%;
+  width: 3.2em;
+  height: 2px;
+  background: var(--amarillo);
+  transform: rotate(-3deg);
+  z-index: -1;
+}
+
+.hero__slash {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  align-self: flex-start;
+  font-family: var(--font-cursive);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 4vw, 2.8rem);
+  color: var(--amarillo);
+  -webkit-text-stroke: 0.6px var(--tinta);
+  transform: rotate(-3deg);
+  text-shadow: 2px 2px 0 var(--tinta);
+}
+
+.hero__cta-row {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(16px, 3vw, 28px);
+  margin-top: clamp(8px, 2vw, 16px);
+}
+
+.btn-brutal {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--crema);
+  background: var(--tinta);
+  border: 3px solid var(--tinta);
+  border-radius: 0;
+  padding: 18px 30px;
+  cursor: pointer;
+  box-shadow: var(--hard-shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.btn-brutal:hover {
+  background: var(--amarillo);
+  color: var(--tinta);
+  border-color: var(--tinta);
+  transform: translate(4px, 4px);
+  box-shadow: 4px 4px 0 var(--tinta);
+}
+.btn-brutal:active {
+  transform: translate(8px, 8px);
+  box-shadow: 0 0 0 var(--tinta);
+}
+.btn-brutal:focus-visible {
+  outline: 3px dashed var(--tinta);
+  outline-offset: 4px;
+}
+
+.hero__meta {
+  display: flex;
+  gap: 10px;
+  font-weight: 800;
+  font-size: clamp(0.85rem, 1.3vw, 1rem);
+  letter-spacing: 0.06em;
+}
+.hero__meta span {
+  border: 2px solid var(--tinta);
+  padding: 6px 10px;
+  background: var(--crema);
+}
+
+/* ============================================================
+   SECCIÓN 2 — MANIFIESTO
+   ============================================================ */
+.manifest {
+  background: var(--azul-oscuro);
+  padding: clamp(28px, 7vw, 90px) clamp(16px, 5vw, 64px);
   display: flex;
   justify-content: center;
-  align-items: center;
-  border-top: 4px solid var(--black-ink); /* Línea divisoria dura */
-  border-bottom: 4px solid var(--black-ink);
 }
 
-.manifesto-content {
-  max-width: 800px;
-  width: 100%;
+.manifest__paper {
+  position: relative;
+  width: min(720px, 100%);
+  background: var(--crema);
+  border: 2px solid var(--tinta);
+  box-shadow: 14px 14px 0 rgba(0, 0, 0, 0.55);
+  padding: clamp(32px, 6vw, 64px) clamp(24px, 6vw, 56px);
+  transform: rotate(-1.1deg);
+  /* filo levemente irregular, tipo hoja arrancada */
+  clip-path: polygon(
+    0% 1.5%, 3% 0%, 30% 0.8%, 55% 0%, 78% 1%, 100% 0%,
+    99% 15%, 100% 40%, 99% 62%, 100% 85%, 98.5% 100%,
+    70% 99%, 45% 100%, 20% 99%, 0% 100%
+  );
 }
 
-.manifesto-text {
-  font-size: clamp(1.5rem, 5vw, 2.5rem);
-  font-weight: 400;
-  line-height: 1.1;
-  text-transform: uppercase;
+.manifest__spiral {
+  position: absolute;
+  left: -14px;
+  top: 8%;
+  bottom: 8%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.manifest__spiral span {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--azul);
+  display: block;
+  box-shadow: inset 0 0 0 2px var(--tinta);
 }
 
-.text-black-heavy {
-  font-weight: 900;
-}
-
-.manifesto-cursive {
-  font-family: 'Neulis Cursive', 'Caveat', cursive;
-  color: var(--blue-cobalt);
-  font-size: clamp(4rem, 12vw, 8rem);
-  margin: -20px 0 20px 0;
-  transform: rotate(-3deg);
+.tape {
+  position: absolute;
+  width: 120px;
+  height: 34px;
+  background: rgba(233, 237, 216, 0.75);
+  border: 1px solid rgba(17, 17, 17, 0.25);
   mix-blend-mode: multiply;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.15);
+}
+.tape--tl {
+  top: -16px;
+  left: 6%;
+  transform: rotate(-8deg);
+}
+.tape--br {
+  bottom: -16px;
+  right: 8%;
+  transform: rotate(6deg);
 }
 
-.manifesto-subtext {
-  font-size: 1.2rem;
+.manifest__lead {
+  margin: 0;
+  font-weight: 600;
+  font-size: clamp(1.2rem, 2.6vw, 1.7rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--tinta);
+  max-width: 22ch;
+}
+
+.manifest__word {
+  margin: 0.1em 0 0.3em;
+  font-family: var(--font-cursive);
   font-weight: 700;
-  color: var(--black-ink);
-  max-width: 500px;
+  font-size: clamp(3.2rem, 10vw, 6rem);
+  color: var(--azul);
+  -webkit-text-stroke: 1px var(--tinta);
+  line-height: 0.9;
+  position: relative;
+}
+.manifest__word::after {
+  content: "";
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  top: 48%;
+  height: 8px;
+  background: var(--amarillo);
+  transform: rotate(-2deg);
+  z-index: -1;
+  opacity: 0.9;
 }
 
-/* --- REGISTRATION SECTION --- */
-.registration-section {
-  background-color: var(--blue-cobalt);
-  min-height: 50vh;
-  padding: 4rem 2rem;
-  color: var(--cream-paper);
+.manifest__body {
+  margin: clamp(20px, 4vw, 32px) 0 0;
+  font-weight: 500;
+  font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+  line-height: 1.5;
+  max-width: 42ch;
+  color: var(--tinta);
+}
+.manifest__body em {
+  font-style: normal;
+  text-decoration: underline wavy var(--azul);
+  text-underline-offset: 3px;
+}
+.manifest__body strong {
+  font-weight: 800;
+  background: var(--amarillo);
+  padding: 0 4px;
+}
+.manifest__strike {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  opacity: 0.45;
+}
+.manifest__cursive {
+  font-family: var(--font-cursive);
+  font-weight: 700;
+  font-size: 1.35em;
+  color: var(--azul);
+  display: inline-block;
+  transform: rotate(-3deg);
+  margin-left: 4px;
+}
+
+/* ============================================================
+   SECCIÓN 3 — CHECK-IN
+   ============================================================ */
+.checkin {
+  background: var(--azul);
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 4vw, 32px);
+  justify-content: center;
+}
+
+.checkin__eyebrow {
+  margin: 0;
+  font-weight: 700;
+  font-size: clamp(11px, 1.4vw, 14px);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: var(--tinta);
+  color: var(--crema);
+  display: inline-block;
+  padding: 6px 12px;
+  width: fit-content;
+}
+
+.checkin__title {
+  margin: 0;
+  font-weight: 900;
+  font-size: clamp(3.2rem, 13vw, 9rem);
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: var(--tinta);
+}
+.checkin__dash {
+  color: var(--crema);
+  -webkit-text-stroke: 2px var(--tinta);
+}
+
+.checkin__facts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 620px;
+}
+.checkin__facts li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: baseline;
+  border-bottom: 2px solid var(--tinta);
+  padding-bottom: 8px;
+}
+.checkin__fact-label {
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--tinta);
+  color: var(--crema);
+  padding: 3px 8px;
+  min-width: 78px;
+  text-align: center;
+}
+.checkin__fact-value {
+  font-weight: 700;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  color: var(--tinta);
+}
+
+.checkin__form-slot {
+  border: 3px solid var(--tinta);
+  background: var(--crema);
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--hard-shadow);
+  padding: 24px;
+}
+.checkin__form-slot-label {
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(17, 17, 17, 0.55);
   text-align: center;
 }
 
-.section-title {
-  font-size: 3rem;
-  font-weight: 900;
+.checkin__footer-tape {
+  margin: 0;
+  align-self: flex-start;
+  font-family: var(--font-cursive);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--tinta);
+  transform: rotate(-2deg);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 640px) {
+  .hero__cursive-inline {
+    position: static;
+    display: block;
+    margin: 4px 0 0;
+    transform: rotate(-4deg);
+  }
+  .hero__title-line--pushed {
+    margin-left: 0.6em;
+  }
+  .manifest__spiral {
+    display: none;
+  }
+  .tape--tl,
+  .tape--br {
+    display: none;
+  }
+}
+
+/* respeta preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .hero__stamp,
+  .btn-brutal {
+    transition: none;
+  }
 }
