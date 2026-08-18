@@ -1,0 +1,175 @@
+/* Importamos Poppins (Neulis Cursive deberías cargarla localmente si la tenés en .ttf/.woff2) */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,700;0,900;1,900&display=swap');
+
+:root {
+  --blue-cobalt: #5167e8;
+  --cream-paper: #e9edd8;
+  --black-ink: #111111;
+  --yellow-accent: #ffcc00;
+}
+
+/* Reseteo general */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--blue-cobalt);
+  font-family: 'Poppins', sans-serif;
+  color: var(--cream-paper);
+  overflow-x: hidden;
+}
+
+/* Efecto de ruido granulado como en el póster */
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+  opacity: 0.15; /* Ajustá este valor para más o menos ruido */
+}
+
+/* --- HERO SECTION --- */
+.hero-section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+}
+
+.hero-tagline {
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-size: 1rem;
+  margin-bottom: -10px;
+  text-transform: uppercase;
+  color: var(--cream-paper);
+}
+
+.hero-title {
+  font-size: clamp(5rem, 15vw, 12rem);
+  font-weight: 900;
+  line-height: 0.85;
+  color: var(--cream-paper);
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  text-shadow: 4px 4px 0px var(--black-ink);
+}
+
+.paper-scrap {
+  background-color: var(--cream-paper);
+  padding: 10px 30px;
+  transform: rotate(-3deg);
+  display: inline-block;
+  margin-bottom: 3rem;
+  box-shadow: 5px 5px 0px rgba(0,0,0,0.3);
+}
+
+/* Asumimos que Neulis Cursive está cargada. Si no, usa un fallback */
+.cursive-highlight {
+  font-family: 'Neulis Cursive', 'Caveat', cursive;
+  font-size: 2.5rem;
+  color: var(--blue-cobalt);
+  font-weight: normal;
+  transform: rotate(2deg);
+}
+
+.brutalist-button {
+  background-color: var(--black-ink);
+  color: var(--cream-paper);
+  font-size: 1.5rem;
+  font-weight: 900;
+  padding: 1rem 3rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  border: 4px solid var(--cream-paper);
+  transition: all 0.2s ease;
+  box-shadow: 8px 8px 0px var(--cream-paper);
+}
+
+.brutalist-button:hover {
+  transform: translate(4px, 4px);
+  box-shadow: 4px 4px 0px var(--cream-paper);
+  background-color: var(--yellow-accent);
+  color: var(--black-ink);
+  border-color: var(--black-ink);
+}
+
+/* --- MANIFESTO SECTION --- */
+.manifesto-section {
+  padding: 5rem 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.manifesto-paper {
+  background-color: var(--cream-paper);
+  color: var(--black-ink);
+  padding: 4rem 2rem;
+  max-width: 600px;
+  position: relative;
+  transform: rotate(1deg);
+  box-shadow: 10px 10px 20px rgba(0,0,0,0.4);
+}
+
+/* Las cintas adhesivas en las esquinas */
+.tape-top-left, .tape-bottom-right {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.6);
+  height: 30px;
+  width: 100px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.tape-top-left {
+  top: -10px;
+  left: -20px;
+  transform: rotate(-45deg);
+}
+
+.tape-bottom-right {
+  bottom: -10px;
+  right: -20px;
+  transform: rotate(-45deg);
+}
+
+.manifesto-text {
+  font-size: 1.5rem;
+  font-weight: 400;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.text-black-heavy {
+  font-weight: 900;
+  display: block;
+  font-size: 2rem;
+  margin-top: 10px;
+}
+
+.manifesto-cursive {
+  font-family: 'Neulis Cursive', 'Caveat', cursive;
+  color: var(--blue-cobalt);
+  font-size: 4.5rem;
+  text-align: center;
+  margin: -10px 0 20px 0;
+  transform: rotate(-2deg);
+}
+
+.manifesto-subtext {
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--blue-cobalt);
+}
