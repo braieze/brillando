@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Landing.css';
-import { QRCodeSVG } from 'qrcode.react'; 
+import QRCode from 'react-qr-code';
 import { db } from '../../config/firebase'; 
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; 
 import { isBefore, parseISO } from 'date-fns'; 
@@ -489,13 +489,13 @@ export default function Landing() {
                 <span className="eyebrow" style={{ color: '#2438e0' }}>Pase generado</span>
                 <h3 style={{ marginTop: '14px' }}>¡Ya sos parte de Brillando!</h3>
                 
-                {/* QR REAL CON qrcode.react */}
+                {/* QR REAL CON react-qr-code */}
                 <div style={{ margin: '20px auto', background: '#e9edd8', padding: '15px', display: 'inline-block', border: '3px solid #0a0a0c', boxShadow: '8px 8px 0 #0a0a0c' }}>
-                  <QRCodeSVG 
+                  <QRCode 
                     value={userId} 
                     size={160}
-                    bgColor={"#e9edd8"}
-                    fgColor={"#0a0a0c"}
+                    bgColor="#e9edd8"
+                    fgColor="#0a0a0c"
                   />
                 </div>
 
