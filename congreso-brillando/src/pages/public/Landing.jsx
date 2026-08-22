@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Landing.css';
 import QRCode from 'react-qr-code';
 import { db } from '../../config/firebase'; 
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; 
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'; 
 import { isBefore, parseISO } from 'date-fns'; 
 
 export default function Landing() {
@@ -18,9 +18,9 @@ export default function Landing() {
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState(''); 
   const [errorMsg, setErrorMsg] = useState('');
+  const [isDuplicate, setIsDuplicate] = useState(false); // Estado para detectar correos repetidos
   
   // LÓGICA DE BLOQUEO POR FECHA
-  // Definimos la fecha límite del Pre-Congreso (12 de sep a la noche)
   const [isPreCongresoActive, setIsPreCongresoActive] = useState(true);
   
   useEffect(() => {
@@ -35,18 +35,55 @@ export default function Landing() {
       ...formData,
       [e.target.name]: e.target.value
     });
+    // Si empieza a escribir de nuevo, limpiamos los errores
+    setIsDuplicate(false);
+    setErrorMsg('');
+  };
+
+  const handleResetForm = () => {
+    setFormData({ nombre: '', apellido: '', email: '', edad: '', iglesia: '' });
+    setIsSubmitted(false);
+    setUserId('');
+    setIsDuplicate(false);
+    setErrorMsg('');
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: '¡Ya tengo mi pase para Brillando 2026!',
+          text: `Salí del molde. Ya aseguré mi lugar para el Pre-Congreso de la Red Juvenil I.C.E.B. ¡Sumate vos también!`,
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.log('Error compartiendo', error);
+      }
+    } else {
+      alert("Tu navegador no soporta esta función, pero podés sacarle captura a tu QR.");
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMsg('');
+    setIsDuplicate(false);
 
     try {
-      // 1. Apuntamos a la colección "inscriptos" en tu Firestore
       const inscriptosRef = collection(db, "inscriptos");
       
-      // 2. Armamos el documento que se va a guardar
+      // 1. VALIDACIÓN: ¿Ya existe este correo?
+      const q = query(inscriptosRef, where("email", "==", formData.email));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        setIsDuplicate(true);
+        setIsLoading(false);
+        return; // Frenamos la ejecución acá si ya existe
+      }
+
+      // 2. Si es nuevo, armamos el documento
       const nuevoInscripto = {
         nombre: formData.nombre,
         apellido: formData.apellido,
@@ -59,10 +96,9 @@ export default function Landing() {
         evento_origen: 'pre_congreso'
       };
 
-      // 3. Guardamos en Firebase y capturamos el ID único
+      // 3. Guardamos en Firebase
       const docRef = await addDoc(inscriptosRef, nuevoInscripto);
       
-      // 4. Guardamos ese ID en el estado de React para generar el QR
       setUserId(docRef.id);
       setIsSubmitted(true);
 
@@ -437,7 +473,6 @@ export default function Landing() {
 
           <form className="pase-form" onSubmit={handleSubmit} noValidate>
             
-            {/* Si ya pasó la fecha del Pre-Congreso, mostramos mensaje de bloqueado */}
             {!isPreCongresoActive ? (
               <div className="confirm-panel show">
                 <h3 style={{ marginTop: '20px' }}>PRE-CONGRESO FINALIZADO</h3>
@@ -475,6 +510,14 @@ export default function Landing() {
                   </div>
                 </div>
 
+                {/* ALERTA DE CORREO DUPLICADO */}
+                {isDuplicate && (
+                  <div style={{ backgroundColor: '#0a0a0c', color: '#ffcc00', padding: '15px', marginTop: '15px', border: '3px solid #ffcc00' }}>
+                    <h4 style={{ fontFamily: 'var(--f-mono)', textTransform: 'uppercase', marginBottom: '5px' }}>Atención</h4>
+                    <p style={{ fontSize: '14px', lineHeight: '1.5' }}>El correo <b>{formData.email}</b> ya tiene un pase registrado. Revisá la carpeta de SPAM o usá otro mail para inscribir a alguien más.</p>
+                  </div>
+                )}
+
                 {errorMsg && <p style={{color: 'red', fontSize: '14px', marginTop: '10px'}}>{errorMsg}</p>}
 
                 <div className="submit-row">
@@ -485,23 +528,39 @@ export default function Landing() {
                 <p className="fine" style={{ marginTop: '14px' }}>Al inscribirte vas a recibir tu Pase Digital con código QR por correo.</p>
               </div>
             ) : (
-              <div className="confirm-panel show">
-                <span className="eyebrow" style={{ color: '#2438e0' }}>Pase generado</span>
-                <h3 style={{ marginTop: '14px' }}>¡Ya sos parte de Brillando!</h3>
+              // NUEVO DISEÑO DEL TICKET VIP
+              <div className="confirm-panel show" style={{ background: 'var(--crema)', border: '4px solid var(--tinta)', padding: '40px 20px', boxShadow: '12px 12px 0 var(--tinta)', textAlign: 'center' }}>
+                <span className="eyebrow" style={{ color: 'var(--azul)', marginBottom: '15px' }}>◆ PASE GENERADO ◆</span>
+                <h3 style={{ fontFamily: 'var(--f-display)', fontSize: 'clamp(24px, 3vw, 32px)', textTransform: 'uppercase', lineHeight: '1', color: 'var(--tinta)', marginBottom: '30px' }}>
+                  ¡YA SOS PARTE DE<br/>BRILLANDO!
+                </h3>
                 
-                {/* QR REAL CON react-qr-code */}
-                <div style={{ margin: '20px auto', background: '#e9edd8', padding: '15px', display: 'inline-block', border: '3px solid #0a0a0c', boxShadow: '8px 8px 0 #0a0a0c' }}>
+                <div style={{ margin: '0 auto 25px', background: 'var(--crema)', padding: '20px', display: 'inline-block', border: '4px solid var(--tinta)', boxShadow: '8px 8px 0 var(--tinta)' }}>
                   <QRCode 
                     value={userId} 
-                    size={160}
-                    bgColor="#e9edd8"
-                    fgColor="#0a0a0c"
+                    size={180}
+                    bgColor="#f2ede0" // var(--crema)
+                    fgColor="#0a0a0c" // var(--tinta)
                   />
                 </div>
 
-                <p><b>El pase de {formData.nombre || 'tu nombre'}</b> fue enviado a <span>{formData.email || 'tu correo'}</span>.</p>
-                <p style={{ fontSize: '12px', marginTop: '10px', opacity: 0.6 }}>ID: {userId}</p>
-                <p>Revisá tu casilla (y la carpeta de spam) para encontrar tu código QR.</p>
+                <p style={{ fontSize: '15px', color: 'var(--tinta)', lineHeight: '1.5' }}>
+                  El pase de <b>{formData.nombre}</b> fue enviado a <br/>
+                  <span style={{ fontFamily: 'var(--f-mono)', fontSize: '13px' }}>{formData.email}</span>
+                </p>
+                <p style={{ fontFamily: 'var(--f-mono)', fontSize: '12px', marginTop: '15px', color: 'rgba(10,10,12,0.6)', textTransform: 'uppercase' }}>
+                  ID: {userId}
+                </p>
+
+                {/* BOTONES SOCIALES Y DE LÍDERES */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '30px' }}>
+                  <button onClick={handleShare} className="btn azul" style={{ width: '100%', justifyContent: 'center', fontSize: '14px' }}>
+                    Compartir mi Pase ↗
+                  </button>
+                  <button type="button" onClick={handleResetForm} className="btn ghost" style={{ width: '100%', justifyContent: 'center', border: '2px solid var(--tinta)' }}>
+                    Inscribir a alguien más
+                  </button>
+                </div>
               </div>
             )}
           </form>
