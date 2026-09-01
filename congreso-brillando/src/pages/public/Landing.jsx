@@ -550,14 +550,14 @@ export default function Landing() {
 
           <div className="form-wrapper" style={{ display: 'flex', flexDirection: 'column' }}>
             
-            {/* PESTAÑAS (TABS) SUPERIORES */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '-3px', position: 'relative', zIndex: 10, overflowX: 'auto' }}>
-              <div style={{ background: 'var(--crema)', border: '3px solid var(--tinta)', borderBottom: 'none', padding: '12px 18px', fontFamily: 'var(--f-mono)', fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', color: 'var(--tinta)', whiteSpace: 'nowrap' }}>
-                Fase 1: Pre-Congreso (12 Sep)
+          {/* PESTAÑAS (TABS) SUPERIORES */}
+            <div className="tabs-container">
+              <div className="tab-active">
+                Fase 1: Pre-Congreso
               </div>
-              <div style={{ background: 'rgba(10,10,12,0.2)', border: '3px solid transparent', borderBottom: 'none', padding: '12px 18px', fontFamily: 'var(--f-mono)', fontSize: '11px', textTransform: 'uppercase', color: 'rgba(242,237,224,0.6)', display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                Fase 2: Congreso (Próximo Nivel)
+              <div className="tab-inactive">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Fase 2: Congreso
               </div>
             </div>
 

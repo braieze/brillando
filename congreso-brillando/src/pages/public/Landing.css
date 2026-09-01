@@ -621,3 +621,62 @@ footer{
   .wrap{ padding:0 20px; }
   .section{ padding:80px 0; }
 }
+
+/* ================= PESTAÑAS DEL FORMULARIO ================= */
+.tabs-container {
+  display: flex;
+  gap: 6px;
+  margin-bottom: -3px;
+  position: relative;
+  z-index: 10;
+  width: 100%;
+}
+
+.tab-active {
+  background: var(--crema);
+  border: 3px solid var(--tinta);
+  border-bottom: none;
+  padding: 12px 18px;
+  font-family: var(--f-mono);
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--tinta);
+  flex: 1; /* Esto hace que ocupe exactamente la mitad */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.tab-inactive {
+  background: rgba(10,10,12,0.2);
+  border: 3px solid transparent;
+  border-bottom: none;
+  padding: 12px 18px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  color: rgba(242,237,224,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 1; /* Esto hace que ocupe exactamente la mitad */
+  text-align: center;
+}
+
+/* Ajustes automáticos para teléfonos celulares */
+@media (max-width: 560px) {
+  .tab-active {
+    padding: 10px 4px;
+    font-size: 10.5px;
+  }
+  .tab-inactive {
+    padding: 10px 4px;
+    font-size: 9.5px;
+  }
+  form.pase-form {
+    padding: 26px 18px; /* Achicamos un poco el relleno de la caja para dar más espacio a los inputs */
+  }
+}
