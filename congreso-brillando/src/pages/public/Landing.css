@@ -530,65 +530,77 @@ footer{
 .galeria { 
   background: var(--crema-2); 
   border-top: 3px solid var(--tinta);
+  padding-bottom: 80px; /* Un poco más de aire abajo */
 }
 .galeria .section-head h2 { color: var(--tinta); }
 .galeria .section-head p { color: var(--tinta); }
 
 .galeria-grid {
   column-count: 3;
-  column-gap: 24px;
+  column-gap: 12px; /* Reducimos el espacio entre columnas */
   margin-top: 40px;
 }
+
 .galeria-item {
-  break-inside: avoid; /* Previene que la foto se corte a la mitad entre columnas */
-  margin-bottom: 24px;
-  border: 3px solid var(--tinta);
-  box-shadow: 6px 6px 0 var(--azul);
-  background: var(--tinta);
+  break-inside: avoid;
+  margin-bottom: 12px; /* Reducimos el espacio vertical */
   position: relative;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
   overflow: hidden;
+  border-radius: 8px; /* Bordes levemente redondeados tipo app */
+  /* Eliminamos los bordes duros y sombras brutalistas para que fluya tipo Pinterest */
 }
-.galeria-item:hover { 
-  transform: translate(-3px, -3px); 
-  box-shadow: 10px 10px 0 var(--amarillo); 
-}
+
 .galeria-item img {
   width: 100%;
   height: auto;
   display: block;
-  /* Aplicamos un filtro brutalista blanco y negro por defecto */
-  filter: grayscale(100%) contrast(1.1); 
+  filter: grayscale(80%) contrast(1.1); /* Menos agresivo el blanco y negro */
   transition: filter 0.3s ease, transform 0.3s ease;
 }
+
 .galeria-item:hover img { 
-  /* Al pasar el mouse, recupera el color y hace un leve zoom */
   filter: none; 
-  transform: scale(1.02);
-}
-.galeria-item .tag {
-  position: absolute;
-  bottom: 14px;
-  left: 14px;
-  background: var(--amarillo);
-  color: var(--tinta);
-  padding: 5px 12px;
-  font-family: var(--f-mono);
-  font-size: 11px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  font-weight: bold;
-  border: 2px solid var(--tinta);
-  pointer-events: none; /* Para que no estorbe el hover de la foto */
+  transform: scale(1.03);
 }
 
-/* Responsive para achicar a 2 columnas en tablets y 1 en celulares */
-@media (max-width: 980px) { 
-  .galeria-grid { column-count: 2; } 
+.galeria-item .tag {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(10, 10, 12, 0.85); /* Fondo oscuro semitransparente */
+  color: var(--crema);
+  padding: 4px 8px;
+  font-family: var(--f-mono);
+  font-size: 9.5px; /* Más sutil */
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  pointer-events: none;
 }
+
+/* --- RESPONSIVE CLAVE PARA PINTEREST STYLE --- */
+@media (max-width: 980px) { 
+  .galeria-grid { 
+    column-count: 3; /* Mantenemos 3 en tablets */
+  } 
+}
+
 @media (max-width: 560px) { 
-  .galeria-grid { column-count: 1; } 
+  .galeria-grid { 
+    column-count: 2; /* FORZAMOS 2 COLUMNAS EN CELULARES */
+    column-gap: 8px;
+  }
+  .galeria-item {
+    margin-bottom: 8px;
+    border-radius: 6px;
+  }
+  .galeria-item .tag {
+    /* Ocultamos los tags en celu si molestan mucho, o los hacemos mínimos */
+    font-size: 8px;
+    padding: 3px 6px;
+    bottom: 6px;
+    left: 6px;
+  }
 }
 
 /* ================= responsive ================= */
