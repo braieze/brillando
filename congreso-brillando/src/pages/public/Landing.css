@@ -526,6 +526,59 @@ footer{
   font-family: var(--f-mono); font-size:11.5px; color: rgba(242,237,224,.45); flex-wrap:wrap; gap:10px;
 }
 
+/* ================= GALERIA HISTÓRICA ================= */
+.galeria { 
+  background: var(--crema-2); 
+  border-top: 3px solid var(--tinta);
+  border-bottom: 3px solid var(--tinta);
+}
+.galeria-grid {
+  column-count: 3;
+  column-gap: 20px;
+  margin-top: 40px;
+}
+.galeria-item {
+  break-inside: avoid; /* Previene que la foto se corte a la mitad entre columnas */
+  margin-bottom: 20px;
+  border: 3px solid var(--tinta);
+  box-shadow: 6px 6px 0 var(--azul);
+  background: var(--tinta);
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+.galeria-item:hover { 
+  transform: translate(-3px, -3px); 
+  box-shadow: 10px 10px 0 var(--amarillo); 
+}
+.galeria-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: grayscale(100%) contrast(1.1); /* Estilo brutalista inicial */
+  transition: filter 0.3s ease;
+}
+.galeria-item:hover img { 
+  filter: none; /* Revela el color al pasar el mouse */
+}
+.galeria-item .tag {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: var(--amarillo);
+  color: var(--tinta);
+  padding: 4px 10px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: bold;
+  border: 2px solid var(--tinta);
+}
+
+@media (max-width: 980px) { .galeria-grid { column-count: 2; } }
+@media (max-width: 560px) { .galeria-grid { column-count: 1; } }
+
 /* ================= responsive ================= */
 @media (max-width: 980px){
   nav.links{ display:none; }

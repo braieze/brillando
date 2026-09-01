@@ -276,6 +276,45 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ============ GALERIA ============ */}
+      <section className="section galeria" id="historia">
+        <div className="wrap">
+          <div className="section-head">
+            <span className="eyebrow">Nuestra Historia</span>
+            <h2>Lo que ya <em>vivimos.</em></h2>
+            <p>Un repaso por las ediciones anteriores. El movimiento de la Red Juvenil no empezó hoy.</p>
+          </div>
+
+          <div className="galeria-grid">
+            {/* Foto 1 (Ejemplo vertical) */}
+            <div className="galeria-item">
+              <img src="https://images.unsplash.com/photo-1540039155733-d76e6f48cb98?q=80&w=800&auto=format&fit=crop" alt="Congreso anterior" />
+              <span className="tag">2025 · Sin Brecha Generacional</span>
+            </div>
+
+            {/* Foto 2 (Ejemplo horizontal) */}
+            <div className="galeria-item">
+              <img src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=800&auto=format&fit=crop" alt="Público" />
+              <span className="tag">2024</span>
+            </div>
+
+            {/* Foto 3 (Ejemplo cuadrado) */}
+            <div className="galeria-item">
+              <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800&auto=format&fit=crop" alt="Banda en vivo" />
+              <span className="tag">Música en vivo</span>
+            </div>
+
+            {/* Foto 4 */}
+            <div className="galeria-item">
+              <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800&auto=format&fit=crop" alt="Staff" />
+              <span className="tag">El Equipo</span>
+            </div>
+            
+            {/* Agregá tantas <div className="galeria-item"> como fotos quieras */}
+          </div>
+        </div>
+      </section>
+
       {/* ============ FECHAS ============ */}
       <section className="section fechas" id="fechas">
         <div className="wrap">
