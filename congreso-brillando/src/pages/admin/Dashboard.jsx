@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { db } from '../../config/firebase';
 import { collection, onSnapshot, doc, updateDoc, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { Scanner } from '@yudiel/react-qr-scanner';
+import './Dashboard.css';
 
 
 // Umbral de arrastre (px) a partir del cual la fila "eliminar" queda abierta
