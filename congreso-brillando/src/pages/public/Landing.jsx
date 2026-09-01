@@ -5,6 +5,50 @@ import { db } from '../../config/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'; 
 import { isBefore, parseISO } from 'date-fns'; 
 
+// Array con las 40 fotos de Unsplash
+const allPhotos = [
+  "https://images.unsplash.com/photo-1788226881098-066b4ef6890d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880955-8030453a2331?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880754-fa94291b48fe?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880765-05714314d347?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881176-f9b1e9ce4406?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881264-0d67dc359030?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880851-2575c6890dd9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880854-f1d98d27c24b?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880759-42714957e61a?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880917-0810e4b98ecc?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881234-4eee1d0891fa?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850244-8d6014a6bbc7?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850054-6ab164546d84?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850188-db2e07bc10ea?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850206-1dad55612c22?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881137-965ae273c1a5?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881006-74316feda82c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226849993-0492ded69d43?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850181-2a8eb039e14d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881277-260df9d5ded4?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850010-80818ba177e1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850166-bb741721b655?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880897-56f697ec957a?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881052-9074ce9ba68e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880896-cbeafaf7ceb5?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880613-929d804db48c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880767-632d2aacf87a?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881073-a745daf2b043?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880779-3065406c9e6d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880974-ec7dd8e80328?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881148-6e1aca9be1a2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880794-25d723b3a616?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880997-8009c04f61bd?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880784-77ac3f911aa1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850102-01f77d645036?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880784-77ac3f911aa1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881148-6e1aca9be1a2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881170-1a385d70fe97?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881060-268f36b0abae?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880766-3f5610c352cd?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0"
+];
+
 export default function Landing() {
   const [formData, setFormData] = useState({
     nombre: '',
@@ -19,6 +63,9 @@ export default function Landing() {
   const [userId, setUserId] = useState(''); 
   const [errorMsg, setErrorMsg] = useState('');
   const [isDuplicate, setIsDuplicate] = useState(false); // Estado conservado para no romper el HTML
+  
+  // Estado para controlar cuántas fotos se ven en la galería (iniciamos en 20)
+  const [visiblePhotos, setVisiblePhotos] = useState(20);
   
   // LÓGICA DE BLOQUEO POR FECHA
   const [isPreCongresoActive, setIsPreCongresoActive] = useState(true);
@@ -286,32 +333,27 @@ export default function Landing() {
           </div>
 
           <div className="galeria-grid">
-            {/* Foto 1 (Ejemplo vertical) */}
-            <div className="galeria-item">
-              <img src="https://images.unsplash.com/photo-1540039155733-d76e6f48cb98?q=80&w=800&auto=format&fit=crop" alt="Congreso anterior" />
-              <span className="tag">2025 · Sin Brecha Generacional</span>
-            </div>
-
-            {/* Foto 2 (Ejemplo horizontal) */}
-            <div className="galeria-item">
-              <img src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=800&auto=format&fit=crop" alt="Público" />
-              <span className="tag">2024</span>
-            </div>
-
-            {/* Foto 3 (Ejemplo cuadrado) */}
-            <div className="galeria-item">
-              <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800&auto=format&fit=crop" alt="Banda en vivo" />
-              <span className="tag">Música en vivo</span>
-            </div>
-
-            {/* Foto 4 */}
-            <div className="galeria-item">
-              <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800&auto=format&fit=crop" alt="Staff" />
-              <span className="tag">El Equipo</span>
-            </div>
-            
-            {/* Agregá tantas <div className="galeria-item"> como fotos quieras */}
+            {allPhotos.slice(0, visiblePhotos).map((photoUrl, index) => (
+              <div className="galeria-item" key={index}>
+                <img src={photoUrl} alt={`Congreso Brillando ${index + 1}`} loading="lazy" />
+                <span className="tag">Archivo Brillando</span>
+              </div>
+            ))}
           </div>
+
+          {/* Botón de Cargar Más si todavía hay fotos ocultas */}
+          {visiblePhotos < allPhotos.length && (
+            <div style={{ textAlign: 'center', marginTop: '50px' }}>
+              <button 
+                type="button" 
+                className="btn ghost" 
+                onClick={() => setVisiblePhotos(allPhotos.length)}
+                style={{ border: '3px solid var(--tinta)' }}
+              >
+                Cargar todas las fotos ↓
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
