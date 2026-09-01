@@ -18,7 +18,7 @@ export default function Landing() {
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState(''); 
   const [errorMsg, setErrorMsg] = useState('');
-  const [isDuplicate, setIsDuplicate] = useState(false); // Estado para detectar correos repetidos
+  const [isDuplicate, setIsDuplicate] = useState(false); // Estado conservado para no romper el HTML
   
   // LÓGICA DE BLOQUEO POR FECHA
   const [isPreCongresoActive, setIsPreCongresoActive] = useState(true);
@@ -52,8 +52,8 @@ export default function Landing() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: '¡Ya tengo mi pase para Brillando 2026!',
-          text: `Salí del molde. Ya aseguré mi lugar para el Pre-Congreso de la Red Juvenil I.C.E.B. ¡Sumate vos también!`,
+          title: '¡Ya tengo mi pase para el Pre-Congreso Brillando 2026!',
+          text: `Salí del molde. Ya aseguré mi lugar para el Pre-Congreso del 12 de Septiembre. ¡Sumate vos también!`,
           url: window.location.href,
         });
       } catch (error) {
@@ -73,16 +73,8 @@ export default function Landing() {
     try {
       const inscriptosRef = collection(db, "inscriptos");
       
-      // 1. VALIDACIÓN: ¿Ya existe este correo?
-      const q = query(inscriptosRef, where("email", "==", formData.email));
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        setIsDuplicate(true);
-        setIsLoading(false);
-        return; // Frenamos la ejecución acá si ya existe
-      }
-
+      // LA VALIDACIÓN DE DUPLICADOS FUE ELIMINADA ACÁ PARA PERMITIR INSCRIPCIONES MASIVAS
+      
       // 2. Si es nuevo, armamos el documento
       const nuevoInscripto = {
         nombre: formData.nombre,
@@ -117,7 +109,7 @@ export default function Landing() {
           <div className="brand">RED JUVENIL <span className="tag">I.C.E.B</span></div>
           <nav className="links" aria-label="Navegación principal">
             <a href="#concepto">Concepto</a>
-            <a href="#romper">Rompé el molde</a>
+            <a href="#talentos">Talentos</a>
             <a href="#fechas">Fechas</a>
             <a href="#ubicacion">Ubicación</a>
             <a href="#pase">Tu pase</a>
@@ -224,19 +216,20 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ============ ROMPER EL MOLDE ============ */}
-      <section className="section romper" id="romper">
+      {/* ============ TALENTOS (ANTI-CASTING) ============ */}
+      {/* Usamos la misma clase "romper" para heredar los colores y las tarjetas */}
+      <section className="section romper" id="talentos">
         <div className="wrap">
           <div className="section-head">
-            <span className="eyebrow">Lo que hay que romper</span>
-            <h2>Tres moldes<br/>para <em>dejar atrás.</em></h2>
-            <p>Tres símbolos del sistema que nos empuja a encajar — y la razón por la que Brillando existe para romperlos.</p>
+            <span className="eyebrow">El Anti-Casting</span>
+            <h2>Se buscan talentos<br/><em>(que no busquen likes).</em></h2>
+            <p>Este año el escenario no es para el más popular, es para el más real. Si tenés algo para mostrar, hacelo sin maquillaje, sin filtros y sin editar.</p>
           </div>
 
           <div className="locker-cards">
             <div className="lcard">
               <span className="latch" aria-hidden="true"></span>
-              <span className="num">01 / TV</span>
+              <span className="num">01 / LA CONSIGNA</span>
               <div className="icon" aria-hidden="true">
                 <svg width="46" height="38" viewBox="0 0 46 38" fill="none">
                   <rect x="1" y="1" width="44" height="30" rx="4" stroke="#f2ede0" strokeWidth="2.5"/>
@@ -245,13 +238,13 @@ export default function Landing() {
                   <line x1="23" y1="31" x2="23" y2="34" stroke="#f2ede0" strokeWidth="2.5"/>
                 </svg>
               </div>
-              <h3>El televisor estático</h3>
-              <p>Consumo pasivo. Repetir lo que ves sin preguntarte si de verdad te representa.</p>
+              <h3>Cero Filtros</h3>
+              <p>Grabate 30 segundos haciendo lo que amás desde tu pieza, en pijama, sin editar el audio y mostrando lo que sos de verdad.</p>
             </div>
 
             <div className="lcard">
               <span className="latch" aria-hidden="true"></span>
-              <span className="num">02 / PAPEL</span>
+              <span className="num">02 / LA REGLA</span>
               <div className="icon" aria-hidden="true">
                 <svg width="44" height="40" viewBox="0 0 44 40" fill="none">
                   <rect x="2" y="4" width="40" height="30" stroke="#f2ede0" strokeWidth="2.5"/>
@@ -261,13 +254,13 @@ export default function Landing() {
                   <line x1="8" y1="30" x2="20" y2="30" stroke="#f2ede0" strokeWidth="2"/>
                 </svg>
               </div>
-              <h3>El diario que tapa la cara</h3>
-              <p>La máscara social. Titulares y apariencias que ocultan lo que en verdad sentís.</p>
+              <h3>Subí y Etiquetanos</h3>
+              <p>Subilo a tus historias etiquetando a <b>@congresobrillando</b> con el hashtag <b>#CeroFiltros</b>. (Si tu cuenta es privada, mandalo por DM).</p>
             </div>
 
             <div className="lcard">
               <span className="latch" aria-hidden="true"></span>
-              <span className="num">03 / CASILLERO</span>
+              <span className="num">03 / EL ESCENARIO</span>
               <div className="icon" aria-hidden="true">
                 <svg width="34" height="42" viewBox="0 0 34 42" fill="none">
                   <rect x="1" y="1" width="32" height="40" stroke="#f2ede0" strokeWidth="2.5"/>
@@ -276,8 +269,8 @@ export default function Landing() {
                   <circle cx="25" cy="31" r="2" fill="#f2ede0"/>
                 </svg>
               </div>
-              <h3>El casillero que encasilla</h3>
-              <p>El sistema que te asigna un lugar. Un número más, sin espacio para ser distinto.</p>
+              <h3>Los Más Reales</h3>
+              <p>Nosotros elegimos a los que se suben al escenario del Pre-Congreso. Nada de votos, puro talento genuino.</p>
             </div>
           </div>
         </div>
@@ -338,7 +331,8 @@ export default function Landing() {
           </div>
 
           <div className="map-panel" style={{ marginBottom: '40px' }}>
-            <div className="map-visual">
+            {/* SVG inline para generar la textura de calles/mapa sutil en el fondo */}
+            <div className="map-visual" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83 43.405-53.11 8.274L.264 0h54.363zM28.05 45l-2-29 25-3-2 30-21 2zm-5 1l-20-4 3-30 20 2-3 32z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E")` }}>
               <div className="pin">
                 <svg viewBox="0 0 52 64" fill="none">
                   <path d="M26 2C13 2 3 12 3 25c0 18 23 37 23 37s23-19 23-37C49 12 39 2 26 2z" fill="#ffd400" stroke="#0a0a0c" strokeWidth="3"/>
@@ -366,11 +360,13 @@ export default function Landing() {
             </div>
           </div>
 
-           <div className="map-panel">
-            <div className="map-visual" style={{ background: 'linear-gradient(rgba(13, 22, 96, 0.9), rgba(13, 22, 96, 0.9)), repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 26px), repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 26px)'}}>
+          <div className="map-panel">
+            {/* Ambos mapas usan la misma textura y los mismos colores */}
+            <div className="map-visual" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83 43.405-53.11 8.274L.264 0h54.363zM28.05 45l-2-29 25-3-2 30-21 2zm-5 1l-20-4 3-30 20 2-3 32z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E")` }}>
               <div className="pin">
                 <svg viewBox="0 0 52 64" fill="none">
-                  <path d="M26 2C13 2 3 12 3 25c0 18 23 37 23 37s23-19 23-37C49 12 39 2 26 2z" fill="#f2ede0" stroke="#0a0a0c" strokeWidth="3"/>
+                  {/* Se igualó el color amarillo para el pin */}
+                  <path d="M26 2C13 2 3 12 3 25c0 18 23 37 23 37s23-19 23-37C49 12 39 2 26 2z" fill="#ffd400" stroke="#0a0a0c" strokeWidth="3"/>
                   <circle cx="26" cy="25" r="9" fill="#0a0a0c"/>
                 </svg>
                 <span>Congreso Principal</span>
@@ -385,7 +381,7 @@ export default function Landing() {
                 <span className="lbl">Fecha</span>
                 <span className="val">Sábado <b>31 de octubre</b> de 2026</span>
               </div>
-              <a href="https://maps.app.goo.gl/g6J6bH3q5HhR7W9n7" target="_blank" rel="noreferrer" className="btn" style={{ alignSelf: 'flex-start', marginTop: '10px' }}>
+              <a href="https://maps.app.goo.gl/g6J6bH3q5HhR7W9n7" target="_blank" rel="noreferrer" className="btn azul" style={{ alignSelf: 'flex-start', marginTop: '10px' }}>
                 Abrir en Google Maps →
               </a>
             </div>
@@ -424,7 +420,7 @@ export default function Landing() {
                 </svg>
               </div>
               <h4>Recibí tu pase por mail</h4>
-              <p>Te llega automáticamente un código QR único: es tu entrada personal a Brillando.</p>
+              <p>Te llega automáticamente un código QR único: es tu entrada personal al Brillando.</p>
             </div>
 
             <div className="step">
@@ -452,8 +448,8 @@ export default function Landing() {
         <div className="wrap insc-grid">
           <div>
             <span className="eyebrow">Reservá tu lugar</span>
-            <h2>Sumate a <em>Brillando</em> 2026.</h2>
-            <p>Dejá tus datos y asegurá tu pase para el Pre-Congreso "Auténticos". Es gratuito y el cupo es limitado.</p>
+            <h2>Asegurá tu pase para el <em>Pre-Congreso.</em></h2>
+            <p>Dejá tus datos para anotarte al evento piloto del 12 de septiembre en el Auditorio CDS. Es gratuito y el cupo es limitado.</p>
 
             <div className="insc-list">
               <div className="li">
@@ -471,99 +467,103 @@ export default function Landing() {
             </div>
           </div>
 
-          <form className="pase-form" onSubmit={handleSubmit} noValidate>
+          <div className="form-wrapper" style={{ display: 'flex', flexDirection: 'column' }}>
             
-            {!isPreCongresoActive ? (
-              <div className="confirm-panel show">
-                <h3 style={{ marginTop: '20px' }}>PRE-CONGRESO FINALIZADO</h3>
-                <p>Las inscripciones para el evento del 12 de septiembre han cerrado.</p>
-                <div style={{ marginTop: '20px', padding: '15px', background: 'var(--azul)', color: 'var(--crema)' }}>
-                  <p style={{ color: 'var(--crema)', fontWeight: 'bold' }}>Próximamente abriremos los registros para el Congreso Principal del 31 de Octubre.</p>
-                </div>
+            {/* PESTAÑAS (TABS) SUPERIORES */}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '-3px', position: 'relative', zIndex: 10, overflowX: 'auto' }}>
+              <div style={{ background: 'var(--crema)', border: '3px solid var(--tinta)', borderBottom: 'none', padding: '12px 18px', fontFamily: 'var(--f-mono)', fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', color: 'var(--tinta)', whiteSpace: 'nowrap' }}>
+                Fase 1: Pre-Congreso (12 Sep)
               </div>
-            ) : !isSubmitted ? (
-              <div id="formFields">
-                <div className="field-row">
-                  <div className="field">
-                    <label htmlFor="nombre">Nombre</label>
-                    <input id="nombre" name="nombre" type="text" placeholder="Tu nombre" value={formData.nombre} onChange={handleInputChange} required />
-                  </div>
-                  <div className="field">
-                    <label htmlFor="apellido">Apellido</label>
-                    <input id="apellido" name="apellido" type="text" placeholder="Tu apellido" value={formData.apellido} onChange={handleInputChange} required />
-                  </div>
-                </div>
-                <div className="field-row">
-                  <div className="field full">
-                    <label htmlFor="email">Correo electrónico</label>
-                    <input id="email" name="email" type="email" placeholder="nombre@correo.com" value={formData.email} onChange={handleInputChange} required />
-                  </div>
-                </div>
-                <div className="field-row">
-                  <div className="field">
-                    <label htmlFor="edad">Edad</label>
-                    <input id="edad" name="edad" type="number" min="10" max="99" placeholder="17" value={formData.edad} onChange={handleInputChange} required />
-                  </div>
-                  <div className="field">
-                    <label htmlFor="iglesia">Iglesia</label>
-                    <input id="iglesia" name="iglesia" type="text" placeholder="Nombre de tu iglesia" value={formData.iglesia} onChange={handleInputChange} required />
-                  </div>
-                </div>
-
-                {/* ALERTA DE CORREO DUPLICADO */}
-                {isDuplicate && (
-                  <div style={{ backgroundColor: '#0a0a0c', color: '#ffcc00', padding: '15px', marginTop: '15px', border: '3px solid #ffcc00' }}>
-                    <h4 style={{ fontFamily: 'var(--f-mono)', textTransform: 'uppercase', marginBottom: '5px' }}>Atención</h4>
-                    <p style={{ fontSize: '14px', lineHeight: '1.5' }}>El correo <b>{formData.email}</b> ya tiene un pase registrado. Revisá la carpeta de SPAM o usá otro mail para inscribir a alguien más.</p>
-                  </div>
-                )}
-
-                {errorMsg && <p style={{color: 'red', fontSize: '14px', marginTop: '10px'}}>{errorMsg}</p>}
-
-                <div className="submit-row">
-                  <button type="submit" className="btn azul" disabled={isLoading}>
-                    {isLoading ? 'GENERANDO PASE...' : 'Quiero mi pase digital →'}
-                  </button>
-                </div>
-                <p className="fine" style={{ marginTop: '14px' }}>Al inscribirte vas a recibir tu Pase Digital con código QR por correo.</p>
+              <div style={{ background: 'rgba(10,10,12,0.2)', border: '3px solid transparent', borderBottom: 'none', padding: '12px 18px', fontFamily: 'var(--f-mono)', fontSize: '11px', textTransform: 'uppercase', color: 'rgba(242,237,224,0.6)', display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Fase 2: Congreso (Próximo Nivel)
               </div>
-            ) : (
-              // NUEVO DISEÑO DEL TICKET VIP
-              <div className="confirm-panel show" style={{ background: 'var(--crema)', border: '4px solid var(--tinta)', padding: '40px 20px', boxShadow: '12px 12px 0 var(--tinta)', textAlign: 'center' }}>
-                <span className="eyebrow" style={{ color: 'var(--azul)', marginBottom: '15px' }}>◆ PASE GENERADO ◆</span>
-                <h3 style={{ fontFamily: 'var(--f-display)', fontSize: 'clamp(24px, 3vw, 32px)', textTransform: 'uppercase', lineHeight: '1', color: 'var(--tinta)', marginBottom: '30px' }}>
-                  ¡YA SOS PARTE DE<br/>BRILLANDO!
-                </h3>
-                
-                <div style={{ margin: '0 auto 25px', background: 'var(--crema)', padding: '20px', display: 'inline-block', border: '4px solid var(--tinta)', boxShadow: '8px 8px 0 var(--tinta)' }}>
-                  <QRCode 
-                    value={userId} 
-                    size={180}
-                    bgColor="#f2ede0" // var(--crema)
-                    fgColor="#0a0a0c" // var(--tinta)
-                  />
-                </div>
+            </div>
 
-                <p style={{ fontSize: '15px', color: 'var(--tinta)', lineHeight: '1.5' }}>
-                  El pase de <b>{formData.nombre}</b> fue enviado a <br/>
-                  <span style={{ fontFamily: 'var(--f-mono)', fontSize: '13px' }}>{formData.email}</span>
-                </p>
-                <p style={{ fontFamily: 'var(--f-mono)', fontSize: '12px', marginTop: '15px', color: 'rgba(10,10,12,0.6)', textTransform: 'uppercase' }}>
-                  ID: {userId}
-                </p>
-
-                {/* BOTONES SOCIALES Y DE LÍDERES */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '30px' }}>
-                  <button onClick={handleShare} className="btn azul" style={{ width: '100%', justifyContent: 'center', fontSize: '14px' }}>
-                    Compartir mi Pase ↗
-                  </button>
-                  <button type="button" onClick={handleResetForm} className="btn ghost" style={{ width: '100%', justifyContent: 'center', border: '2px solid var(--tinta)' }}>
-                    Inscribir a alguien más
-                  </button>
+            <form className="pase-form" onSubmit={handleSubmit} noValidate>
+              
+              {!isPreCongresoActive ? (
+                <div className="confirm-panel show">
+                  <h3 style={{ marginTop: '20px' }}>PRE-CONGRESO FINALIZADO</h3>
+                  <p>Las inscripciones para el evento del 12 de septiembre han cerrado.</p>
+                  <div style={{ marginTop: '20px', padding: '15px', background: 'var(--azul)', color: 'var(--crema)' }}>
+                    <p style={{ color: 'var(--crema)', fontWeight: 'bold' }}>Próximamente abriremos los registros para el Congreso Principal del 31 de Octubre.</p>
+                  </div>
                 </div>
-              </div>
-            )}
-          </form>
+              ) : !isSubmitted ? (
+                <div id="formFields">
+                  <div className="field-row">
+                    <div className="field">
+                      <label htmlFor="nombre">Nombre</label>
+                      <input id="nombre" name="nombre" type="text" placeholder="Tu nombre" value={formData.nombre} onChange={handleInputChange} required />
+                    </div>
+                    <div className="field">
+                      <label htmlFor="apellido">Apellido</label>
+                      <input id="apellido" name="apellido" type="text" placeholder="Tu apellido" value={formData.apellido} onChange={handleInputChange} required />
+                    </div>
+                  </div>
+                  <div className="field-row">
+                    <div className="field full">
+                      <label htmlFor="email">Correo electrónico</label>
+                      <input id="email" name="email" type="email" placeholder="nombre@correo.com" value={formData.email} onChange={handleInputChange} required />
+                    </div>
+                  </div>
+                  <div className="field-row">
+                    <div className="field">
+                      <label htmlFor="edad">Edad</label>
+                      <input id="edad" name="edad" type="number" min="10" max="99" placeholder="17" value={formData.edad} onChange={handleInputChange} required />
+                    </div>
+                    <div className="field">
+                      <label htmlFor="iglesia">Iglesia</label>
+                      <input id="iglesia" name="iglesia" type="text" placeholder="Nombre de tu iglesia" value={formData.iglesia} onChange={handleInputChange} required />
+                    </div>
+                  </div>
+
+                  {errorMsg && <p style={{color: 'red', fontSize: '14px', marginTop: '10px'}}>{errorMsg}</p>}
+
+                  <div className="submit-row">
+                    <button type="submit" className="btn azul" disabled={isLoading}>
+                      {isLoading ? 'GENERANDO PASE...' : 'Quiero mi pase digital →'}
+                    </button>
+                  </div>
+                  <p className="fine" style={{ marginTop: '14px' }}>Al inscribirte vas a recibir tu Pase Digital con código QR por correo.</p>
+                </div>
+              ) : (
+                <div className="confirm-panel show" style={{ background: 'var(--crema)', border: '4px solid var(--tinta)', padding: '40px 20px', boxShadow: '12px 12px 0 var(--tinta)', textAlign: 'center' }}>
+                  <span className="eyebrow" style={{ color: 'var(--azul)', marginBottom: '15px' }}>◆ PASE GENERADO ◆</span>
+                  <h3 style={{ fontFamily: 'var(--f-display)', fontSize: 'clamp(24px, 3vw, 32px)', textTransform: 'uppercase', lineHeight: '1', color: 'var(--tinta)', marginBottom: '30px' }}>
+                    ¡YA SOS PARTE DE<br/>BRILLANDO!
+                  </h3>
+                  
+                  <div style={{ margin: '0 auto 25px', background: 'var(--crema)', padding: '20px', display: 'inline-block', border: '4px solid var(--tinta)', boxShadow: '8px 8px 0 var(--tinta)' }}>
+                    <QRCode 
+                      value={userId} 
+                      size={180}
+                      bgColor="#f2ede0"
+                      fgColor="#0a0a0c"
+                    />
+                  </div>
+
+                  <p style={{ fontSize: '15px', color: 'var(--tinta)', lineHeight: '1.5' }}>
+                    El pase de <b>{formData.nombre}</b> fue enviado a <br/>
+                    <span style={{ fontFamily: 'var(--f-mono)', fontSize: '13px' }}>{formData.email}</span>
+                  </p>
+                  <p style={{ fontFamily: 'var(--f-mono)', fontSize: '12px', marginTop: '15px', color: 'rgba(10,10,12,0.6)', textTransform: 'uppercase' }}>
+                    ID: {userId}
+                  </p>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '30px' }}>
+                    <button onClick={handleShare} className="btn azul" style={{ width: '100%', justifyContent: 'center', fontSize: '14px' }}>
+                      Compartir mi Pase ↗
+                    </button>
+                    <button type="button" onClick={handleResetForm} className="btn ghost" style={{ width: '100%', justifyContent: 'center', border: '2px solid var(--tinta)' }}>
+                      Inscribir a alguien más
+                    </button>
+                  </div>
+                </div>
+              )}
+            </form>
+          </div>
         </div>
       </section>
 
@@ -578,7 +578,7 @@ export default function Landing() {
             <div className="foot-col">
               <h5>Congreso</h5>
               <a href="#concepto">El concepto</a>
-              <a href="#romper">Rompé el molde</a>
+              <a href="#talentos">Talentos</a>
               <a href="#fechas">Fechas</a>
               <a href="#pase">Tu pase digital</a>
             </div>
