@@ -4,6 +4,7 @@ import QRCode from 'react-qr-code';
 import { db } from '../../config/firebase'; 
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'; 
 import { isBefore, parseISO } from 'date-fns'; 
+import emailjs from '@emailjs/browser'; // NUEVO: Importación de EmailJS
 
 // Array con las 40 fotos de Unsplash
 const allPhotos = [
@@ -137,12 +138,31 @@ export default function Landing() {
 
       // 3. Guardamos en Firebase
       const docRef = await addDoc(inscriptosRef, nuevoInscripto);
+      const nuevoId = docRef.id;
+
+      // 4. Elegimos la plantilla automáticamente según la fecha
+      const templateSeleccionado = isPreCongresoActive 
+        ? 'template_ibmci92' // REEMPLAZAR CON TU TEMPLATE ID DE PRE-CONGRESO
+        : 'TU_TEMPLATE_ID_CONGRESO';    // REEMPLAZAR CON TU TEMPLATE ID DE OCTUBRE
       
-      setUserId(docRef.id);
+      // 5. Disparamos el correo automático con EmailJS
+      await emailjs.send(
+        'service_re4saxp', // Tu Service ID de Gmail
+        templateSeleccionado,
+        {
+          nombre: formData.nombre,
+          apellido: formData.apellido,
+          email: formData.email, 
+          qr_id: nuevoId
+        },
+        'JaIg5bPIS3yXaFIj1' // REEMPLAZAR CON TU PUBLIC KEY DE EMAILJS
+      );
+      
+      setUserId(nuevoId);
       setIsSubmitted(true);
 
     } catch (error) {
-      console.error("Error al guardar la inscripción: ", error);
+      console.error("Error al guardar la inscripción o enviar el correo: ", error);
       setErrorMsg("Hubo un error de conexión. Por favor, intentá de nuevo.");
     } finally {
       setIsLoading(false);
