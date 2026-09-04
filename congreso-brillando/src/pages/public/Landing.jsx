@@ -292,7 +292,7 @@ export default function Landing() {
             <span className="eyebrow">El Anti-Casting</span>
             <h2>Se buscan talentos<br/><em>(solistas).</em></h2>
             <p style={{ maxWidth: '650px', margin: '0 auto', padding: '0 20px' }}>
-              Stand-up, pintura en vivo, rap, poesía, baile o lo que sea que hagas. Nada de bandas, acá subís vos solo. Buscamos lo extravagante, lo genuino, lo real.
+              Stand-up, pintura en vivo, rap, poesía, baile o lo que sea que hagas. Solo solistas, acá subís vos solo. Buscamos lo extravagante, lo genuino.
             </p>
           </div>
 
