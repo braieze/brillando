@@ -127,19 +127,37 @@ export default function Dashboard() {
     }
   };
 
-  // --- NUEVO FLUJO DE ESCÁNER (DETIENE Y MUESTRA MODAL) ---
-  const handleScan = (text) => {
-    if (!text || text === ultimoEscaneo) return;
-    setUltimoEscaneo(text);
+  // --- NUEVO FLUJO DE ESCÁNER BLINDADO ---
+  const handleScan = (rawData) => {
+    if (!rawData) return;
 
-    const persona = inscriptos.find((i) => i.id === text);
+    // Extraemos el texto real sin importar la versión de la librería
+    let textoQR = "";
+    if (typeof rawData === 'string') {
+      textoQR = rawData;
+    } else if (Array.isArray(rawData) && rawData.length > 0) {
+      textoQR = rawData[0].rawValue;
+    } else if (rawData.text || rawData.rawValue) {
+      textoQR = rawData.text || rawData.rawValue;
+    }
+
+    if (!textoQR) return;
+    textoQR = textoQR.trim(); // Quitamos espacios fantasma
+
+    if (textoQR === ultimoEscaneo) return;
+    setUltimoEscaneo(textoQR);
+
+    // Buscamos a la persona en Firebase
+    const persona = inscriptos.find((i) => i.id === textoQR);
 
     if (persona) {
       vibrar(60);
       setScannedPerson(persona);
-      setIsScannerOpen(false); // Cierra la cámara para mostrar el flyer
+      setIsScannerOpen(false); 
     } else {
       vibrar([40, 60, 40]);
+      // ALERTA DE DIAGNÓSTICO
+      alert(`El escáner leyó esto:\n"${textoQR}"\n\nPero no coincide con nadie en la base de datos.`);
       setScanResult({ type: 'error', msg: 'CÓDIGO INVÁLIDO', sub: 'No está registrado' });
       setTimeout(() => { setScanResult(null); setUltimoEscaneo(''); }, 2000);
     }
@@ -156,7 +174,7 @@ export default function Dashboard() {
     
     setTimeout(() => { 
       setScanResult(null); 
-      setIsScannerOpen(true); // Vuelve a abrir la cámara automáticamente
+      setIsScannerOpen(true); 
     }, 1500);
   };
 
@@ -190,7 +208,7 @@ export default function Dashboard() {
     }
   };
 
-  // --- FILTROS Y NUEVAS MÉTRICAS DINÁMICAS ---
+  // --- FILTROS Y MÉTRICAS DINÁMICAS ---
   const iglesiasUnicas = useMemo(() => {
     const lista = inscriptos.map((p) => p.iglesia?.trim().toUpperCase()).filter(Boolean);
     return ['TODAS', ...new Set(lista)].sort();
@@ -205,10 +223,9 @@ export default function Dashboard() {
     });
   }, [inscriptos, busqueda, filtroIglesia]);
 
-  // CÁLCULO DE PROGRESO REAL: Depende 100% de la base de datos, no del salón.
   const totalInscriptos = inscriptos.length;
   const totalAsistentes = inscriptos.filter((p) => (eventoActivo === 'pre' ? p.asistio_pre : p.asistio_congreso)).length;
-  const capacidadMax = totalInscriptos === 0 ? 1 : totalInscriptos; // Evita dividir por cero
+  const capacidadMax = totalInscriptos === 0 ? 1 : totalInscriptos; 
   const porcentajeOcupacion = Math.min(Number(((totalAsistentes / capacidadMax) * 100).toFixed(1)), 100);
   const ocupacionAlta = porcentajeOcupacion >= 90;
 
@@ -219,7 +236,6 @@ export default function Dashboard() {
     setFiltroIglesia('TODAS');
   };
 
-  // Saber si la persona escaneada ya entró
   const scannedPersonYaIngreso = scannedPerson ? (eventoActivo === 'pre' ? scannedPerson.asistio_pre : scannedPerson.asistio_congreso) : false;
 
   return (
@@ -374,7 +390,8 @@ export default function Dashboard() {
             <button className="bd-scanner-close" onClick={() => setIsScannerOpen(false)}>✕</button>
           </div>
           <div className="bd-scanner-camera">
-            <Scanner onResult={(text) => handleScan(text)} options={{ delayBetweenScanAttempts: 1500 }} />
+            {/* LIBRERÍA DE ESCÁNER BLINDADA CON AMBOS EVENTOS */}
+            <Scanner onScan={(result) => handleScan(result)} onResult={(text) => handleScan(text)} options={{ delayBetweenScanAttempts: 1500 }} />
             <div className="bd-scanner-frame"><span className="corner tl" /><span className="corner tr" /><span className="corner bl" /><span className="corner br" /></div>
           </div>
           <p className="bd-scanner-hint">Apuntá la cámara al código QR del pase</p>
