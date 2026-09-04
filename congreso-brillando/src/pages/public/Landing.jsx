@@ -284,98 +284,113 @@ export default function Landing() {
       </section>
 
 {/* ============ TALENTOS (ANTI-CASTING) ============ */}
-      <section className="section romper" id="talentos" style={{ position: 'relative' }}>
+{/* ============ TALENTOS (ANTI-CASTING) ============ */}
+      <section className="section romper" id="talentos">
         <div className="wrap">
-          <div className="section-head">
+          
+          <div className="section-head" style={{ marginBottom: '40px' }}>
             <span className="eyebrow">El Anti-Casting</span>
             <h2>Se buscan talentos<br/><em>(solistas).</em></h2>
-            <p>Stand-up, pintura en vivo, rap, poesía, baile o lo que sea que hagas. Nada de bandas, acá subís vos solo. Buscamos lo extravagante, lo genuino, lo real.</p>
+            <p style={{ maxWidth: '650px', margin: '0 auto', padding: '0 20px' }}>
+              Stand-up, pintura en vivo, rap, poesía, baile o lo que sea que hagas. Nada de bandas, acá subís vos solo. Buscamos lo extravagante, lo genuino, lo real.
+            </p>
           </div>
 
-          {/* ESTADO BLOQUEADO: Overlay que desaparece automáticamente el 13 de septiembre */}
-          {isPreCongresoActive && (
-            <div style={{
-              position: 'absolute',
-              top: '60%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '90%',
-              maxWidth: '500px',
-              background: 'var(--tinta)',
-              padding: '40px 30px',
-              border: '4px solid var(--amarillo)',
-              zIndex: 10,
-              textAlign: 'center',
-              boxShadow: '12px 12px 0 var(--azul)'
+          {/* CONTENEDOR RELATIVO: Mantiene la caja negra centrada SOLO sobre las tarjetas */}
+          <div style={{ position: 'relative' }}>
+            
+            {/* ESTADO BLOQUEADO */}
+            {isPreCongresoActive && (
+              <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '90%',
+                maxWidth: '550px',
+                background: 'var(--tinta)',
+                padding: '40px 30px',
+                border: '4px solid var(--tinta)',
+                zIndex: 10,
+                textAlign: 'center',
+                boxShadow: '12px 12px 0 var(--azul)'
+              }}>
+                <span style={{ display: 'inline-block', background: 'var(--amarillo)', color: 'var(--tinta)', padding: '6px 12px', fontFamily: 'var(--f-mono)', fontSize: '13px', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '20px' }}>
+                  ACCESO DENEGADO
+                </span>
+                
+                <h3 style={{ fontFamily: 'var(--f-display)', color: 'var(--crema)', fontSize: '28px', textTransform: 'uppercase', marginBottom: '15px', lineHeight: '1.1' }}>
+                  LAS REGLAS ESTÁN BLOQUEADAS
+                </h3>
+                
+                <p style={{ fontFamily: 'var(--f-mono)', color: 'var(--crema)', fontSize: '15px', lineHeight: '1.6', marginBottom: '30px', opacity: '0.9' }}>
+                  No hay casting por internet. Si querés subirte al escenario principal el 31 de Octubre, vas a tener que estar ahí.<br/><br/>
+                  Los requisitos y la forma de enviar tu talento se <b>DESBLOQUEARÁN ÚNICAMENTE</b> en persona para los que asistan al Pre-Congreso este <b>12 de Septiembre</b>.
+                </p>
+                
+                <a href="#registro" className="btn amarillo" style={{ display: 'inline-flex', width: '100%', justifyContent: 'center', background: 'var(--amarillo)', color: 'var(--tinta)', border: 'none' }}>
+                  Sacar mi pase para el 12/09 →
+                </a>
+              </div>
+            )}
+
+            {/* TARJETAS ORIGINALES (Se borronean si está activo el Pre-Congreso) */}
+            <div className="locker-cards" style={{ 
+              filter: isPreCongresoActive ? 'blur(10px)' : 'none', 
+              opacity: isPreCongresoActive ? 0.3 : 1,
+              pointerEvents: isPreCongresoActive ? 'none' : 'auto',
+              userSelect: isPreCongresoActive ? 'none' : 'auto',
+              transition: 'all 0.5s ease',
+              padding: isPreCongresoActive ? '20px 0' : '0'
             }}>
-              <h3 style={{ fontFamily: 'var(--f-display)', color: 'var(--amarillo)', fontSize: '24px', textTransform: 'uppercase', marginBottom: '15px', lineHeight: '1.2' }}>
-                INFORMACIÓN CLASIFICADA
-              </h3>
-              <p style={{ fontFamily: 'var(--f-mono)', color: 'var(--crema)', fontSize: '15px', lineHeight: '1.5', marginBottom: '25px' }}>
-                ¿Querés participar en los talentos el 31 de octubre?<br/><br/>
-                Las reglas y la forma de inscripción se revelan <b>ÚNICAMENTE EN PERSONA este 12 de Septiembre</b> en el Pre-Congreso.<br/><br/>
-                Es la única fecha para enterarte cómo participar.
-              </p>
-              <a href="#registro" className="btn azul" style={{ display: 'inline-flex', width: '100%', justifyContent: 'center' }}>
-                Asegurar mi lugar para el 12/09
-              </a>
-            </div>
-          )}
-
-          {/* TARJETAS ORIGINALES: Se ven borrosas e inaccesibles si el evento aún no pasó */}
-          <div className="locker-cards" style={{ 
-            filter: isPreCongresoActive ? 'blur(12px)' : 'none', 
-            opacity: isPreCongresoActive ? 0.3 : 1,
-            pointerEvents: isPreCongresoActive ? 'none' : 'auto',
-            userSelect: isPreCongresoActive ? 'none' : 'auto',
-            transition: 'all 0.5s ease'
-          }}>
-            <div className="lcard">
-              <span className="latch" aria-hidden="true"></span>
-              <span className="num">01 / LA CONSIGNA</span>
-              <div className="icon" aria-hidden="true">
-                <svg width="46" height="38" viewBox="0 0 46 38" fill="none">
-                  <rect x="1" y="1" width="44" height="30" rx="4" stroke="#f2ede0" strokeWidth="2.5"/>
-                  <rect x="7" y="7" width="32" height="18" fill="#f2ede0" opacity=".25"/>
-                  <line x1="16" y1="34" x2="30" y2="34" stroke="#f2ede0" strokeWidth="2.5"/>
-                  <line x1="23" y1="31" x2="23" y2="34" stroke="#f2ede0" strokeWidth="2.5"/>
-                </svg>
+              <div className="lcard">
+                <span className="latch" aria-hidden="true"></span>
+                <span className="num">01 / LA CONSIGNA</span>
+                <div className="icon" aria-hidden="true">
+                  <svg width="46" height="38" viewBox="0 0 46 38" fill="none">
+                    <rect x="1" y="1" width="44" height="30" rx="4" stroke="#f2ede0" strokeWidth="2.5"/>
+                    <rect x="7" y="7" width="32" height="18" fill="#f2ede0" opacity=".25"/>
+                    <line x1="16" y1="34" x2="30" y2="34" stroke="#f2ede0" strokeWidth="2.5"/>
+                    <line x1="23" y1="31" x2="23" y2="34" stroke="#f2ede0" strokeWidth="2.5"/>
+                  </svg>
+                </div>
+                <h3>Cero Filtros</h3>
+                <p>Grabate 30 segundos haciendo lo que amás desde tu pieza, baño, donde sea y sin editar el audio y mostrando lo que sos de verdad.</p>
               </div>
-              <h3>Cero Filtros</h3>
-              <p>Grabate 30 segundos haciendo lo que amás desde tu pieza, baño, donde sea y sin editar el audio y mostrando lo que sos de verdad.</p>
-            </div>
 
-            <div className="lcard">
-              <span className="latch" aria-hidden="true"></span>
-              <span className="num">02 / LA REGLA</span>
-              <div className="icon" aria-hidden="true">
-                <svg width="44" height="40" viewBox="0 0 44 40" fill="none">
-                  <rect x="2" y="4" width="40" height="30" stroke="#f2ede0" strokeWidth="2.5"/>
-                  <line x1="8" y1="12" x2="36" y2="12" stroke="#f2ede0" strokeWidth="2"/>
-                  <line x1="8" y1="18" x2="26" y2="18" stroke="#f2ede0" strokeWidth="2"/>
-                  <line x1="8" y1="24" x2="32" y2="24" stroke="#f2ede0" strokeWidth="2"/>
-                  <line x1="8" y1="30" x2="20" y2="30" stroke="#f2ede0" strokeWidth="2"/>
-                </svg>
+              <div className="lcard">
+                <span className="latch" aria-hidden="true"></span>
+                <span className="num">02 / LA REGLA</span>
+                <div className="icon" aria-hidden="true">
+                  <svg width="44" height="40" viewBox="0 0 44 40" fill="none">
+                    <rect x="2" y="4" width="40" height="30" stroke="#f2ede0" strokeWidth="2.5"/>
+                    <line x1="8" y1="12" x2="36" y2="12" stroke="#f2ede0" strokeWidth="2"/>
+                    <line x1="8" y1="18" x2="26" y2="18" stroke="#f2ede0" strokeWidth="2"/>
+                    <line x1="8" y1="24" x2="32" y2="24" stroke="#f2ede0" strokeWidth="2"/>
+                    <line x1="8" y1="30" x2="20" y2="30" stroke="#f2ede0" strokeWidth="2"/>
+                  </svg>
+                </div>
+                <h3>Subí y Etiquetanos</h3>
+                <p>Subilo como reel etiquetando como colaborador a <b>@congresobrillando</b> con el hashtag <b>#Autenticos</b>. Tenés tiempo hasta el 30 de Septiembre.</p>
               </div>
-              <h3>Subí y Etiquetanos</h3>
-              <p>Subilo como reel etiquetando como colaborador a <b>@congresobrillando</b> con el hashtag <b>#Autenticos</b>. Tenés tiempo hasta el 30 de Septiembre.</p>
-            </div>
 
-            <div className="lcard">
-              <span className="latch" aria-hidden="true"></span>
-              <span className="num">03 / EL ESCENARIO</span>
-              <div className="icon" aria-hidden="true">
-                <svg width="34" height="42" viewBox="0 0 34 42" fill="none">
-                  <rect x="1" y="1" width="32" height="40" stroke="#f2ede0" strokeWidth="2.5"/>
-                  <line x1="1" y1="21" x2="33" y2="21" stroke="#f2ede0" strokeWidth="2"/>
-                  <circle cx="25" cy="12" r="2" fill="#f2ede0"/>
-                  <circle cx="25" cy="31" r="2" fill="#f2ede0"/>
-                </svg>
+              <div className="lcard">
+                <span className="latch" aria-hidden="true"></span>
+                <span className="num">03 / EL ESCENARIO</span>
+                <div className="icon" aria-hidden="true">
+                  <svg width="34" height="42" viewBox="0 0 34 42" fill="none">
+                    <rect x="1" y="1" width="32" height="40" stroke="#f2ede0" strokeWidth="2.5"/>
+                    <line x1="1" y1="21" x2="33" y2="21" stroke="#f2ede0" strokeWidth="2"/>
+                    <circle cx="25" cy="12" r="2" fill="#f2ede0"/>
+                    <circle cx="25" cy="31" r="2" fill="#f2ede0"/>
+                  </svg>
+                </div>
+                <h3>Los Más Reales</h3>
+                <p>Nosotros elegimos a los que se suben al escenario del Congreso. Nada de votos, puro talento genuino y extravagante.</p>
               </div>
-              <h3>Los Más Reales</h3>
-              <p>Nosotros elegimos a los que se suben al escenario del Congreso. Nada de votos, puro talento genuino y extravagante.</p>
             </div>
           </div>
+
         </div>
       </section>
 
