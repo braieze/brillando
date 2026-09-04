@@ -283,17 +283,53 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ============ TALENTOS (ANTI-CASTING) ============ */}
-      {/* Usamos la misma clase "romper" para heredar los colores y las tarjetas */}
-      <section className="section romper" id="talentos">
+{/* ============ TALENTOS (ANTI-CASTING) ============ */}
+      <section className="section romper" id="talentos" style={{ position: 'relative' }}>
         <div className="wrap">
           <div className="section-head">
             <span className="eyebrow">El Anti-Casting</span>
-            <h2>Se buscan talentos<br/><em>(que no busquen likes).</em></h2>
-            <p>Este año el escenario no es para el más popular, es para el más real. Si tenés algo para mostrar, hacelo sin maquillaje, sin filtros y sin editar.</p>
+            <h2>Se buscan talentos<br/><em>(solistas).</em></h2>
+            <p>Stand-up, pintura en vivo, rap, poesía, baile o lo que sea que hagas. Nada de bandas, acá subís vos solo. Buscamos lo extravagante, lo genuino, lo real.</p>
           </div>
 
-          <div className="locker-cards">
+          {/* ESTADO BLOQUEADO: Overlay que desaparece automáticamente el 13 de septiembre */}
+          {isPreCongresoActive && (
+            <div style={{
+              position: 'absolute',
+              top: '60%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '90%',
+              maxWidth: '500px',
+              background: 'var(--tinta)',
+              padding: '40px 30px',
+              border: '4px solid var(--amarillo)',
+              zIndex: 10,
+              textAlign: 'center',
+              boxShadow: '12px 12px 0 var(--azul)'
+            }}>
+              <h3 style={{ fontFamily: 'var(--f-display)', color: 'var(--amarillo)', fontSize: '24px', textTransform: 'uppercase', marginBottom: '15px', lineHeight: '1.2' }}>
+                INFORMACIÓN CLASIFICADA
+              </h3>
+              <p style={{ fontFamily: 'var(--f-mono)', color: 'var(--crema)', fontSize: '15px', lineHeight: '1.5', marginBottom: '25px' }}>
+                ¿Querés participar en los talentos el 31 de octubre?<br/><br/>
+                Las reglas y la forma de inscripción se revelan <b>ÚNICAMENTE EN PERSONA este 12 de Septiembre</b> en el Pre-Congreso.<br/><br/>
+                Es la única fecha para enterarte cómo participar.
+              </p>
+              <a href="#registro" className="btn azul" style={{ display: 'inline-flex', width: '100%', justifyContent: 'center' }}>
+                Asegurar mi lugar para el 12/09
+              </a>
+            </div>
+          )}
+
+          {/* TARJETAS ORIGINALES: Se ven borrosas e inaccesibles si el evento aún no pasó */}
+          <div className="locker-cards" style={{ 
+            filter: isPreCongresoActive ? 'blur(12px)' : 'none', 
+            opacity: isPreCongresoActive ? 0.3 : 1,
+            pointerEvents: isPreCongresoActive ? 'none' : 'auto',
+            userSelect: isPreCongresoActive ? 'none' : 'auto',
+            transition: 'all 0.5s ease'
+          }}>
             <div className="lcard">
               <span className="latch" aria-hidden="true"></span>
               <span className="num">01 / LA CONSIGNA</span>
@@ -306,7 +342,7 @@ export default function Landing() {
                 </svg>
               </div>
               <h3>Cero Filtros</h3>
-              <p>Grabate 30 segundos haciendo lo que amás desde tu pieza, en pijama, sin editar el audio y mostrando lo que sos de verdad.</p>
+              <p>Grabate 30 segundos haciendo lo que amás desde tu pieza, baño, donde sea y sin editar el audio y mostrando lo que sos de verdad.</p>
             </div>
 
             <div className="lcard">
@@ -322,7 +358,7 @@ export default function Landing() {
                 </svg>
               </div>
               <h3>Subí y Etiquetanos</h3>
-              <p>Subilo a tus historias etiquetando a <b>@congresobrillando</b> con el hashtag <b>#CeroFiltros</b>. (Si tu cuenta es privada, mandalo por DM).</p>
+              <p>Subilo como reel etiquetando como colaborador a <b>@congresobrillando</b> con el hashtag <b>#Autenticos</b>. Tenés tiempo hasta el 30 de Septiembre.</p>
             </div>
 
             <div className="lcard">
@@ -337,7 +373,7 @@ export default function Landing() {
                 </svg>
               </div>
               <h3>Los Más Reales</h3>
-              <p>Nosotros elegimos a los que se suben al escenario del Pre-Congreso. Nada de votos, puro talento genuino.</p>
+              <p>Nosotros elegimos a los que se suben al escenario del Congreso. Nada de votos, puro talento genuino y extravagante.</p>
             </div>
           </div>
         </div>
