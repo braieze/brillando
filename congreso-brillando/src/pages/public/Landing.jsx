@@ -324,11 +324,11 @@ export default function Landing() {
                 </h3>
                 
                 <p style={{ fontFamily: 'var(--f-mono)', color: 'var(--crema)', fontSize: '15px', lineHeight: '1.6', marginBottom: '30px', opacity: '0.9' }}>
-                  No hay casting por internet. Si querés subirte al escenario principal el 31 de Octubre, vas a tener que estar ahí.<br/><br/>
+                  Por el momento no hay casting por internet. Si querés subirte al escenario principal el 31 de Octubre, vas a tener que estar ahí.<br/><br/>
                   Los requisitos y la forma de enviar tu talento se <b>DESBLOQUEARÁN ÚNICAMENTE</b> en persona para los que asistan al Pre-Congreso este <b>12 de Septiembre</b>.
                 </p>
                 
-                <a href="#registro" className="btn amarillo" style={{ display: 'inline-flex', width: '100%', justifyContent: 'center', background: 'var(--amarillo)', color: 'var(--tinta)', border: 'none' }}>
+                <a href="#inscripcion" className="btn amarillo" style={{ display: 'inline-flex', width: '100%', justifyContent: 'center', background: 'var(--amarillo)', color: 'var(--tinta)', border: 'none' }}>
                   Sacar mi pase para el 12/09 →
                 </a>
               </div>
