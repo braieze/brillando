@@ -103,30 +103,35 @@ export default function Landing() {
 
     const svg = ticketElement.querySelector('svg');
     let tempImg = null;
+    let blobUrl = null;
+    const parent = svg ? svg.parentNode : null;
 
     try {
-      if (svg) {
-        // Aseguramos que el SVG tenga el namespace requerido por el navegador
+      if (svg && parent) {
         if (!svg.getAttribute('xmlns')) {
           svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         }
         
+        // Convertir el SVG en un archivo virtual (Blob)
         const svgData = new XMLSerializer().serializeToString(svg);
-        const svg64 = btoa(unescape(encodeURIComponent(svgData)));
-        const image64 = `data:image/svg+xml;base64,${svg64}`;
+        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+        const DOMURL = window.URL || window.webkitURL || window;
+        blobUrl = DOMURL.createObjectURL(svgBlob);
         
-        tempImg = document.createElement('img');
+        tempImg = new Image();
         tempImg.style.width = '180px';
         tempImg.style.height = '180px';
-        tempImg.src = image64;
         
-        // LA CLAVE: Forzamos a que el código espere a que la imagen esté cargada en pantalla
-        await new Promise((resolve) => {
+        // Esperar a que la imagen cargue completamente en memoria
+        await new Promise((resolve, reject) => {
           tempImg.onload = resolve;
+          tempImg.onerror = reject;
+          tempImg.src = blobUrl;
         });
 
-        svg.style.display = 'none';
-        svg.parentNode.appendChild(tempImg);
+        // Reemplazar el SVG por la imagen
+        parent.removeChild(svg);
+        parent.appendChild(tempImg);
       }
 
       const canvas = await html2canvas(ticketElement, {
@@ -146,9 +151,14 @@ export default function Landing() {
     } finally {
       btn.innerText = textoOriginal;
       
-      if (svg) {
-        svg.style.display = 'block';
-        if (tempImg) tempImg.remove();
+      // Restaurar el DOM original y limpiar memoria
+      if (svg && parent && tempImg) {
+        parent.removeChild(tempImg);
+        parent.appendChild(svg);
+      }
+      if (blobUrl) {
+        const DOMURL = window.URL || window.webkitURL || window;
+        DOMURL.revokeObjectURL(blobUrl);
       }
     }
   };
