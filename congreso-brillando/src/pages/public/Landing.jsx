@@ -4,7 +4,7 @@ import QRCode from 'react-qr-code';
 import { db } from '../../config/firebase'; 
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'; 
 import { isBefore, parseISO } from 'date-fns'; 
-import emailjs from '@emailjs/browser'; // NUEVO: Importación de EmailJS
+import emailjs from '@emailjs/browser'; 
 import html2canvas from 'html2canvas';
 
 // Array con las 40 fotos de Unsplash
@@ -144,6 +144,41 @@ export default function Landing() {
         svg.style.display = 'block';
         if (tempImg) tempImg.remove();
       }
+    }
+  };
+
+  // RESTAURADA: Función que se ejecuta al enviar el formulario
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrorMsg('');
+
+    try {
+      const inscriptosRef = collection(db, "inscriptos");
+      
+      const nuevoInscripto = {
+        nombre: formData.nombre,
+        apellido: formData.apellido,
+        email: formData.email,
+        edad: Number(formData.edad),
+        iglesia: formData.iglesia,
+        fechaInscripcion: serverTimestamp(),
+        asistio_pre: false,
+        asistio_congreso: false,
+        evento_origen: 'pre_congreso'
+      };
+
+      const docRef = await addDoc(inscriptosRef, nuevoInscripto);
+      const nuevoId = docRef.id;
+
+      setUserId(nuevoId);
+      setIsSubmitted(true);
+
+    } catch (error) {
+      console.error("Error al guardar la inscripción", error);
+      setErrorMsg("Hubo un error de conexión. Por favor, intentá de nuevo.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
