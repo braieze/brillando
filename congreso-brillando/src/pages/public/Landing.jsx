@@ -101,27 +101,34 @@ export default function Landing() {
     const textoOriginal = btn.innerText;
     btn.innerText = "Generando imagen...";
 
-    // 1. TRUCO: Buscar el SVG del QR y convertirlo temporalmente en una imagen estática
     const svg = ticketElement.querySelector('svg');
     let tempImg = null;
-    
-    if (svg) {
-      const svgData = new XMLSerializer().serializeToString(svg);
-      const svg64 = btoa(unescape(encodeURIComponent(svgData)));
-      const image64 = `data:image/svg+xml;base64,${svg64}`;
-      
-      tempImg = document.createElement('img');
-      tempImg.src = image64;
-      tempImg.style.width = '180px';
-      tempImg.style.height = '180px';
-      
-      // Ocultar el SVG original y meter la imagen estática temporal
-      svg.style.display = 'none';
-      svg.parentNode.appendChild(tempImg);
-    }
 
     try {
-      // 2. Sacar la foto ahora que el QR es una imagen normal
+      if (svg) {
+        // Aseguramos que el SVG tenga el namespace requerido por el navegador
+        if (!svg.getAttribute('xmlns')) {
+          svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        }
+        
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const svg64 = btoa(unescape(encodeURIComponent(svgData)));
+        const image64 = `data:image/svg+xml;base64,${svg64}`;
+        
+        tempImg = document.createElement('img');
+        tempImg.style.width = '180px';
+        tempImg.style.height = '180px';
+        tempImg.src = image64;
+        
+        // LA CLAVE: Forzamos a que el código espere a que la imagen esté cargada en pantalla
+        await new Promise((resolve) => {
+          tempImg.onload = resolve;
+        });
+
+        svg.style.display = 'none';
+        svg.parentNode.appendChild(tempImg);
+      }
+
       const canvas = await html2canvas(ticketElement, {
         scale: 2, 
         backgroundColor: '#f2ede0', 
@@ -139,7 +146,6 @@ export default function Landing() {
     } finally {
       btn.innerText = textoOriginal;
       
-      // 3. LIMPIEZA: Borrar la imagen temporal y volver a mostrar el SVG interactivo
       if (svg) {
         svg.style.display = 'block';
         if (tempImg) tempImg.remove();
@@ -147,7 +153,6 @@ export default function Landing() {
     }
   };
 
-  // RESTAURADA: Función que se ejecuta al enviar el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
