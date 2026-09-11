@@ -5,7 +5,6 @@ import { db } from '../../config/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'; 
 import { isBefore, parseISO } from 'date-fns'; 
 import emailjs from '@emailjs/browser'; 
-import html2canvas from 'html2canvas';
 
 // Array con las 40 fotos de Unsplash
 const allPhotos = [
@@ -93,74 +92,40 @@ export default function Landing() {
     setErrorMsg('');
   };
 
-  const descargarPase = async () => {
-    const ticketElement = document.getElementById('pase-oficial');
-    if (!ticketElement) return;
+  // NUEVO SISTEMA DE DESCARGA: 100% Nativo, sin librerías externas.
+  const descargarPase = () => {
+    const wrapper = document.getElementById('qr-wrapper');
+    const svg = wrapper.querySelector('svg');
+    if (!svg) return;
 
-    const btn = document.getElementById('btn-descarga');
-    const textoOriginal = btn.innerText;
-    btn.innerText = "Generando imagen...";
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
 
-    const svg = ticketElement.querySelector('svg');
-    let tempImg = null;
-    let blobUrl = null;
-    const parent = svg ? svg.parentNode : null;
-
-    try {
-      if (svg && parent) {
-        if (!svg.getAttribute('xmlns')) {
-          svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        }
-        
-        // Convertir el SVG en un archivo virtual (Blob)
-        const svgData = new XMLSerializer().serializeToString(svg);
-        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-        const DOMURL = window.URL || window.webkitURL || window;
-        blobUrl = DOMURL.createObjectURL(svgBlob);
-        
-        tempImg = new Image();
-        tempImg.style.width = '180px';
-        tempImg.style.height = '180px';
-        
-        // Esperar a que la imagen cargue completamente en memoria
-        await new Promise((resolve, reject) => {
-          tempImg.onload = resolve;
-          tempImg.onerror = reject;
-          tempImg.src = blobUrl;
-        });
-
-        // Reemplazar el SVG por la imagen
-        parent.removeChild(svg);
-        parent.appendChild(tempImg);
-      }
-
-      const canvas = await html2canvas(ticketElement, {
-        scale: 2, 
-        backgroundColor: '#f2ede0', 
-        useCORS: true
-      });
+    img.onload = () => {
+      // Le damos 20px extra de margen blanco alrededor al QR
+      const padding = 20;
+      canvas.width = img.width + (padding * 2);
+      canvas.height = img.height + (padding * 2);
       
-      const image = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = `Pase-Autenticos-${formData.nombre}.png`;
-      link.click();
-    } catch (error) {
-      console.error("Error al generar la imagen", error);
-      alert("Error al descargar. Por favor, sacale una captura de pantalla al QR.");
-    } finally {
-      btn.innerText = textoOriginal;
+      // Fondo blanco sólido
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Restaurar el DOM original y limpiar memoria
-      if (svg && parent && tempImg) {
-        parent.removeChild(tempImg);
-        parent.appendChild(svg);
-      }
-      if (blobUrl) {
-        const DOMURL = window.URL || window.webkitURL || window;
-        DOMURL.revokeObjectURL(blobUrl);
-      }
-    }
+      // Dibujar el QR en el medio
+      ctx.drawImage(img, padding, padding);
+      
+      // Descargar como PNG
+      const pngFile = canvas.toDataURL("image/png");
+      const downloadLink = document.createElement("a");
+      downloadLink.download = `QR-Pase-${formData.nombre}.png`;
+      downloadLink.href = pngFile;
+      downloadLink.click();
+    };
+
+    // Forzar renderizado desde la cadena de texto SVG
+    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
   };
 
   const handleSubmit = async (e) => {
@@ -633,7 +598,7 @@ export default function Landing() {
             <div className="insc-list">
               <div className="li">
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-9" stroke="#ffd400" strokeWidth="2.5" fill="none"/></svg>
-                <span>Pase digital con QR enviado a tu correo</span>
+                <span>Pase digital con QR generado en tu celular</span>
               </div>
               <div className="li">
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-9" stroke="#ffd400" strokeWidth="2.5" fill="none"/></svg>
@@ -705,12 +670,12 @@ export default function Landing() {
                       {isLoading ? 'GENERANDO PASE...' : 'Quiero mi pase digital →'}
                     </button>
                   </div>
-                  <p className="fine" style={{ marginTop: '14px' }}>Al inscribirte vas a descargar tu Pase Digital con código QR oficial.</p>
+                  <p className="fine" style={{ marginTop: '14px' }}>Al inscribirte vas a poder descargar el código QR de tu entrada.</p>
                 </div>
               ) : (
                 <div className="confirm-panel show" style={{ textAlign: 'center', padding: '10px 0' }}>
                   
-                  {/* EL PASE VISUAL (Esto es lo que html2canvas va a convertir en imagen) */}
+                  {/* PANTALLA VISUAL (El usuario ve el diseño, pero solo descarga el QR) */}
                   <div id="pase-oficial" style={{ 
                     background: 'var(--crema)', 
                     border: '5px solid var(--tinta)', 
@@ -732,12 +697,13 @@ export default function Landing() {
                       📍 {formData.iglesia || 'Sin iglesia'}
                     </p>
                     
-                    <div style={{ background: 'white', padding: '15px', border: '4px solid var(--tinta)', display: 'inline-block', marginBottom: '30px' }}>
+                    {/* ENVOLTORIO PARA EXTRAER SOLO EL QR */}
+                    <div id="qr-wrapper" style={{ background: 'white', padding: '15px', border: '4px solid var(--tinta)', display: 'inline-block', marginBottom: '30px' }}>
                       <QRCode 
                         value={userId} 
                         size={180}
                         bgColor="#ffffff"
-                        fgColor="#0a0a0c"
+                        fgColor="#000000"
                       />
                     </div>
                     
@@ -749,12 +715,12 @@ export default function Landing() {
                   </div>
 
                   <p style={{ fontFamily: 'var(--f-mono)', fontSize: '14px', maxWidth: '400px', margin: '0 auto 20px', color: 'var(--tinta)' }}>
-                    ⚠️ Guardá esta imagen o sacale captura de pantalla ahora. <b>No la enviamos por correo.</b> Te vamos a escanear este código en la puerta.
+                    ⚠️ <b>Descargá el QR de acceso.</b> No lo enviamos por correo. Te lo vamos a escanear en la puerta para entrar.
                   </p>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxWidth: '380px', margin: '0 auto' }}>
-                    <button type="button" id="btn-descarga" onClick={descargarPase} className="btn azul" style={{ width: '100%', background: 'var(--azul)', color: 'white', padding: '18px', border: '4px solid var(--tinta)', fontFamily: 'var(--f-mono)', fontWeight: 'bold', fontSize: '16px', textTransform: 'uppercase', cursor: 'pointer', boxShadow: '6px 6px 0 var(--tinta)' }}>
-                      Descargar mi Pase ↓
+                    <button type="button" onClick={descargarPase} className="btn azul" style={{ width: '100%', background: 'var(--azul)', color: 'white', padding: '18px', border: '4px solid var(--tinta)', fontFamily: 'var(--f-mono)', fontWeight: 'bold', fontSize: '16px', textTransform: 'uppercase', cursor: 'pointer', boxShadow: '6px 6px 0 var(--tinta)' }}>
+                      Descargar mi QR ↓
                     </button>
                     <button type="button" onClick={handleResetForm} className="btn ghost" style={{ width: '100%', justifyContent: 'center', border: '2px solid var(--tinta)' }}>
                       Inscribir a alguien más
