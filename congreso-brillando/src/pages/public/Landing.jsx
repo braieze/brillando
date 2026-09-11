@@ -5,6 +5,7 @@ import { db } from '../../config/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'; 
 import { isBefore, parseISO } from 'date-fns'; 
 import emailjs from '@emailjs/browser'; // NUEVO: Importación de EmailJS
+import html2canvas from 'html2canvas';
 
 // Array con las 40 fotos de Unsplash
 const allPhotos = [
@@ -63,16 +64,13 @@ export default function Landing() {
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState(''); 
   const [errorMsg, setErrorMsg] = useState('');
-  const [isDuplicate, setIsDuplicate] = useState(false); // Estado conservado para no romper el HTML
+  const [isDuplicate, setIsDuplicate] = useState(false);
   
-  // Estado para controlar cuántas fotos se ven en la galería (iniciamos en 20)
   const [visiblePhotos, setVisiblePhotos] = useState(20);
   
-  // LÓGICA DE BLOQUEO POR FECHA
   const [isPreCongresoActive, setIsPreCongresoActive] = useState(true);
   
   useEffect(() => {
-    // A las 23:59 del 12 de Septiembre se bloquea
     const fechaLimite = parseISO('2026-09-12T23:59:59-03:00'); 
     const hoy = new Date();
     setIsPreCongresoActive(isBefore(hoy, fechaLimite));
@@ -83,7 +81,6 @@ export default function Landing() {
       ...formData,
       [e.target.name]: e.target.value
     });
-    // Si empieza a escribir de nuevo, limpiamos los errores
     setIsDuplicate(false);
     setErrorMsg('');
   };
@@ -96,19 +93,31 @@ export default function Landing() {
     setErrorMsg('');
   };
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: '¡Ya tengo mi pase para el Pre-Congreso Brillando 2026!',
-          text: `Salí del molde. Ya aseguré mi lugar para el Pre-Congreso del 12 de Septiembre. ¡Sumate vos también!`,
-          url: window.location.href,
-        });
-      } catch (error) {
-        console.log('Error compartiendo', error);
-      }
-    } else {
-      alert("Tu navegador no soporta esta función, pero podés sacarle captura a tu QR.");
+  const descargarPase = async () => {
+    const ticketElement = document.getElementById('pase-oficial');
+    if (!ticketElement) return;
+
+    const btn = document.getElementById('btn-descarga');
+    const textoOriginal = btn.innerText;
+    btn.innerText = "Generando imagen...";
+
+    try {
+      const canvas = await html2canvas(ticketElement, {
+        scale: 2, 
+        backgroundColor: '#f2ede0', 
+        useCORS: true
+      });
+      
+      const image = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = `Pase-Autenticos-${formData.nombre}.png`;
+      link.click();
+    } catch (error) {
+      console.error("Error al generar la imagen", error);
+      alert("Error al descargar. Por favor, sacale una captura de pantalla al QR.");
+    } finally {
+      btn.innerText = textoOriginal;
     }
   };
 
@@ -121,9 +130,6 @@ export default function Landing() {
     try {
       const inscriptosRef = collection(db, "inscriptos");
       
-      // LA VALIDACIÓN DE DUPLICADOS FUE ELIMINADA ACÁ PARA PERMITIR INSCRIPCIONES MASIVAS
-      
-      // 2. Si es nuevo, armamos el documento
       const nuevoInscripto = {
         nombre: formData.nombre,
         apellido: formData.apellido,
@@ -136,33 +142,14 @@ export default function Landing() {
         evento_origen: 'pre_congreso'
       };
 
-      // 3. Guardamos en Firebase
       const docRef = await addDoc(inscriptosRef, nuevoInscripto);
       const nuevoId = docRef.id;
 
-      // 4. Elegimos la plantilla automáticamente según la fecha
-      const templateSeleccionado = isPreCongresoActive 
-        ? 'template_ibmci92' // REEMPLAZAR CON TU TEMPLATE ID DE PRE-CONGRESO
-        : 'TU_TEMPLATE_ID_CONGRESO';    // REEMPLAZAR CON TU TEMPLATE ID DE OCTUBRE
-      
-      // 5. Disparamos el correo automático con EmailJS
-      await emailjs.send(
-        'service_re4saxp', // Tu Service ID de Gmail
-        templateSeleccionado,
-        {
-          nombre: formData.nombre,
-          apellido: formData.apellido,
-          email: formData.email, 
-          qr_id: nuevoId
-        },
-        'JaIg5bPIS3yXaFIj1' // REEMPLAZAR CON TU PUBLIC KEY DE EMAILJS
-      );
-      
       setUserId(nuevoId);
       setIsSubmitted(true);
 
     } catch (error) {
-      console.error("Error al guardar la inscripción o enviar el correo: ", error);
+      console.error("Error al guardar la inscripción", error);
       setErrorMsg("Hubo un error de conexión. Por favor, intentá de nuevo.");
     } finally {
       setIsLoading(false);
@@ -283,7 +270,6 @@ export default function Landing() {
         </div>
       </section>
 
-{/* ============ TALENTOS (ANTI-CASTING) ============ */}
 {/* ============ TALENTOS (ANTI-CASTING) ============ */}
       <section className="section romper" id="talentos">
         <div className="wrap">
@@ -678,40 +664,62 @@ export default function Landing() {
                       {isLoading ? 'GENERANDO PASE...' : 'Quiero mi pase digital →'}
                     </button>
                   </div>
-                  <p className="fine" style={{ marginTop: '14px' }}>Al inscribirte vas a recibir tu Pase Digital con código QR por correo.</p>
+                  <p className="fine" style={{ marginTop: '14px' }}>Al inscribirte vas a descargar tu Pase Digital con código QR oficial.</p>
                 </div>
               ) : (
-                <div className="confirm-panel show" style={{ background: 'var(--crema)', border: '4px solid var(--tinta)', padding: '40px 20px', boxShadow: '12px 12px 0 var(--tinta)', textAlign: 'center' }}>
-                  <span className="eyebrow" style={{ color: 'var(--azul)', marginBottom: '15px' }}>◆ PASE GENERADO ◆</span>
-                  <h3 style={{ fontFamily: 'var(--f-display)', fontSize: 'clamp(24px, 3vw, 32px)', textTransform: 'uppercase', lineHeight: '1', color: 'var(--tinta)', marginBottom: '30px' }}>
-                    ¡YA SOS PARTE DE<br/>BRILLANDO!
-                  </h3>
+                <div className="confirm-panel show" style={{ textAlign: 'center', padding: '10px 0' }}>
                   
-                  <div style={{ margin: '0 auto 25px', background: 'var(--crema)', padding: '20px', display: 'inline-block', border: '4px solid var(--tinta)', boxShadow: '8px 8px 0 var(--tinta)' }}>
-                    <QRCode 
-                      value={userId} 
-                      size={180}
-                      bgColor="#f2ede0"
-                      fgColor="#0a0a0c"
-                    />
+                  {/* EL PASE VISUAL (Esto es lo que html2canvas va a convertir en imagen) */}
+                  <div id="pase-oficial" style={{ 
+                    background: 'var(--crema)', 
+                    border: '5px solid var(--tinta)', 
+                    padding: '40px 20px', 
+                    maxWidth: '380px', 
+                    margin: '0 auto 25px', 
+                    textAlign: 'center',
+                    boxShadow: '10px 10px 0 var(--azul)',
+                    position: 'relative'
+                  }}>
+                    <span style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: 'var(--amarillo)', border: '3px solid var(--tinta)', padding: '5px 15px', fontFamily: 'var(--f-mono)', fontWeight: 'bold', fontSize: '13px' }}>
+                      PASE DIGITAL
+                    </span>
+
+                    <h2 style={{ fontFamily: 'var(--f-display)', textTransform: 'uppercase', color: 'var(--tinta)', fontSize: '32px', margin: '20px 0 5px', lineHeight: '1' }}>
+                      {formData.nombre} <br/> {formData.apellido}
+                    </h2>
+                    <p style={{ fontFamily: 'var(--f-mono)', fontSize: '15px', color: 'var(--azul)', margin: '0 0 30px', fontWeight: 'bold' }}>
+                      📍 {formData.iglesia || 'Sin iglesia'}
+                    </p>
+                    
+                    <div style={{ background: 'white', padding: '15px', border: '4px solid var(--tinta)', display: 'inline-block', marginBottom: '30px' }}>
+                      <QRCode 
+                        value={userId} 
+                        size={180}
+                        bgColor="#ffffff"
+                        fgColor="#0a0a0c"
+                      />
+                    </div>
+                    
+                    <div style={{ borderTop: '3px dashed var(--tinta)', paddingTop: '20px' }}>
+                      <span style={{ fontFamily: 'var(--f-mono)', fontSize: '14px', fontWeight: 'bold', color: 'var(--tinta)' }}>
+                        PRE-CONGRESO AUTÉNTICOS<br/>12 SEPTIEMBRE
+                      </span>
+                    </div>
                   </div>
 
-                  <p style={{ fontSize: '15px', color: 'var(--tinta)', lineHeight: '1.5' }}>
-                    El pase de <b>{formData.nombre}</b> fue enviado a <br/>
-                    <span style={{ fontFamily: 'var(--f-mono)', fontSize: '13px' }}>{formData.email}</span>
-                  </p>
-                  <p style={{ fontFamily: 'var(--f-mono)', fontSize: '12px', marginTop: '15px', color: 'rgba(10,10,12,0.6)', textTransform: 'uppercase' }}>
-                    ID: {userId}
+                  <p style={{ fontFamily: 'var(--f-mono)', fontSize: '14px', maxWidth: '400px', margin: '0 auto 20px', color: 'var(--tinta)' }}>
+                    ⚠️ Guardá esta imagen o sacale captura de pantalla ahora. <b>No la enviamos por correo.</b> Te vamos a escanear este código en la puerta.
                   </p>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '30px' }}>
-                    <button onClick={handleShare} className="btn azul" style={{ width: '100%', justifyContent: 'center', fontSize: '14px' }}>
-                      Compartir mi Pase ↗
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxWidth: '380px', margin: '0 auto' }}>
+                    <button type="button" id="btn-descarga" onClick={descargarPase} className="btn azul" style={{ width: '100%', background: 'var(--azul)', color: 'white', padding: '18px', border: '4px solid var(--tinta)', fontFamily: 'var(--f-mono)', fontWeight: 'bold', fontSize: '16px', textTransform: 'uppercase', cursor: 'pointer', boxShadow: '6px 6px 0 var(--tinta)' }}>
+                      Descargar mi Pase ↓
                     </button>
                     <button type="button" onClick={handleResetForm} className="btn ghost" style={{ width: '100%', justifyContent: 'center', border: '2px solid var(--tinta)' }}>
                       Inscribir a alguien más
                     </button>
                   </div>
+                  
                 </div>
               )}
             </form>
