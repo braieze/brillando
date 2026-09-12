@@ -14,10 +14,44 @@ function vibrar(pattern) {
   }
 }
 
+// 1. DICCIONARIO INTELIGENTE DE IGLESIAS
+const normalizarIglesia = (texto) => {
+  if (!texto) return 'SIN IGLESIA';
+  const t = texto.toLowerCase().trim();
+  
+  if (t.includes('cds') || t.includes('conquistador') || t.includes('sueño')) return 'CONQUISTADORES DE SUEÑOS';
+  if (t.includes('eben') || t.includes('ezer')) return 'EBEN EZER';
+  if (t.includes('amor y milagro') || t.includes('cca')) return 'CCA AMOR Y MILAGROS';
+  if (t.includes('dios de los') || t.includes('ejército') || t.includes('ejercito')) return 'DIOS DE LOS EJÉRCITOS';
+  if (t.includes('@') || t.includes('.com')) return 'SIN IGLESIA'; // Detecta emails puestos por error
+  
+  return texto.trim().toUpperCase();
+};
+
+// 2. UNIFICADOR EN MEMORIA DE DUPLICADOS
+const unificarDuplicados = (lista) => {
+  const unicos = new Map();
+  lista.forEach(persona => {
+    // Clave única basada en nombre y apellido exacto
+    const key = `${persona.nombre?.trim().toLowerCase()}-${persona.apellido?.trim().toLowerCase()}`;
+    
+    if (!unicos.has(key)) {
+      unicos.set(key, persona);
+    } else {
+      // Si el duplicado ya tenía la asistencia marcada, la conservamos en el registro principal
+      const existente = unicos.get(key);
+      if (persona.asistio_pre) existente.asistio_pre = true;
+      if (persona.asistio_congreso) existente.asistio_congreso = true;
+    }
+  });
+  return Array.from(unicos.values());
+};
+
 /* ============================================================
    FILA CON SWIPE-TO-DELETE
    ============================================================ */
-function FilaInscripto({ persona, asistio, onToggle, onDelete }) {
+// Usamos React.memo para evitar que las 1500 filas se vuelvan a dibujar cuando escribís en el buscador
+const FilaInscripto = React.memo(({ persona, asistio, onToggle, onDelete }) => {
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
   const startX = useRef(0);
@@ -72,7 +106,7 @@ function FilaInscripto({ persona, asistio, onToggle, onDelete }) {
         <div className="bd-row-info">
           <h4 className="bd-row-name">{persona.nombre} {persona.apellido}</h4>
           <span className="bd-row-church">
-            📍 {persona.iglesia || 'Sin iglesia'}
+            📍 {persona.iglesia}
           </span>
         </div>
 
@@ -86,7 +120,7 @@ function FilaInscripto({ persona, asistio, onToggle, onDelete }) {
       </div>
     </div>
   );
-}
+});
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -97,26 +131,30 @@ export default function Dashboard() {
   const [filtroIglesia, setFiltroIglesia] = useState('TODAS');
   const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
 
-  // Estados de escáner y Modal de Identidad
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [ultimoEscaneo, setUltimoEscaneo] = useState('');
-  const [scannedPerson, setScannedPerson] = useState(null); // Guarda a la persona leída para mostrar el Flyer
+  const [scannedPerson, setScannedPerson] = useState(null);
   const [scanResult, setScanResult] = useState(null); 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [manualForm, setManualForm] = useState({ nombre: '', apellido: '', iglesia: '' });
 
-  // --- CONEXIÓN EN VIVO ---
+  // --- CONEXIÓN EN VIVO Y LIMPIEZA DE DATOS ---
   useEffect(() => {
     const inscriptosRef = collection(db, 'inscriptos');
     const unsubscribe = onSnapshot(inscriptosRef, (snapshot) => {
-      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setInscriptos(data);
+      const rawData = snapshot.docs.map((d) => ({ 
+        id: d.id, 
+        ...d.data(),
+        iglesia: normalizarIglesia(d.data().iglesia) // Normalizamos al descargar
+      }));
+      
+      const cleanData = unificarDuplicados(rawData); // Filtramos duplicados
+      setInscriptos(cleanData);
     });
     return () => unsubscribe();
   }, []);
 
-  // --- LÓGICA DE ASISTENCIA ---
   const marcarAsistencia = async (id, estadoActual) => {
     try {
       const inscriptoRef = doc(db, 'inscriptos', id);
@@ -127,11 +165,9 @@ export default function Dashboard() {
     }
   };
 
-  // --- NUEVO FLUJO DE ESCÁNER BLINDADO ---
   const handleScan = (rawData) => {
     if (!rawData) return;
 
-    // Extraemos el texto real sin importar la versión de la librería
     let textoQR = "";
     if (typeof rawData === 'string') {
       textoQR = rawData;
@@ -142,12 +178,11 @@ export default function Dashboard() {
     }
 
     if (!textoQR) return;
-    textoQR = textoQR.trim(); // Quitamos espacios fantasma
+    textoQR = textoQR.trim(); 
 
     if (textoQR === ultimoEscaneo) return;
     setUltimoEscaneo(textoQR);
 
-    // Buscamos a la persona en Firebase
     const persona = inscriptos.find((i) => i.id === textoQR);
 
     if (persona) {
@@ -156,8 +191,7 @@ export default function Dashboard() {
       setIsScannerOpen(false); 
     } else {
       vibrar([40, 60, 40]);
-      // ALERTA DE DIAGNÓSTICO
-      alert(`El escáner leyó esto:\n"${textoQR}"\n\nPero no coincide con nadie en la base de datos.`);
+      alert(`El escáner leyó:\n"${textoQR}"\n\nNo coincide con nadie en la base.`);
       setScanResult({ type: 'error', msg: 'CÓDIGO INVÁLIDO', sub: 'No está registrado' });
       setTimeout(() => { setScanResult(null); setUltimoEscaneo(''); }, 2000);
     }
@@ -178,7 +212,6 @@ export default function Dashboard() {
     }, 1500);
   };
 
-  // --- MODO RESCATE Y ELIMINAR ---
   const eliminarInscripto = async (id, nombre) => {
     if (window.confirm(`¿Eliminar a ${nombre} del sistema? Esta acción no se puede deshacer.`)) {
       try { await deleteDoc(doc(db, 'inscriptos', id)); } 
@@ -192,7 +225,7 @@ export default function Dashboard() {
       await addDoc(collection(db, 'inscriptos'), {
         nombre: manualForm.nombre,
         apellido: manualForm.apellido,
-        iglesia: manualForm.iglesia,
+        iglesia: normalizarIglesia(manualForm.iglesia),
         email: 'inscripcion_puerta@iceb.com',
         edad: 0,
         fechaInscripcion: serverTimestamp(),
@@ -208,9 +241,9 @@ export default function Dashboard() {
     }
   };
 
-  // --- FILTROS Y MÉTRICAS DINÁMICAS ---
+  // --- RENDIMIENTO: useMemo cachea resultados para no recalcular en cada tecleo ---
   const iglesiasUnicas = useMemo(() => {
-    const lista = inscriptos.map((p) => p.iglesia?.trim().toUpperCase()).filter(Boolean);
+    const lista = inscriptos.map((p) => p.iglesia);
     return ['TODAS', ...new Set(lista)].sort();
   }, [inscriptos]);
 
@@ -218,7 +251,7 @@ export default function Dashboard() {
     const textoBuscado = busqueda.toLowerCase();
     return inscriptos.filter((persona) => {
       const coincideTexto = persona.nombre?.toLowerCase().includes(textoBuscado) || persona.apellido?.toLowerCase().includes(textoBuscado);
-      const coincideIglesia = filtroIglesia === 'TODAS' || persona.iglesia?.trim().toUpperCase() === filtroIglesia;
+      const coincideIglesia = filtroIglesia === 'TODAS' || persona.iglesia === filtroIglesia;
       return coincideTexto && coincideIglesia;
     });
   }, [inscriptos, busqueda, filtroIglesia]);
@@ -228,7 +261,6 @@ export default function Dashboard() {
   const capacidadMax = totalInscriptos === 0 ? 1 : totalInscriptos; 
   const porcentajeOcupacion = Math.min(Number(((totalAsistentes / capacidadMax) * 100).toFixed(1)), 100);
   const ocupacionAlta = porcentajeOcupacion >= 90;
-
   const filtrosActivos = busqueda.trim() !== '' || filtroIglesia !== 'TODAS';
 
   const limpiarFiltros = () => {
@@ -240,8 +272,6 @@ export default function Dashboard() {
 
   return (
     <div className="bd-root">
-
-      {/* ================= MODAL FLYER DE IDENTIDAD (FLUJO MANUAL) ================= */}
       {scannedPerson && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'var(--bd-crema)', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '20px', background: scannedPersonYaIngreso ? 'var(--bd-rojo)' : 'var(--bd-azul)', color: 'white', borderBottom: '4px solid var(--bd-tinta)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -276,7 +306,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ================= FLASH DE VALIDACIÓN RÁPIDA ================= */}
       {scanResult && (
         <div className={`bd-flash bd-flash--${scanResult.type}`} role="alert">
           <svg className="bd-flash-icon" width="72" height="72" viewBox="0 0 72 72" fill="none" aria-hidden="true">
@@ -291,7 +320,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ================= HEADER ================= */}
       <header className="bd-header">
         <div className="bd-header-top">
           <button className="bd-back" onClick={() => navigate('/')}>
@@ -316,7 +344,6 @@ export default function Dashboard() {
       </header>
 
       <main className="bd-main">
-        {/* ================= MÉTRICAS DINÁMICAS ================= */}
         <div className="bd-metrics">
           <div className="bd-metric">
             <span className="bd-metric-label">Inscriptos</span>
@@ -332,7 +359,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* ================= FILTROS Y BUSCADOR ================= */}
         <div className="bd-filterbar">
           <button className="bd-filter-toggle" onClick={() => setFiltrosAbiertos((v) => !v)}>
             Buscar / Filtrar {filtrosActivos && <span className="bd-filter-badge">1</span>}
@@ -353,7 +379,6 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* ================= LISTA GESTIÓN MANUAL ================= */}
         <div className="bd-list">
           {inscriptosFiltrados.map((persona) => {
             const asistio = eventoActivo === 'pre' ? persona.asistio_pre : persona.asistio_congreso;
@@ -370,7 +395,6 @@ export default function Dashboard() {
         </div>
       </main>
 
-      {/* ================= ACCIONES RÁPIDAS (BOTTOM) ================= */}
       {!isScannerOpen && !scannedPerson && (
         <div style={{ position: 'fixed', bottom: '20px', left: '20px', right: '20px', zIndex: 45, display: 'flex', gap: '10px' }}>
           <button onClick={() => setIsScannerOpen(true)} style={{ flex: 2, background: 'var(--bd-tinta)', color: 'var(--bd-crema)', border: '4px solid var(--bd-tinta)', padding: '16px', fontFamily: 'var(--bd-mono)', fontSize: '15px', fontWeight: 'bold', textTransform: 'uppercase', boxShadow: '6px 6px 0 var(--bd-amarillo)' }}>
@@ -382,7 +406,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ================= CÁMARA OVERLAY ================= */}
       {isScannerOpen && (
         <div className="bd-scanner-overlay">
           <div className="bd-scanner-top">
@@ -390,7 +413,6 @@ export default function Dashboard() {
             <button className="bd-scanner-close" onClick={() => setIsScannerOpen(false)}>✕</button>
           </div>
           <div className="bd-scanner-camera">
-            {/* LIBRERÍA DE ESCÁNER BLINDADA CON AMBOS EVENTOS */}
             <Scanner onScan={(result) => handleScan(result)} onResult={(text) => handleScan(text)} options={{ delayBetweenScanAttempts: 1500 }} />
             <div className="bd-scanner-frame"><span className="corner tl" /><span className="corner tr" /><span className="corner bl" /><span className="corner br" /></div>
           </div>
@@ -398,7 +420,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ================= MODAL MODO RESCATE ================= */}
       {isModalOpen && (
         <div className="bd-modal">
           <div className="bd-modal-header">
