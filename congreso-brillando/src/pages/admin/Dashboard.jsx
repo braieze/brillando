@@ -14,31 +14,32 @@ function vibrar(pattern) {
   }
 }
 
-// 1. DICCIONARIO INTELIGENTE DE IGLESIAS
+// 1. DICCIONARIO INTELIGENTE DE IGLESIAS (MEJORADO)
 const normalizarIglesia = (texto) => {
   if (!texto) return 'SIN IGLESIA';
   const t = texto.toLowerCase().trim();
   
-  if (t.includes('cds') || t.includes('conquistador') || t.includes('sueño')) return 'CONQUISTADORES DE SUEÑOS';
+  // Atrapa variaciones, faltas de ortografía y agregados como "Ministerio"
+  if (t.includes('cds') || t.includes('conquistador') || t.includes('conquitador') || t.includes('sueño')) return 'CONQUISTADORES DE SUEÑOS';
   if (t.includes('eben') || t.includes('ezer')) return 'EBEN EZER';
   if (t.includes('amor y milagro') || t.includes('cca')) return 'CCA AMOR Y MILAGROS';
   if (t.includes('dios de los') || t.includes('ejército') || t.includes('ejercito')) return 'DIOS DE LOS EJÉRCITOS';
-  if (t.includes('@') || t.includes('.com')) return 'SIN IGLESIA'; // Detecta emails puestos por error
+  if (t.includes('@') || t.includes('.com')) return 'SIN IGLESIA'; 
   
-  return texto.trim().toUpperCase();
+  // Limpia prefijos comunes para agrupar las que quedaron sueltas
+  const limpio = t.replace(/^(iglesia|ministerio|centro cristiano|templo)\s+/i, '').trim();
+  return limpio.toUpperCase();
 };
 
 // 2. UNIFICADOR EN MEMORIA DE DUPLICADOS
 const unificarDuplicados = (lista) => {
   const unicos = new Map();
   lista.forEach(persona => {
-    // Clave única basada en nombre y apellido exacto
     const key = `${persona.nombre?.trim().toLowerCase()}-${persona.apellido?.trim().toLowerCase()}`;
     
     if (!unicos.has(key)) {
       unicos.set(key, persona);
     } else {
-      // Si el duplicado ya tenía la asistencia marcada, la conservamos en el registro principal
       const existente = unicos.get(key);
       if (persona.asistio_pre) existente.asistio_pre = true;
       if (persona.asistio_congreso) existente.asistio_congreso = true;
@@ -50,7 +51,6 @@ const unificarDuplicados = (lista) => {
 /* ============================================================
    FILA CON SWIPE-TO-DELETE
    ============================================================ */
-// Usamos React.memo para evitar que las 1500 filas se vuelvan a dibujar cuando escribís en el buscador
 const FilaInscripto = React.memo(({ persona, asistio, onToggle, onDelete }) => {
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
@@ -139,17 +139,16 @@ export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [manualForm, setManualForm] = useState({ nombre: '', apellido: '', iglesia: '' });
 
-  // --- CONEXIÓN EN VIVO Y LIMPIEZA DE DATOS ---
   useEffect(() => {
     const inscriptosRef = collection(db, 'inscriptos');
     const unsubscribe = onSnapshot(inscriptosRef, (snapshot) => {
       const rawData = snapshot.docs.map((d) => ({ 
         id: d.id, 
         ...d.data(),
-        iglesia: normalizarIglesia(d.data().iglesia) // Normalizamos al descargar
+        iglesia: normalizarIglesia(d.data().iglesia) 
       }));
       
-      const cleanData = unificarDuplicados(rawData); // Filtramos duplicados
+      const cleanData = unificarDuplicados(rawData); 
       setInscriptos(cleanData);
     });
     return () => unsubscribe();
@@ -241,18 +240,25 @@ export default function Dashboard() {
     }
   };
 
-  // --- RENDIMIENTO: useMemo cachea resultados para no recalcular en cada tecleo ---
   const iglesiasUnicas = useMemo(() => {
     const lista = inscriptos.map((p) => p.iglesia);
     return ['TODAS', ...new Set(lista)].sort();
   }, [inscriptos]);
 
+  // RENDIMIENTO: Filtrado y ORDEN ALFABÉTICO combinados
   const inscriptosFiltrados = useMemo(() => {
     const textoBuscado = busqueda.toLowerCase();
-    return inscriptos.filter((persona) => {
+    const filtrados = inscriptos.filter((persona) => {
       const coincideTexto = persona.nombre?.toLowerCase().includes(textoBuscado) || persona.apellido?.toLowerCase().includes(textoBuscado);
       const coincideIglesia = filtroIglesia === 'TODAS' || persona.iglesia === filtroIglesia;
       return coincideTexto && coincideIglesia;
+    });
+
+    // Se ordena alfabéticamente de A-Z
+    return filtrados.sort((a, b) => {
+      const nombreA = `${a.nombre || ''} ${a.apellido || ''}`.trim().toLowerCase();
+      const nombreB = `${b.nombre || ''} ${b.apellido || ''}`.trim().toLowerCase();
+      return nombreA.localeCompare(nombreB);
     });
   }, [inscriptos, busqueda, filtroIglesia]);
 
