@@ -1,29 +1,33 @@
-# Brillando 2026 ⚡️
+<div align="center">
+  <img src="./brillando-portada.gif" alt="Demo Brillando 2026" width="800" />
+</div>
 
-Sistema integral de web y control de accesos para el Congreso Juvenil "Brillando 2026" y su Pre-Congreso ("Auténticos"). Desarrollado con una estética gráfica de estilo brutalista, el proyecto se divide en una Landing Page pública para el registro de asistentes y un Dashboard administrativo para el escaneo rápido de pases digitales en la puerta del evento.
+<br />
 
-## Características Principales
+# ⚡️ Brillando 2026 - Sistema Integral de Accesos y Landing Page
 
-### 1. Landing Page (Portal Público)
-* **Inscripción y Base de Datos:** Formulario de registro conectado en tiempo real a Firebase Firestore.
-* **Pase Digital Inmediato:** Generación automática de un ID único y un código QR que funciona como entrada.
-* **Integración de Correos:** Envío automatizado del pase digital mediante EmailJS con plantillas HTML personalizadas que mantienen la estética del sitio.
-* **Lógica de Bloqueo por Fecha (FOMO):** Ocultamiento programado de contenido ("Anti-Casting") que se revela automáticamente después de la fecha del evento presencial para incentivar la asistencia.
+**[ SISTEMA EN PRODUCCIÓN | CONTROL EN TIEMPO REAL ]**
+
+Sistema web integral diseñado para la gestión del Congreso Juvenil "Brillando 2026" y su evento previo. El proyecto fusiona una identidad visual de **estilo Brutalista** con una arquitectura de control de accesos de alta concurrencia. Se divide en dos módulos críticos: una Landing Page pública para la inscripción automatizada y un Dashboard administrativo optimizado para el escaneo *in situ* y la toma de decisiones en la puerta del evento.
+
+## 🚀 Arquitectura y Soluciones
+
+### 1. Portal Público (Landing Page & Registro)
+* **Inscripción Serverless:** Formulario de captura de datos conectado en tiempo real a Firebase Firestore.
+* **Emisión de Pases Digitales:** Generación automática de IDs únicos y códigos QR renderizados en el cliente (`react-qr-code`).
+* **Mailing Automatizado:** Envío instantáneo del ticket vía EmailJS con plantillas HTML personalizadas que respetan la estética del evento.
+* **Lógica Anti-Casting (FOMO):** Renderizado condicional basado en fechas (`date-fns`) que oculta contenido estratégico hasta que finaliza el evento presencial, incentivando la asistencia física.
 
 ### 2. Dashboard Administrativo (Control de Puerta)
-* **Escáner QR Blindado:** Módulo de cámara integrado (`@yudiel/react-qr-scanner`) capaz de leer los códigos de los asistentes desde cualquier dispositivo móvil.
-* **Flujo Anti-Accidentes:** Modal visual de confirmación de identidad que frena el escaneo y detecta accesos duplicados ("Pase ya utilizado").
-* **Modo Rescate:** Sistema de ingreso manual de emergencia para anotar a personas que llegan sin previo aviso, sincronizándolas al instante con la base de datos.
-* **Métricas en Vivo:** Panel estadístico que calcula el progreso porcentual real comparando el total de inscriptos con la gente que ya ingresó al salón.
-* **UI Optimizada para Móviles:** Gestos integrados como "swipe-to-delete" para administrar la base de datos desde la pantalla táctil en la trinchera del evento.
+* **Escáner QR Blindado:** Módulo de lectura mediante cámara (`@yudiel/react-qr-scanner`) compatible con cualquier dispositivo móvil en el terreno.
+* **Flujo Anti-Duplicados:** Modal visual de confirmación de identidad que bloquea el escáner al detectar pases previamente utilizados, evitando accesos irregulares.
+* **Modo Rescate:** Sistema de ingreso manual de emergencia para asistentes sin registro previo, sincronizando la base de datos al instante.
+* **Analítica en Vivo:** Panel estadístico que calcula el aforo porcentual en tiempo real, contrastando inscriptos totales contra asistentes ingresados.
+* **UI Táctica (Mobile-Optimized):** Gestos nativos integrados como *swipe-to-delete* para una gestión de bases de datos fluida y rápida desde pantallas táctiles.
 
-## Stack Tecnológico
+## 🛠️ Stack Tecnológico
 
-* **Frontend:** React 
-* **Backend as a Service (BaaS):** Firebase (Firestore)
-* **Mailing:** EmailJS
-* **Librerías Clave:** 
-  * `react-qr-code` (Renderizado de QR en la web)
-  * `@yudiel/react-qr-scanner` (Lectura por cámara web/celular)
-  * `date-fns` (Manejo condicional de fechas de eventos)
-* **Diseño UI:** CSS puro estructurado mediante variables CSS, enfocado en un diseño Brutalista (sombras sólidas gruesas, alto contraste, paleta reducida a colores crema, tinta, azul y amarillo, y tipografías Display pesadas).
+* **Frontend:** React.js[cite: 16].
+* **Diseño UI/UX:** Estilo Brutalista implementado con CSS puro y variables CSS (sombras sólidas, alto contraste, paleta reducida y tipografías Display pesadas)[cite: 16].
+* **Backend & BaaS:** Firebase (Firestore Realtime Database)[cite: 16].
+* **Integraciones:** EmailJS (Mailing Transaccional).
