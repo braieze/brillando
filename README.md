@@ -8,6 +8,8 @@
 
 **[ SISTEMA EN PRODUCCIÓN | CONTROL EN TIEMPO REAL ]**
 
+🔗 **Ver en vivo:** [Visitar la plataforma web](https://brillando.vercel.app/)
+
 Sistema web integral diseñado para la gestión del Congreso Juvenil "Brillando 2026" y su evento previo. El proyecto fusiona una identidad visual de **estilo Brutalista** con una arquitectura de control de accesos de alta concurrencia. Se divide en dos módulos críticos: una Landing Page pública para la inscripción automatizada y un Dashboard administrativo optimizado para el escaneo *in situ* y la toma de decisiones en la puerta del evento.
 
 ## 🚀 Arquitectura y Soluciones
