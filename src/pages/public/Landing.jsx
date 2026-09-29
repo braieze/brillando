@@ -6,8 +6,6 @@ import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'fire
 import { isBefore, parseISO } from 'date-fns'; 
 import emailjs from '@emailjs/browser'; 
 
-
-// Array con las 40 fotos de Unsplash
 const allPhotos = [
   "https://images.unsplash.com/photo-1788226881098-066b4ef6890d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
   "https://images.unsplash.com/photo-1788226880955-8030453a2331?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
@@ -50,7 +48,9 @@ const allPhotos = [
   "https://images.unsplash.com/photo-1788226881060-268f36b0abae?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
   "https://images.unsplash.com/photo-1788226880766-3f5610c352cd?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0"
 ];
-const [formData, setFormData] = useState({
+
+export default function Landing() {
+  const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
     email: '',
@@ -94,14 +94,12 @@ const [formData, setFormData] = useState({
     setErrorMsg('');
   };
 
-  // 1. BLOQUEAR EL ENTER
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
       e.preventDefault();
     }
   };
 
-  // 2. AUTOCOMPLETAR AL PERDER EL FOCO DEL EMAIL
   const handleEmailBlur = async () => {
     if (!formData.email) return;
 
@@ -111,14 +109,13 @@ const [formData, setFormData] = useState({
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
-        // Encontramos correos, extraemos TODOS los perfiles
         const perfiles = [];
         querySnapshot.forEach((doc) => {
           perfiles.push({ id: doc.id, ...doc.data() });
         });
-        setUsuariosPrevios(perfiles); // Mostramos los botones
+        setUsuariosPrevios(perfiles); 
       } else {
-        setUsuariosPrevios([]); // Si es un mail nuevo, no mostramos nada
+        setUsuariosPrevios([]); 
       }
     } catch (error) {
       console.error("Error buscando historial del email:", error);
@@ -149,7 +146,6 @@ const [formData, setFormData] = useState({
     }
   };
 
-  // 3. NUEVA FUNCIÓN DE DESCARGA: SOLO EL QR EN SECO Y CON FONDO BLANCO
   const descargarPase = () => {
     const svg = document.querySelector('#qr-wrapper svg');
     if (!svg) {
@@ -190,7 +186,6 @@ const [formData, setFormData] = useState({
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // 4. VALIDACIÓN ANTES DE ENVIAR
     if (!formData.nombre || !formData.apellido || !formData.email || !formData.edad || !formData.iglesia) {
       setErrorMsg("Por favor, completá todos los campos antes de generar tu pase.");
       return;
@@ -342,7 +337,7 @@ const [formData, setFormData] = useState({
         </div>
       </section>
 
-{/* ============ TALENTOS (ANTI-CASTING) ============ */}
+      {/* ============ TALENTOS (ANTI-CASTING) ============ */}
       <section className="section romper" id="talentos">
         <div className="wrap">
           
@@ -610,7 +605,7 @@ const [formData, setFormData] = useState({
         </div>
       </section>
 
-{/* ============ INSCRIPCION ============ */}
+      {/* ============ INSCRIPCION ============ */}
       <section className="section inscripcion" id="inscripcion">
         <div className="wrap insc-grid">
           <div>
