@@ -603,7 +603,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ============ INSCRIPCION ============ */}
+{/* ============ INSCRIPCION ============ */}
       <section className="section inscripcion" id="inscripcion">
         <div className="wrap insc-grid">
           <div>
@@ -625,9 +625,9 @@ export default function Landing() {
 
           <div className="form-wrapper" style={{ display: 'flex', flexDirection: 'column' }}>
             
-          {/* PESTAÑAS (TABS) SUPERIORES INVERTIDAS */}
+            {/* PESTAÑAS (TABS) - FASE 2 ACTIVA */}
             <div className="tabs-container">
-              <div className="tab-inactive">
+              <div className="tab-inactive" style={{ opacity: 0.6 }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12l5 5L20 7"></path></svg>
                 Fase 1: Pre-Congreso
               </div>
@@ -648,20 +648,21 @@ export default function Landing() {
                   <div className="field-row">
                     <div className="field full">
                       <label htmlFor="email">Correo electrónico (Escribí tu email primero)</label>
-                        <input 
-                          id="email" 
-                          name="email" 
-                          type="email" 
-                          placeholder="nombre@correo.com" 
-                          value={formData.email} 
-                          onChange={handleInputChange}
-                          onBlur={handleEmailBlur}
-                          required 
-                        />
+                      <input 
+                        id="email" 
+                        name="email" 
+                        type="email" 
+                        placeholder="nombre@correo.com" 
+                        value={formData.email} 
+                        onChange={handleInputChange} 
+                        onBlur={handleEmailBlur} 
+                        required 
+                      />
                     </div>
                   </div>
+
                   {/* ===== SELECTOR DE PERFILES MÚLTIPLES ===== */}
-                  {usuariosPrevios.length > 0 && (
+                  {usuariosPrevios && usuariosPrevios.length > 0 && (
                     <div style={{ marginTop: '5px', marginBottom: '15px', padding: '15px', background: 'rgba(255, 212, 0, 0.1)', border: '2px dashed var(--tinta)' }}>
                       <p style={{ margin: '0 0 10px', fontSize: '13px', fontWeight: 'bold', textTransform: 'uppercase', color: 'var(--tinta)' }}>
                         Encontramos estos registros. Seleccioná tu nombre para autocompletar:
@@ -690,6 +691,8 @@ export default function Landing() {
                       </div>
                     </div>
                   )}
+                  {/* ========================================== */}
+
                   <div className="field-row">
                     <div className="field">
                       <label htmlFor="nombre">Nombre</label>
@@ -723,7 +726,7 @@ export default function Landing() {
               ) : (
                 <div className="confirm-panel show" style={{ textAlign: 'center', padding: '10px 0' }}>
                   
-                  {/* PANTALLA VISUAL */}
+                  {/* PANTALLA VISUAL QR */}
                   <div id="pase-oficial" style={{ 
                     background: 'var(--crema)', 
                     border: '5px solid var(--tinta)', 
