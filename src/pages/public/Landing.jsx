@@ -5,7 +5,6 @@ import { db } from '../../config/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'; 
 import { isBefore, parseISO } from 'date-fns'; 
 import emailjs from '@emailjs/browser'; 
-import html2canvas from 'html2canvas';
 
 
 // Array con las 40 fotos de Unsplash
