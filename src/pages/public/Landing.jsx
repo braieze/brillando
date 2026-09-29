@@ -1,0 +1,814 @@
+import React, { useState, useEffect } from 'react';
+import './Landing.css';
+import QRCode from 'react-qr-code';
+import { db } from '../../config/firebase'; 
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'; 
+import { isBefore, parseISO } from 'date-fns'; 
+import emailjs from '@emailjs/browser'; 
+import html2canvas from 'html2canvas';
+
+
+// Array con las 40 fotos de Unsplash
+const allPhotos = [
+  "https://images.unsplash.com/photo-1788226881098-066b4ef6890d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880955-8030453a2331?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880754-fa94291b48fe?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880765-05714314d347?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881176-f9b1e9ce4406?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881264-0d67dc359030?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880851-2575c6890dd9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880854-f1d98d27c24b?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880759-42714957e61a?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880917-0810e4b98ecc?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881234-4eee1d0891fa?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850244-8d6014a6bbc7?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850054-6ab164546d84?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850188-db2e07bc10ea?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850206-1dad55612c22?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881137-965ae273c1a5?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881006-74316feda82c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226849993-0492ded69d43?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850181-2a8eb039e14d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881277-260df9d5ded4?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850010-80818ba177e1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850166-bb741721b655?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880897-56f697ec957a?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881052-9074ce9ba68e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880896-cbeafaf7ceb5?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880613-929d804db48c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880767-632d2aacf87a?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881073-a745daf2b043?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880779-3065406c9e6d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880974-ec7dd8e80328?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881148-6e1aca9be1a2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880794-25d723b3a616?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880997-8009c04f61bd?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880784-77ac3f911aa1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226850102-01f77d645036?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880784-77ac3f911aa1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881148-6e1aca9be1a2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881170-1a385d70fe97?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226881060-268f36b0abae?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
+  "https://images.unsplash.com/photo-1788226880766-3f5610c352cd?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0"
+];
+
+export default function Landing() {
+ const [formData, setFormData] = useState({
+    nombre: '',
+    apellido: '',
+    email: '',
+    edad: '',
+    iglesia: ''
+  });
+
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [userId, setUserId] = useState(''); 
+  const [errorMsg, setErrorMsg] = useState('');
+  const [isDuplicate, setIsDuplicate] = useState(false); 
+  const [visiblePhotos, setVisiblePhotos] = useState(20);
+  
+  const [isCongresoActive, setIsCongresoActive] = useState(true);
+  const [usuariosPrevios, setUsuariosPrevios] = useState([]);
+
+  const handleSelectPerfil = (perfil) => {
+    setFormData(prev => ({
+      ...prev,
+      nombre: perfil.nombre || '',
+      apellido: perfil.apellido || '',
+      edad: perfil.edad || '',
+      iglesia: perfil.iglesia || ''
+    }));
+    setErrorMsg('');
+  };
+  
+  useEffect(() => {
+    const fechaLimiteCongreso = parseISO('2026-10-31T23:59:59-03:00'); 
+    const hoy = new Date();
+    setIsCongresoActive(isBefore(hoy, fechaLimiteCongreso));
+  }, []);
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+    setIsDuplicate(false);
+    setErrorMsg('');
+  };
+
+  // 1. BLOQUEAR EL ENTER
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+      e.preventDefault();
+    }
+  };
+
+  // 2. AUTOCOMPLETAR AL PERDER EL FOCO DEL EMAIL
+  const handleEmailBlur = async () => {
+    if (!formData.email) return;
+
+    try {
+      const inscriptosRef = collection(db, "inscriptos");
+      const q = query(inscriptosRef, where("email", "==", formData.email.trim()));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        // Encontramos correos, extraemos TODOS los perfiles
+        const perfiles = [];
+        querySnapshot.forEach((doc) => {
+          perfiles.push({ id: doc.id, ...doc.data() });
+        });
+        setUsuariosPrevios(perfiles); // Mostramos los botones
+      } else {
+        setUsuariosPrevios([]); // Si es un mail nuevo, no mostramos nada
+      }
+    } catch (error) {
+      console.error("Error buscando historial del email:", error);
+    }
+  };
+
+  const handleResetForm = () => {
+    setFormData({ nombre: '', apellido: '', email: '', edad: '', iglesia: '' });
+    setIsSubmitted(false);
+    setUserId('');
+    setIsDuplicate(false);
+    setErrorMsg('');
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: '¡Ya tengo mi pase para el Pre-Congreso Brillando 2026!',
+          text: `Salí del molde. Ya aseguré mi lugar para el Pre-Congreso del 12 de Septiembre. ¡Sumate vos también!`,
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.log('Error compartiendo', error);
+      }
+    } else {
+      alert("Tu navegador no soporta esta función, pero podés sacarle captura a tu QR.");
+    }
+  };
+
+  const descargarPase = async () => {
+    const ticketElement = document.getElementById('pase-oficial');
+    if (!ticketElement) return;
+
+    const btn = document.getElementById('btn-descarga');
+    const textoOriginal = btn.innerText;
+    btn.innerText = "Generando imagen...";
+
+    try {
+      const canvas = await html2canvas(ticketElement, {
+        scale: 2, 
+        backgroundColor: '#f2ede0', 
+        useCORS: true
+      });
+      
+      const image = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = `Pase-Autenticos-${formData.nombre}.png`;
+      link.click();
+    } catch (error) {
+      console.error("Error al generar la imagen", error);
+      alert("Error al descargar. Por favor, sacale una captura de pantalla al QR.");
+    } finally {
+      btn.innerText = textoOriginal;
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // 3. VALIDACIÓN ANTES DE ENVIAR
+    if (!formData.nombre || !formData.apellido || !formData.email || !formData.edad || !formData.iglesia) {
+      setErrorMsg("Por favor, completá todos los campos antes de generar tu pase.");
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMsg('');
+    setIsDuplicate(false);
+
+    try {
+      const inscriptosRef = collection(db, "inscriptos");
+      
+      const nuevoInscripto = {
+        nombre: formData.nombre,
+        apellido: formData.apellido,
+        email: formData.email,
+        edad: Number(formData.edad),
+        iglesia: formData.iglesia,
+        fechaInscripcion: serverTimestamp(),
+        asistio_pre: false,
+        asistio_congreso: false,
+        evento_origen: 'pre_congreso'
+      };
+
+      const docRef = await addDoc(inscriptosRef, nuevoInscripto);
+      
+      setUserId(docRef.id);
+      setIsSubmitted(true);
+
+    } catch (error) {
+      console.error("Error al guardar la inscripción: ", error);
+      setErrorMsg("Hubo un error de conexión. Por favor, intentá de nuevo.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <header className="site">
+        <div className="wrap nav-row">
+          <div className="brand">RED JUVENIL <span className="tag">I.C.E.B</span></div>
+          <nav className="links" aria-label="Navegación principal">
+            <a href="#concepto">Concepto</a>
+            <a href="#talentos">Talentos</a>
+            <a href="#fechas">Fechas</a>
+            <a href="#ubicacion">Ubicación</a>
+            <a href="#pase">Tu pase</a>
+          </nav>
+          <div className="nav-cta">
+            <a href="#inscripcion" className="btn azul">Inscribite →</a>
+          </div>
+        </div>
+      </header>
+
+      {/* ============ HERO ============ */}
+      <section className="hero">
+        <div className="wrap hero-grid">
+          <div>
+            <div className="kicker-row">
+              <span>Red Juvenil · I.C.E.B</span>
+              <span>2026</span>
+            </div>
+            <span className="handle">@congresobrillando</span>
+            <span className="sub-handle">Brillando 2026 — Auténticos</span>
+
+            <h1 className="mega" style={{ marginTop: '22px' }}>
+              Salí del<br/>
+              <span className="strike-wrap">
+                <span className="molde">molde.</span>
+                <svg className="strike" viewBox="0 0 300 60" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M4,30 C80,10 220,52 296,26" stroke="#f2ede0" strokeWidth="5" fill="none" strokeLinecap="round"/>
+                </svg>
+              </span>
+            </h1>
+
+            <p className="hero-copy">
+              Vivimos rodeados de filtros, máscaras y casilleros que nos dicen cómo encajar.
+              <b>Brillando 2026</b> es el espacio para apagar ese ruido y confrontarte con quién sos de verdad.
+              La identidad real no se copia.
+            </p>
+
+            <div className="hero-tags">
+              <span className="tag-chip">Cero filtros</span>
+              <span className="tag-chip">100% real</span>
+              <span className="tag-chip">Pre-Congreso · 12 sep</span>
+              <span className="tag-chip">Congreso · 31 oct</span>
+            </div>
+
+            <div className="hero-actions">
+              <a href="#inscripcion" className="btn">Quiero mi pase →</a>
+              <a href="#concepto" className="btn ghost">Ver el concepto</a>
+            </div>
+          </div>
+
+          <div className="hero-visual" aria-hidden="true">
+            <div className="mag">
+              <svg viewBox="0 0 420 520" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="10,60 165,20 165,470 30,500" fill="url(#gradPage)"/>
+                <polygon points="10,60 165,20 165,470 30,500" fill="none" stroke="#0a0a0c" strokeWidth="4"/>
+                <rect x="165" y="10" width="245" height="490" fill="#f2ede0" stroke="#0a0a0c" strokeWidth="4"/>
+                <text x="192" y="70" fontFamily="Space Mono, monospace" fontSize="14" letterSpacing="1" fill="#0a0a0c">CERO</text>
+                <text x="272" y="70" fontFamily="Space Mono, monospace" fontSize="14" letterSpacing="1" fill="#0a0a0c">FILTROS</text>
+                <text x="358" y="70" fontFamily="Space Mono, monospace" fontSize="12" letterSpacing="1" fill="#0a0a0c">100%</text>
+                <text x="185" y="150" fontFamily="Archivo Black" fontSize="46" fill="#2438e0">Salí</text>
+                <text x="185" y="205" fontFamily="Archivo Black" fontSize="46" fill="#2438e0">del</text>
+                <text x="182" y="272" fontFamily="Caveat" fontWeight="700" fontSize="64" fill="#2438e0">molde.</text>
+                <line x1="185" y1="300" x2="395" y2="300" stroke="#0a0a0c" strokeWidth="1.5" strokeDasharray="4 5"/>
+                <text x="185" y="330" fontFamily="Space Grotesk" fontSize="15" fill="#0a0a0c">La identidad real</text>
+                <text x="185" y="352" fontFamily="Space Grotesk" fontSize="15" fontWeight="700" fill="#0a0a0c">no se copia.</text>
+                <defs>
+                  <linearGradient id="gradPage" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stopColor="#0d1660"/>
+                    <stop offset="1" stopColor="#8fa8ff"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ CONCEPTO / MANIFIESTO ============ */}
+      <section className="section manifiesto" id="concepto">
+        <div className="wrap">
+          <div className="section-head">
+            <span className="eyebrow">El concepto 2026</span>
+            <h2>No sos lo que <em>mostrás.</em><br/>Sos lo que sos.</h2>
+            <p>Auténticos no es una tendencia más para publicar. Es la confrontación con la identidad real, lejos de la pantalla y de la aprobación ajena.</p>
+          </div>
+
+          <div className="tv-row">
+            <div className="tv">
+              <div className="knob k1"></div>
+              <div className="knob k2"></div>
+              <div className="tv-screen">
+                <h3>Auténtico no es<br/>seguir la <span className="y">tendencia</span>.</h3>
+              </div>
+              <div className="tv-stand"></div>
+              <div className="tv-legs"><span></span><span></span></div>
+            </div>
+
+            <div className="manifiesto-copy">
+              <p>Crecimos frente a pantallas que nos enseñaron a editar cada versión de nosotros mismos antes de mostrarla. Un mundo de consumo pasivo, donde es más fácil repetir un molde que animarse a romperlo.</p>
+              <p>Brillando 2026 plantea lo contrario: apagar el televisor, bajar el volumen del afuera, y escuchar lo que de verdad somos por dentro.</p>
+              <p className="quote">"Es abrazar tu verdadera identidad."</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+{/* ============ TALENTOS (ANTI-CASTING) ============ */}
+      <section className="section romper" id="talentos">
+        <div className="wrap">
+          
+          <div className="section-head" style={{ marginBottom: '40px' }}>
+            <span className="eyebrow">El Anti-Casting</span>
+            <h2>Se buscan talentos<br/><em>(solistas).</em></h2>
+            <p style={{ maxWidth: '650px', margin: '0 auto', padding: '0 20px' }}>
+              Stand-up, pintura en vivo, rap, poesía, baile o lo que sea que hagas. Solo solistas, acá subís vos solo. Buscamos lo extravagante, lo genuino.
+            </p>
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            
+            {/* TARJETAS ORIGINALES (Desbloqueadas) */}
+            <div className="locker-cards">
+              <div className="lcard">
+                <span className="latch" aria-hidden="true"></span>
+                <span className="num">01 / LA CONSIGNA</span>
+                <div className="icon" aria-hidden="true">
+                  <svg width="46" height="38" viewBox="0 0 46 38" fill="none">
+                    <rect x="1" y="1" width="44" height="30" rx="4" stroke="#f2ede0" strokeWidth="2.5"/>
+                    <rect x="7" y="7" width="32" height="18" fill="#f2ede0" opacity=".25"/>
+                    <line x1="16" y1="34" x2="30" y2="34" stroke="#f2ede0" strokeWidth="2.5"/>
+                    <line x1="23" y1="31" x2="23" y2="34" stroke="#f2ede0" strokeWidth="2.5"/>
+                  </svg>
+                </div>
+                <h3>Cero Filtros</h3>
+                <p>Grabate 30 segundos haciendo lo que amás desde tu pieza, baño, donde sea y sin editar el audio y mostrando lo que sos de verdad.</p>
+              </div>
+
+              <div className="lcard">
+                <span className="latch" aria-hidden="true"></span>
+                <span className="num">02 / LA REGLA</span>
+                <div className="icon" aria-hidden="true">
+                  <svg width="44" height="40" viewBox="0 0 44 40" fill="none">
+                    <rect x="2" y="4" width="40" height="30" stroke="#f2ede0" strokeWidth="2.5"/>
+                    <line x1="8" y1="12" x2="36" y2="12" stroke="#f2ede0" strokeWidth="2"/>
+                    <line x1="8" y1="18" x2="26" y2="18" stroke="#f2ede0" strokeWidth="2"/>
+                    <line x1="8" y1="24" x2="32" y2="24" stroke="#f2ede0" strokeWidth="2"/>
+                    <line x1="8" y1="30" x2="20" y2="30" stroke="#f2ede0" strokeWidth="2"/>
+                  </svg>
+                </div>
+                <h3>Subí y Etiquetanos</h3>
+                <p>Subilo como reel etiquetando como colaborador a <b>@congresobrillando</b> con el hashtag <b>#Autenticos</b>. Tenés tiempo hasta el 30 de Septiembre.</p>
+              </div>
+
+              <div className="lcard">
+                <span className="latch" aria-hidden="true"></span>
+                <span className="num">03 / EL ESCENARIO</span>
+                <div className="icon" aria-hidden="true">
+                  <svg width="34" height="42" viewBox="0 0 34 42" fill="none">
+                    <rect x="1" y="1" width="32" height="40" stroke="#f2ede0" strokeWidth="2.5"/>
+                    <line x1="1" y1="21" x2="33" y2="21" stroke="#f2ede0" strokeWidth="2"/>
+                    <circle cx="25" cy="12" r="2" fill="#f2ede0"/>
+                    <circle cx="25" cy="31" r="2" fill="#f2ede0"/>
+                  </svg>
+                </div>
+                <h3>Los Más Reales</h3>
+                <p>Nosotros elegimos a los que se suben al escenario del Congreso. Nada de votos, puro talento genuino y extravagante.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ============ GALERIA ============ */}
+      <section className="section galeria" id="historia">
+        <div className="wrap">
+          <div className="section-head">
+            <span className="eyebrow">Nuestra Historia</span>
+            <h2>Lo que ya <em>vivimos.</em></h2>
+            <p>Un repaso por las ediciones anteriores. El movimiento de la Red Juvenil no empezó hoy.</p>
+          </div>
+
+          <div className="galeria-grid">
+            {allPhotos.slice(0, visiblePhotos).map((photoUrl, index) => (
+              <div className="galeria-item" key={index}>
+                <img src={photoUrl} alt={`Congreso Brillando ${index + 1}`} loading="lazy" />
+                <span className="tag">Archivo Brillando</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Botón de Cargar Más si todavía hay fotos ocultas */}
+          {visiblePhotos < allPhotos.length && (
+            <div style={{ textAlign: 'center', marginTop: '50px' }}>
+              <button 
+                type="button" 
+                className="btn ghost" 
+                onClick={() => setVisiblePhotos(allPhotos.length)}
+                style={{ border: '3px solid var(--tinta)' }}
+              >
+                Cargar todas las fotos ↓
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ============ FECHAS ============ */}
+      <section className="section fechas" id="fechas">
+        <div className="wrap">
+          <div className="section-head">
+            <span className="eyebrow">Agendalo</span>
+            <h2>Dos citas.<br/>Un solo <em>llamado.</em></h2>
+            <p>Brillando 2026 se vive en dos instancias: el Pre-Congreso, que enciende la previa, y el Congreso principal, el gran encuentro de la Red Juvenil.</p>
+          </div>
+
+          <div className="dates-grid">
+            <article className="flyer">
+              <span className="tape-corner" aria-hidden="true"></span>
+              <div className="top-row"><span>Red Juvenil</span><span>I.C.E.B</span></div>
+              <span className="pill">Pre-Congreso</span>
+              <h3>Auten<span className="accent">ticos</span></h3>
+              <div className="big-date">
+                <span className="num">12</span>
+                <span className="stamp">DE SEPTIEMBRE<br/>A LAS 19HS</span>
+              </div>
+              <div className="loc">
+                <b>Lugar</b>
+                Auditorio Ministerio CDS<br/>
+                <span className="addr">Calle 23 N° 4642, Berazategui</span>
+              </div>
+            </article>
+
+            <article className="flyer">
+              <span className="tape-corner" aria-hidden="true"></span>
+              <div className="top-row"><span>Red Juvenil</span><span>I.C.E.B</span></div>
+              <span className="pill">Congreso principal</span>
+              <h3>Brillando<span className="accent">.</span></h3>
+              <div className="big-date">
+                <span className="num">31</span>
+                <span className="stamp">DE OCTUBRE<br/>2026</span>
+              </div>
+              <div className="loc">
+                <b>Lugar</b>
+                Centro Municipal de Actividades Roberto De Vicenzo<br/>
+                <span className="addr">Calle 148 y 18, Berazategui</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ UBICACION ============ */}
+      <section className="section ubicacion" id="ubicacion">
+        <div className="wrap">
+          <div className="section-head">
+            <span className="eyebrow">Cómo llegar</span>
+            <h2>Te esperamos<br/>en <em>Berazategui.</em></h2>
+            <p>Guardá las direcciones y llegá con tiempo.</p>
+          </div>
+
+          <div className="map-panel" style={{ marginBottom: '40px' }}>
+            {/* SVG inline para generar la textura de calles/mapa sutil en el fondo */}
+            <div className="map-visual" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83 43.405-53.11 8.274L.264 0h54.363zM28.05 45l-2-29 25-3-2 30-21 2zm-5 1l-20-4 3-30 20 2-3 32z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E")` }}>
+              <div className="pin">
+                <svg viewBox="0 0 52 64" fill="none">
+                  <path d="M26 2C13 2 3 12 3 25c0 18 23 37 23 37s23-19 23-37C49 12 39 2 26 2z" fill="#ffd400" stroke="#0a0a0c" strokeWidth="3"/>
+                  <circle cx="26" cy="25" r="9" fill="#0a0a0c"/>
+                </svg>
+                <span>Pre-Congreso</span>
+              </div>
+            </div>
+            <div className="map-info">
+              <div className="row">
+                <span className="lbl">Lugar</span>
+                <span className="val"><b>Auditorio Ministerio CDS</b><br/>Calle 23 N° 4642, Berazategui</span>
+              </div>
+              <div className="row">
+                <span className="lbl">Fecha</span>
+                <span className="val">Sábado <b>12 de septiembre</b> de 2026</span>
+              </div>
+              <div className="row">
+                <span className="lbl">Hora</span>
+                <span className="val">Puertas <b>19:00 hs</b></span>
+              </div>
+              <a href="https://www.google.com/maps/search/?api=1&query=Calle+23+N%C2%B0+4642+Berazategui" target="_blank" rel="noreferrer" className="btn azul" style={{ alignSelf: 'flex-start', marginTop: '10px' }}>
+                Abrir en Google Maps →
+              </a>
+            </div>
+          </div>
+
+          <div className="map-panel">
+            {/* Ambos mapas usan la misma textura y los mismos colores */}
+            <div className="map-visual" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83 43.405-53.11 8.274L.264 0h54.363zM28.05 45l-2-29 25-3-2 30-21 2zm-5 1l-20-4 3-30 20 2-3 32z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E")` }}>
+              <div className="pin">
+                <svg viewBox="0 0 52 64" fill="none">
+                  {/* Se igualó el color amarillo para el pin */}
+                  <path d="M26 2C13 2 3 12 3 25c0 18 23 37 23 37s23-19 23-37C49 12 39 2 26 2z" fill="#ffd400" stroke="#0a0a0c" strokeWidth="3"/>
+                  <circle cx="26" cy="25" r="9" fill="#0a0a0c"/>
+                </svg>
+                <span>Congreso Principal</span>
+              </div>
+            </div>
+            <div className="map-info">
+              <div className="row">
+                <span className="lbl">Lugar</span>
+                <span className="val"><b>Centro Roberto De Vicenzo</b><br/>Calle 148 y 18, Berazategui</span>
+              </div>
+              <div className="row">
+                <span className="lbl">Fecha</span>
+                <span className="val">Sábado <b>31 de octubre</b> de 2026</span>
+              </div>
+              <a href="https://maps.app.goo.gl/g6J6bH3q5HhR7W9n7" target="_blank" rel="noreferrer" className="btn azul" style={{ alignSelf: 'flex-start', marginTop: '10px' }}>
+                Abrir en Google Maps →
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ PASE DIGITAL ============ */}
+      <section className="section pase" id="pase">
+        <div className="wrap">
+          <div className="section-head">
+            <span className="eyebrow">Tu entrada</span>
+            <h2>Un pase.<br/>Un <em>QR.</em> Vos.</h2>
+            <p>Todo el sistema de acceso es digital: te inscribís, te llega tu pase por mail y lo mostrás en la puerta. Nada de filas eternas ni papeles perdidos.</p>
+          </div>
+
+          <div className="steps">
+            <div className="step">
+              <span className="idx">01</span>
+              <div className="icon" aria-hidden="true">
+                <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+                  <rect x="1" y="1" width="32" height="32" rx="3" stroke="#2438e0" strokeWidth="2.5"/>
+                  <path d="M8 17h18M17 8v18" stroke="#2438e0" strokeWidth="2.5"/>
+                </svg>
+              </div>
+              <h4>Completá el formulario</h4>
+              <p>Nombre, contacto e iglesia. Un minuto y listo — sin vueltas.</p>
+            </div>
+
+            <div className="step">
+              <span className="idx">02</span>
+              <div className="icon" aria-hidden="true">
+                <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+                  <rect x="2" y="6" width="30" height="22" rx="2" stroke="#ffd400" strokeWidth="2.5"/>
+                  <path d="M2 8l15 11L32 8" stroke="#ffd400" strokeWidth="2.5"/>
+                </svg>
+              </div>
+              <h4>Recibí tu pase por mail</h4>
+              <p>Te llega automáticamente un código QR único: es tu entrada personal al Brillando.</p>
+            </div>
+
+            <div className="step">
+              <span className="idx">03</span>
+              <div className="icon" aria-hidden="true">
+                <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+                  <rect x="1" y="1" width="10" height="10" stroke="#2438e0" strokeWidth="2.5"/>
+                  <rect x="23" y="1" width="10" height="10" stroke="#2438e0" strokeWidth="2.5"/>
+                  <rect x="1" y="23" width="10" height="10" stroke="#2438e0" strokeWidth="2.5"/>
+                  <rect x="20" y="20" width="4" height="4" fill="#2438e0"/>
+                  <rect x="28" y="20" width="4" height="4" fill="#2438e0"/>
+                  <rect x="20" y="28" width="4" height="4" fill="#2438e0"/>
+                  <rect x="28" y="28" width="4" height="4" fill="#2438e0"/>
+                </svg>
+              </div>
+              <h4>Escaneá en la puerta</h4>
+              <p>Mostrás tu QR, lo escanean y tu asistencia queda registrada al instante.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ INSCRIPCION ============ */}
+      <section className="section inscripcion" id="inscripcion">
+        <div className="wrap insc-grid">
+          <div>
+            <span className="eyebrow">Reservá tu lugar</span>
+            <h2>Asegurá tu pase para el <em>Congreso.</em></h2>
+            <p>Dejá tus datos para anotarte al evento principal del 31 de Octubre. Es gratuito y el cupo es limitado.</p>
+
+            <div className="insc-list">
+              <div className="li">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-9" stroke="#ffd400" strokeWidth="2.5" fill="none"/></svg>
+                <span>Pase digital con QR generado en tu celular</span>
+              </div>
+              <div className="li">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-9" stroke="#ffd400" strokeWidth="2.5" fill="none"/></svg>
+                <span>Acceso prioritario en la puerta del evento</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-wrapper" style={{ display: 'flex', flexDirection: 'column' }}>
+            
+          {/* PESTAÑAS (TABS) SUPERIORES INVERTIDAS */}
+            <div className="tabs-container">
+              <div className="tab-inactive">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12l5 5L20 7"></path></svg>
+                Fase 1: Pre-Congreso
+              </div>
+              <div className="tab-active">
+                Fase 2: Congreso
+              </div>
+            </div>
+
+            <form className="pase-form" onSubmit={handleSubmit} onKeyDown={handleKeyDown} noValidate>
+              
+              {!isCongresoActive ? (
+                <div className="confirm-panel show">
+                  <h3 style={{ marginTop: '20px' }}>CONGRESO FINALIZADO</h3>
+                  <p>Las inscripciones para el evento del 31 de octubre han cerrado.</p>
+                </div>
+              ) : !isSubmitted ? (
+                <div id="formFields">
+                  <div className="field-row">
+                    <div className="field full">
+                      <label htmlFor="email">Correo electrónico (Escribí tu email primero)</label>
+                        <input 
+                          id="email" 
+                          name="email" 
+                          type="email" 
+                          placeholder="nombre@correo.com" 
+                          value={formData.email} 
+                          onChange={handleInputChange}
+                          onBlur={handleEmailBlur}
+                          required 
+                        />
+                    </div>
+                  </div>
+                  {/* ===== SELECTOR DE PERFILES MÚLTIPLES ===== */}
+                  {usuariosPrevios.length > 0 && (
+                    <div style={{ marginTop: '5px', marginBottom: '15px', padding: '15px', background: 'rgba(255, 212, 0, 0.1)', border: '2px dashed var(--tinta)' }}>
+                      <p style={{ margin: '0 0 10px', fontSize: '13px', fontWeight: 'bold', textTransform: 'uppercase', color: 'var(--tinta)' }}>
+                        Encontramos estos registros. Seleccioná tu nombre para autocompletar:
+                      </p>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        {usuariosPrevios.map((perfil, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => handleSelectPerfil(perfil)}
+                            style={{
+                              padding: '6px 12px',
+                              background: 'var(--crema)',
+                              border: '2px solid var(--tinta)',
+                              cursor: 'pointer',
+                              fontFamily: 'var(--f-mono)',
+                              fontSize: '12px',
+                              fontWeight: 'bold',
+                              textTransform: 'uppercase',
+                              color: 'var(--tinta)'
+                            }}
+                          >
+                            {perfil.nombre} {perfil.apellido}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <div className="field-row">
+                    <div className="field">
+                      <label htmlFor="nombre">Nombre</label>
+                      <input id="nombre" name="nombre" type="text" placeholder="Tu nombre" value={formData.nombre} onChange={handleInputChange} required />
+                    </div>
+                    <div className="field">
+                      <label htmlFor="apellido">Apellido</label>
+                      <input id="apellido" name="apellido" type="text" placeholder="Tu apellido" value={formData.apellido} onChange={handleInputChange} required />
+                    </div>
+                  </div>
+                  <div className="field-row">
+                    <div className="field">
+                      <label htmlFor="edad">Edad</label>
+                      <input id="edad" name="edad" type="number" min="10" max="99" placeholder="17" value={formData.edad} onChange={handleInputChange} required />
+                    </div>
+                    <div className="field">
+                      <label htmlFor="iglesia">Iglesia</label>
+                      <input id="iglesia" name="iglesia" type="text" placeholder="Nombre de tu iglesia" value={formData.iglesia} onChange={handleInputChange} required />
+                    </div>
+                  </div>
+
+                  {errorMsg && <p style={{color: 'red', fontSize: '14px', marginTop: '10px'}}>{errorMsg}</p>}
+
+                  <div className="submit-row">
+                    <button type="submit" className="btn azul" disabled={isLoading}>
+                      {isLoading ? 'GENERANDO PASE...' : 'Quiero mi pase digital →'}
+                    </button>
+                  </div>
+                  <p className="fine" style={{ marginTop: '14px' }}>Al inscribirte vas a poder descargar el código QR de tu entrada.</p>
+                </div>
+              ) : (
+                <div className="confirm-panel show" style={{ textAlign: 'center', padding: '10px 0' }}>
+                  
+                  {/* PANTALLA VISUAL */}
+                  <div id="pase-oficial" style={{ 
+                    background: 'var(--crema)', 
+                    border: '5px solid var(--tinta)', 
+                    padding: '40px 20px', 
+                    maxWidth: '380px', 
+                    margin: '0 auto 25px', 
+                    textAlign: 'center',
+                    boxShadow: '10px 10px 0 var(--azul)',
+                    position: 'relative'
+                  }}>
+                    <span style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: 'var(--amarillo)', border: '3px solid var(--tinta)', padding: '5px 15px', fontFamily: 'var(--f-mono)', fontWeight: 'bold', fontSize: '13px' }}>
+                      PASE DIGITAL
+                    </span>
+
+                    <h2 style={{ fontFamily: 'var(--f-display)', textTransform: 'uppercase', color: 'var(--tinta)', fontSize: '32px', margin: '20px 0 5px', lineHeight: '1' }}>
+                      {formData.nombre} <br/> {formData.apellido}
+                    </h2>
+                    <p style={{ fontFamily: 'var(--f-mono)', fontSize: '15px', color: 'var(--azul)', margin: '0 0 30px', fontWeight: 'bold' }}>
+                      📍 {formData.iglesia || 'Sin iglesia'}
+                    </p>
+                    
+                    <div id="qr-wrapper" style={{ background: 'white', padding: '15px', border: '4px solid var(--tinta)', display: 'inline-block', marginBottom: '30px' }}>
+                      <QRCode 
+                        value={userId} 
+                        size={180}
+                        bgColor="#ffffff"
+                        fgColor="#000000"
+                      />
+                    </div>
+                    
+                    <div style={{ borderTop: '3px dashed var(--tinta)', paddingTop: '20px' }}>
+                      <span style={{ fontFamily: 'var(--f-mono)', fontSize: '14px', fontWeight: 'bold', color: 'var(--tinta)' }}>
+                        CONGRESO BRILLANDO<br/>31 OCTUBRE
+                      </span>
+                    </div>
+                  </div>
+
+                  <p style={{ fontFamily: 'var(--f-mono)', fontSize: '14px', maxWidth: '400px', margin: '0 auto 20px', color: 'var(--tinta)' }}>
+                    ⚠️ <b>Descargá el QR de acceso.</b> No lo enviamos por correo. Te lo vamos a escanear en la puerta para entrar.
+                  </p>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxWidth: '380px', margin: '0 auto' }}>
+                    <button type="button" onClick={descargarPase} className="btn azul" style={{ width: '100%', background: 'var(--azul)', color: 'white', padding: '18px', border: '4px solid var(--tinta)', fontFamily: 'var(--f-mono)', fontWeight: 'bold', fontSize: '16px', textTransform: 'uppercase', cursor: 'pointer', boxShadow: '6px 6px 0 var(--tinta)' }}>
+                      Descargar mi QR ↓
+                    </button>
+                    <button type="button" onClick={handleResetForm} className="btn ghost" style={{ width: '100%', justifyContent: 'center', border: '2px solid var(--tinta)' }}>
+                      Inscribir a alguien más
+                    </button>
+                  </div>
+                  
+                </div>
+              )}
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ FOOTER ============ */}
+      <footer>
+        <div className="wrap">
+          <div className="foot-grid">
+            <div className="foot-brand">
+              <span className="handle">Brillando 2026</span>
+              <p>Un movimiento de la Red Juvenil I.C.E.B para confrontar a los jóvenes con su identidad real, lejos de las presiones de la sociedad.</p>
+            </div>
+            <div className="foot-col">
+              <h5>Congreso</h5>
+              <a href="#concepto">El concepto</a>
+              <a href="#talentos">Talentos</a>
+              <a href="#fechas">Fechas</a>
+              <a href="#pase">Tu pase digital</a>
+            </div>
+            <div className="foot-col">
+              <h5>Contacto</h5>
+              <a href="https://instagram.com/congresobrillando" target="_blank" rel="noreferrer">@congresobrillando</a>
+              <a href="#ubicacion">Auditorio Ministerio CDS</a>
+              <a href="#inscripcion">Inscribirme ahora</a>
+            </div>
+          </div>
+          <div className="foot-bottom">
+            <span>© 2026 Red Juvenil · I.C.E.B</span>
+            <span>La identidad real no se copia.</span>
+          </div>
+        </div>
+      </footer>
+    </>
+  );
+}
