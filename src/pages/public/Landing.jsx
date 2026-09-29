@@ -784,7 +784,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ============ FOOTER ============ */}
+      {/* ============ FOOTERR ============ */}
       <footer>
         <div className="wrap">
           <div className="foot-grid">
