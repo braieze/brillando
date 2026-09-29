@@ -51,9 +51,7 @@ const allPhotos = [
   "https://images.unsplash.com/photo-1788226881060-268f36b0abae?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0",
   "https://images.unsplash.com/photo-1788226880766-3f5610c352cd?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0"
 ];
-
-export default function Landing() {
- const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
     email: '',
@@ -140,8 +138,8 @@ export default function Landing() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: '¡Ya tengo mi pase para el Pre-Congreso Brillando 2026!',
-          text: `Salí del molde. Ya aseguré mi lugar para el Pre-Congreso del 12 de Septiembre. ¡Sumate vos también!`,
+          title: '¡Ya tengo mi pase para el Congreso Brillando 2026!',
+          text: `Salí del molde. Ya aseguré mi lugar para el Congreso del 31 de Octubre. ¡Sumate vos también!`,
           url: window.location.href,
         });
       } catch (error) {
@@ -152,38 +150,48 @@ export default function Landing() {
     }
   };
 
-  const descargarPase = async () => {
-    const ticketElement = document.getElementById('pase-oficial');
-    if (!ticketElement) return;
+  // 3. NUEVA FUNCIÓN DE DESCARGA: SOLO EL QR EN SECO Y CON FONDO BLANCO
+  const descargarPase = () => {
+    const svg = document.querySelector('#qr-wrapper svg');
+    if (!svg) {
+      alert("No se encontró el QR para descargar.");
+      return;
+    }
 
     const btn = document.getElementById('btn-descarga');
-    const textoOriginal = btn.innerText;
-    btn.innerText = "Generando imagen...";
+    const textoOriginal = btn ? btn.innerText : 'Descargar mi QR ↓';
+    if (btn) btn.innerText = "Generando QR...";
 
-    try {
-      const canvas = await html2canvas(ticketElement, {
-        scale: 2, 
-        backgroundColor: '#f2ede0', 
-        useCORS: true
-      });
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+
+    img.onload = () => {
+      const padding = 20; 
+      canvas.width = img.width + (padding * 2);
+      canvas.height = img.height + (padding * 2);
       
-      const image = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = `Pase-Autenticos-${formData.nombre}.png`;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, padding, padding);
+      
+      const pngFile = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.download = `QR-Acceso-${formData.nombre}.png`;
+      link.href = pngFile;
       link.click();
-    } catch (error) {
-      console.error("Error al generar la imagen", error);
-      alert("Error al descargar. Por favor, sacale una captura de pantalla al QR.");
-    } finally {
-      btn.innerText = textoOriginal;
-    }
+
+      if (btn) btn.innerText = textoOriginal;
+    };
+
+    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // 3. VALIDACIÓN ANTES DE ENVIAR
+    // 4. VALIDACIÓN ANTES DE ENVIAR
     if (!formData.nombre || !formData.apellido || !formData.email || !formData.edad || !formData.iglesia) {
       setErrorMsg("Por favor, completá todos los campos antes de generar tu pase.");
       return;
@@ -205,7 +213,7 @@ export default function Landing() {
         fechaInscripcion: serverTimestamp(),
         asistio_pre: false,
         asistio_congreso: false,
-        evento_origen: 'pre_congreso'
+        evento_origen: 'congreso'
       };
 
       const docRef = await addDoc(inscriptosRef, nuevoInscripto);
