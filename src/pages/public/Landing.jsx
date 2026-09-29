@@ -769,7 +769,7 @@ export default function Landing() {
                   </p>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxWidth: '380px', margin: '0 auto' }}>
-                    <button type="button" onClick={descargarPase} className="btn azul" style={{ width: '100%', background: 'var(--azul)', color: 'white', padding: '18px', border: '4px solid var(--tinta)', fontFamily: 'var(--f-mono)', fontWeight: 'bold', fontSize: '16px', textTransform: 'uppercase', cursor: 'pointer', boxShadow: '6px 6px 0 var(--tinta)' }}>
+                    <button id="btn-descarga" type="button" onClick={descargarPase} className="btn azul" style={{ width: '100%', background: 'var(--azul)', color: 'white', padding: '18px', border: '4px solid var(--tinta)', fontFamily: 'var(--f-mono)', fontWeight: 'bold', fontSize: '16px', textTransform: 'uppercase', cursor: 'pointer', boxShadow: '6px 6px 0 var(--tinta)' }}>
                       Descargar mi QR ↓
                     </button>
                     <button type="button" onClick={handleResetForm} className="btn ghost" style={{ width: '100%', justifyContent: 'center', border: '2px solid var(--tinta)' }}>
