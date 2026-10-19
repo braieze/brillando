@@ -11,12 +11,13 @@ import {
   LogOut
 } from 'lucide-react';
 
-// Estos son los "Badges" adaptados como los juegos de la Kermesse
+// Estos son los "Badges" base adaptados a los juegos de la Kermesse. 
+// El estado ('Completado' o 'Pendiente') se inyectará dinámicamente desde Firebase.
 const desafios = [
-  { id: 1, titulo: 'Tiro al Blanco', estado: 'Completado', puntos: 50, icon: Target, tone: 'yellow' },
-  { id: 2, titulo: 'Fuga Lógica', estado: 'Pendiente', puntos: 0, icon: Flame, tone: 'blue' },
-  { id: 3, titulo: 'Campo Minado', estado: 'Pendiente', puntos: 0, icon: ShieldCheck, tone: 'blue' },
-  { id: 4, titulo: 'Rompecabezas', estado: 'Completado', puntos: 50, icon: Trophy, tone: 'yellow' },
+  { id: 1, titulo: 'Tiro al Blanco', puntos: 50, icon: Target, tone: 'yellow' },
+  { id: 2, titulo: 'Fuga Lógica', puntos: 50, icon: Flame, tone: 'blue' },
+  { id: 3, titulo: 'Campo Minado', puntos: 50, icon: ShieldCheck, tone: 'blue' },
+  { id: 4, titulo: 'Rompecabezas', puntos: 50, icon: Trophy, tone: 'yellow' },
 ];
 
 // Mapeo de colores brutalistas
@@ -25,12 +26,11 @@ const toneClasses = {
   blue: 'from-blue-400 via-blue-600 to-blue-900',
 };
 
-function DesafioCard({ desafio }) {
+function DesafioCard({ desafio, isDone }) {
   const Icon = desafio.icon;
-  const isDone = desafio.estado === 'Completado';
 
   return (
-    <article className={`flex items-center justify-between rounded-2xl border ${isDone ? 'border-yellow-400/30 bg-yellow-400/5' : 'border-white/[0.05] bg-[#0a0a0a]'} p-4 shadow-lg`}>
+    <article className={`flex items-center justify-between rounded-2xl border ${isDone ? 'border-yellow-400/30 bg-yellow-400/5' : 'border-white/[0.05] bg-[#0a0a0a]'} p-4 shadow-lg transition-colors`}>
       <div className="flex items-center gap-4">
         <div className={`relative flex size-12 items-center justify-center`}>
           <div className={`absolute inset-0 rotate-45 rounded-xl bg-gradient-to-br ${toneClasses[desafio.tone]} opacity-20`} />
@@ -39,7 +39,7 @@ function DesafioCard({ desafio }) {
         <div>
           <h3 className="text-sm font-black uppercase tracking-wide text-white">{desafio.titulo}</h3>
           <p className={`text-[10px] font-bold uppercase tracking-widest ${isDone ? 'text-yellow-400' : 'text-gray-500'}`}>
-            {desafio.estado}
+            {isDone ? 'Completado' : 'Pendiente'}
           </p>
         </div>
       </div>
@@ -53,16 +53,18 @@ function DesafioCard({ desafio }) {
 }
 
 export default function DashboardJugador({ onEscanear, onSalir }) {
-  // Estado real conectado a Firebase
+  // Estado real conectado a Firebase, inicializado con valores por defecto
   const [grupoActual, setGrupoActual] = useState({
+    nombre: 'CARGANDO...',
     pin: '----',
     puntosTotales: 0,
     vidas: 3,
-    ranking: '-' 
+    ranking: '-',
+    juegosCompletados: [] 
   });
 
   useEffect(() => {
-    // Recuperamos el PIN que guardamos al crear o unirnos al grupo
+    // Recuperamos el PIN que guardamos al crear o unirnos al grupo (Persistencia)
     const pinGuardado = localStorage.getItem('miGrupoPIN');
     if (!pinGuardado) return;
 
@@ -73,10 +75,12 @@ export default function DashboardJugador({ onEscanear, onSalir }) {
       if (!snapshot.empty) {
         const data = snapshot.docs[0].data();
         setGrupoActual({
+          nombre: data.nombre || 'ESCUADRÓN',
           pin: data.pin,
           puntosTotales: data.puntos || 0,
           vidas: data.vidas !== undefined ? data.vidas : 3,
-          ranking: data.ranking || '-' 
+          ranking: data.ranking || '-',
+          juegosCompletados: data.juegosCompletados || []
         });
       }
     });
@@ -106,8 +110,8 @@ export default function DashboardJugador({ onEscanear, onSalir }) {
           
           <div className="flex justify-between items-start mb-4 relative z-10">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-400">Escuadrón</p>
-              <h2 className="text-3xl font-black uppercase tracking-tight text-white">#{grupoActual.pin}</h2>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-400">Escuadrón #{grupoActual.pin}</p>
+              <h2 className="text-2xl font-black uppercase tracking-tight text-white">{grupoActual.nombre}</h2>
             </div>
             <div className="text-right">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">Ranking</p>
@@ -136,13 +140,14 @@ export default function DashboardJugador({ onEscanear, onSalir }) {
         {/* LISTA DE DESAFÍOS */}
         <div className="mb-4 flex items-end justify-between">
           <h2 className="text-sm font-black uppercase tracking-widest text-gray-300">Registro de Misiones</h2>
-          <span className="text-[10px] font-bold uppercase text-yellow-400">2 Completadas</span>
+          <span className="text-[10px] font-bold uppercase text-yellow-400">{grupoActual.juegosCompletados.length} Completadas</span>
         </div>
         
         <div className="flex flex-col gap-3">
-          {desafios.map((desafio) => (
-            <DesafioCard key={desafio.id} desafio={desafio} />
-          ))}
+          {desafios.map((desafio) => {
+            const isDone = grupoActual.juegosCompletados.includes(desafio.id);
+            return <DesafioCard key={desafio.id} desafio={desafio} isDone={isDone} />
+          })}
         </div>
 
       </div>
