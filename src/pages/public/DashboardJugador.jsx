@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { db } from '../../config/firebase'; // Asegurá que esta ruta coincida con tu proyecto
 import {
   Zap,
   Camera,
@@ -51,13 +53,36 @@ function DesafioCard({ desafio }) {
 }
 
 export default function DashboardJugador({ onEscanear, onSalir }) {
-  // Datos simulados (luego vendrán de tu estado de Firebase)
-  const grupoActual = {
-    pin: '7779',
-    puntosTotales: 100,
+  // Estado real conectado a Firebase
+  const [grupoActual, setGrupoActual] = useState({
+    pin: '----',
+    puntosTotales: 0,
     vidas: 3,
-    ranking: 4
-  };
+    ranking: '-' 
+  });
+
+  useEffect(() => {
+    // Recuperamos el PIN que guardamos al crear o unirnos al grupo
+    const pinGuardado = localStorage.getItem('miGrupoPIN');
+    if (!pinGuardado) return;
+
+    // Escuchamos los cambios de este grupo en tiempo real
+    const q = query(collection(db, "grupos"), where("pin", "==", pinGuardado));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) {
+        const data = snapshot.docs[0].data();
+        setGrupoActual({
+          pin: data.pin,
+          puntosTotales: data.puntos || 0,
+          vidas: data.vidas !== undefined ? data.vidas : 3,
+          ranking: data.ranking || '-' 
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <main className="min-h-screen bg-[#050505] text-white pb-24">
@@ -75,7 +100,7 @@ export default function DashboardJugador({ onEscanear, onSalir }) {
 
       <div className="px-5 py-6">
         
-        {/* TARJETA PRINCIPAL DEL EQUIPO (Adaptada del "aside" flotante de v0) */}
+        {/* TARJETA PRINCIPAL DEL EQUIPO */}
         <div className="relative mb-8 overflow-hidden rounded-3xl border border-blue-500/20 bg-gradient-to-b from-[#0a0f1c] to-[#050505] p-6 shadow-2xl shadow-blue-900/20">
           <div className="absolute -right-10 -top-10 size-32 rounded-full bg-blue-500/10 blur-2xl" />
           
@@ -108,7 +133,7 @@ export default function DashboardJugador({ onEscanear, onSalir }) {
           </div>
         </div>
 
-        {/* LISTA DE DESAFÍOS (Adaptado de los Badges) */}
+        {/* LISTA DE DESAFÍOS */}
         <div className="mb-4 flex items-end justify-between">
           <h2 className="text-sm font-black uppercase tracking-widest text-gray-300">Registro de Misiones</h2>
           <span className="text-[10px] font-bold uppercase text-yellow-400">2 Completadas</span>
@@ -122,7 +147,7 @@ export default function DashboardJugador({ onEscanear, onSalir }) {
 
       </div>
 
-      {/* BOTÓN FLOTANTE DE ESCÁNER (Acción Principal Anclada) */}
+      {/* BOTÓN FLOTANTE DE ESCÁNER */}
       <div className="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-[#050505] via-[#050505]/90 to-transparent p-5 pb-8">
         <button 
           onClick={onEscanear}
