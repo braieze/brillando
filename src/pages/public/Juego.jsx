@@ -81,12 +81,12 @@ export default function Juego() {
         vidas: 3,
         juegosCompletados: [],
         creadoEn: new Date(),
-        integrantes: 1
+        integrantes: 1 // Arranca ocupando 1 de los 2 lugares disponibles
       });
       
       setPinGenerado(nuevoPin);
       localStorage.setItem('miGrupoPIN', nuevoPin);
-      setView('dashboard');
+      // Acá NO redireccionamos automáticamente para que puedan ver el PIN en pantalla
     } catch (error) {
       console.error("Error al crear:", error);
       alert("Error de conexión. Intentá de nuevo.");
@@ -94,7 +94,7 @@ export default function Juego() {
     setLoading(false);
   };
 
-  // 2. Lógica para buscar el PIN y unirse
+  // 2. Lógica para buscar el PIN y unirse (CON BLOQUEO DE MAX 2 DISPOSITIVOS)
   const handleUnirse = async (e) => {
     if (e) e.preventDefault();
     if (pinInput.length !== 4) return;
@@ -107,8 +107,21 @@ export default function Juego() {
       if (querySnapshot.empty) {
         alert("ACCESO DENEGADO. El PIN no existe.");
       } else {
-        localStorage.setItem('miGrupoPIN', pinInput);
-        setView('dashboard');
+        const docRef = querySnapshot.docs[0];
+        const datosGrupo = docRef.data();
+
+        // Control estricto de cupos
+        if (datosGrupo.integrantes >= 2) {
+          alert("ACCESO DENEGADO. Este escuadrón ya está lleno (Máximo 2 dispositivos).");
+        } else {
+          // Bloqueamos el cupo sumando +1 al registro de Firebase
+          await updateDoc(docRef.ref, {
+            integrantes: increment(1)
+          });
+          
+          localStorage.setItem('miGrupoPIN', pinInput);
+          setView('dashboard');
+        }
       }
     } catch (error) {
       console.error("Fallo de red:", error);
@@ -161,7 +174,7 @@ export default function Juego() {
     setView('dashboard');
   };
 
-  // ================= VISTAS PREMIUM (TAILWIND) =================
+  // ================= VISTAS PREMIUM =================
   
   if (view === 'dashboard') {
     return (
@@ -257,7 +270,7 @@ export default function Juego() {
         )}
 
         {view === 'crear' && (
-          <form onSubmit={handleCrearGrupo}>
+          <form onSubmit={!pinGenerado ? handleCrearGrupo : (e) => { e.preventDefault(); setView('dashboard'); }}>
             <h1 className="onb-title small">Identidad</h1>
             <p className="onb-desc">
               Bautizá a tu escuadrón antes de generar el código de acceso.
@@ -271,11 +284,27 @@ export default function Juego() {
               onChange={(e) => setNombreEquipo(e.target.value)}
               required
               autoFocus
+              disabled={!!pinGenerado} // Bloquea el input si ya generó el PIN
             />
-            <button type="submit" className="onb-btn primary mt-8" style={{ marginTop: '30px' }} disabled={loading}>
-              {loading ? 'Generando...' : 'Crear y Generar PIN'}
-            </button>
-            <button type="button" className="onb-btn text-only" style={{ marginTop: '10px' }} onClick={() => setView('inicio')}>
+            
+            {/* Si ya se generó el PIN, lo mostramos gigante */}
+            {pinGenerado && (
+              <div style={{ marginTop: '20px', padding: '15px', background: 'var(--amarillo)', color: 'var(--tinta)', textAlign: 'center', fontSize: '32px', fontWeight: '900', letterSpacing: '10px' }}>
+                {pinGenerado}
+              </div>
+            )}
+
+            {!pinGenerado ? (
+              <button type="submit" className="onb-btn primary mt-8" style={{ marginTop: '30px' }} disabled={loading}>
+                {loading ? 'Generando...' : 'Crear y Generar PIN'}
+              </button>
+            ) : (
+              <button type="button" className="onb-btn primary mt-8" style={{ marginTop: '30px' }} onClick={() => setView('dashboard')}>
+                Entrar a la Sala
+              </button>
+            )}
+            
+            <button type="button" className="onb-btn text-only" style={{ marginTop: '10px' }} onClick={() => { setView('inicio'); setPinGenerado(''); }}>
               Volver
             </button>
           </form>
