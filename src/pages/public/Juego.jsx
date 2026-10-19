@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, query, where, getDocs, updateDoc, increment, arrayUnion } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs, updateDoc, increment, arrayUnion, onSnapshot } from "firebase/firestore";
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { db } from '../../config/firebase';
 import DashboardJugador from './DashboardJugador';
 import './Juego.css';
 
-// DICCIONARIO INTELIGENTE: Múltiples preguntas por código QR físico
 const diccionarioJuegos = {
   'qr-tiro': {
     id: 1, 
@@ -152,23 +151,25 @@ export default function Juego() {
   const [juegoActivo, setJuegoActivo] = useState(null);
   const [feedback, setFeedback] = useState(null);
 
-  // Variable de estado local para tener a mano los datos del grupo (útil para el bloqueo de QR)
+  // Escucha en TIEMPO REAL a Firebase para evitar trampas
   const [grupoDataCache, setGrupoDataCache] = useState(null);
 
-  // Recuperar los datos del grupo actualizados al entrar al dashboard o escanear
   useEffect(() => {
-    const fetchGrupo = async () => {
+    let unsubscribe;
+    const fetchGrupoLive = () => {
       const pinGuardado = localStorage.getItem('miGrupoPIN');
       if (pinGuardado) {
         const q = query(collection(db, "grupos"), where("pin", "==", pinGuardado));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-          setGrupoDataCache(snap.docs[0].data());
-        }
+        unsubscribe = onSnapshot(q, (snap) => {
+          if (!snap.empty) {
+            setGrupoDataCache(snap.docs[0].data());
+          }
+        });
       }
     };
-    fetchGrupo();
-  }, [view]); // Se refresca cada vez que cambiamos de vista (ej. al abrir el escáner)
+    fetchGrupoLive();
+    return () => { if (unsubscribe) unsubscribe(); };
+  }, [view]); 
 
   const handleCrearGrupo = async (e) => {
     e.preventDefault();
@@ -191,7 +192,6 @@ export default function Juego() {
       setPinGenerado(nuevoPin);
       localStorage.setItem('miGrupoPIN', nuevoPin);
     } catch (error) {
-      console.error("Error al crear:", error);
       alert("Error de conexión. Intentá de nuevo.");
     }
     setLoading(false);
@@ -218,13 +218,11 @@ export default function Juego() {
           await updateDoc(docRef.ref, {
             integrantes: increment(1)
           });
-          
           localStorage.setItem('miGrupoPIN', pinInput);
           setView('dashboard');
         }
       }
     } catch (error) {
-      console.error("Fallo de red:", error);
       alert("Error de conexión al buscar el grupo.");
     }
     setLoading(false);
@@ -237,19 +235,17 @@ export default function Juego() {
     const baseJuego = diccionarioJuegos[textoQR];
     
     if (baseJuego) {
-      // 1. REGLA: ¿Ya completaron este juego?
+      // 1. REGLA: Usamos el Cache en Tiempo Real para bloquear dobles escaneos
       if (grupoDataCache?.juegosCompletados?.includes(baseJuego.id)) {
         alert("⚠️ MISIÓN YA COMPLETADA. Busquen otro puesto para seguir sumando.");
         setView('dashboard');
         return;
       }
 
-      // 2. REGLA: Pregunta Aleatoria
-      // Sorteamos un número del 0 a la cantidad de preguntas que tenga el array
+      // 2. REGLA: Pregunta 100% Aleatoria
       const randomIndex = Math.floor(Math.random() * baseJuego.preguntas.length);
       const preguntaSorteada = baseJuego.preguntas[randomIndex];
 
-      // Armamos el objeto para la trivia combinando el título del juego y la pregunta sorteada
       setJuegoActivo({
         id: baseJuego.id,
         titulo: baseJuego.titulo,
@@ -274,41 +270,65 @@ export default function Juego() {
     const datosServer = querySnapshot.docs[0].data();
 
     if (opcionSeleccionada === juegoActivo.correcta) {
-      // Respuesta CORRECTA: +50 Puntos y registrar el ID del juego
       await updateDoc(docRef, {
         puntos: increment(50),
         juegosCompletados: arrayUnion(juegoActivo.id)
       });
       setFeedback({ type: 'success', titulo: '¡SALA SUPERADA!', subtitulo: '+50 PUNTOS' });
       
+      setTimeout(() => {
+        setFeedback(null);
+        setJuegoActivo(null);
+        setView('dashboard');
+      }, 3000);
+      
     } else {
-      // Respuesta INCORRECTA
-      // 3. REGLA: Si pierden la última vida, vuelven a CERO puntos y resetean sus vidas a 3
+      // 3. REGLA: Muerte Súbita
       if (datosServer.vidas <= 1) {
         await updateDoc(docRef, {
           puntos: 0,
           vidas: 3
         });
-        setFeedback({ type: 'error', titulo: 'SISTEMA COMPROMETIDO', subtitulo: 'VIDAS AGOTADAS. PUNTOS A CERO.' });
+        // Dispara la pantalla de GAME OVER sin temporizador
+        setFeedback({ type: 'gameover', titulo: '¡ATRAPADOS!', subtitulo: 'Quedaron encerrados en la sala de escape.' });
       } else {
-        // Si tienen vidas de sobra, solo le restamos 1
-        await updateDoc(docRef, {
-          vidas: increment(-1)
-        });
+        await updateDoc(docRef, { vidas: increment(-1) });
         setFeedback({ type: 'error', titulo: 'SISTEMA COMPROMETIDO', subtitulo: '-1 VIDA' });
+        
+        setTimeout(() => {
+          setFeedback(null);
+          setJuegoActivo(null);
+          setView('dashboard');
+        }, 3000);
       }
     }
-    
-    setTimeout(() => {
-      setFeedback(null);
-      setJuegoActivo(null);
-      setView('dashboard');
-    }, 3500); // Le damos 3.5 segundos para que lean bien el mensaje de puntos a cero
   };
 
   // ================= VISTAS PREMIUM =================
 
   if (feedback) {
+    if (feedback.type === 'gameover') {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-[#050505] text-white">
+          <div className="mb-6">
+            <span className="text-9xl drop-shadow-xl">🔒</span>
+          </div>
+          <h1 className="text-4xl font-black uppercase tracking-tighter mb-4 leading-none text-red-600">
+            {feedback.titulo}
+          </h1>
+          <p className="text-lg font-bold uppercase tracking-widest text-gray-400 mb-10 leading-relaxed">
+            {feedback.subtitulo}<br/><span className="text-white">Han perdido todos sus puntos.</span>
+          </p>
+          <button 
+            onClick={() => { setFeedback(null); setJuegoActivo(null); setView('dashboard'); }}
+            className="w-full max-w-sm py-5 bg-red-600 text-white font-black text-sm uppercase tracking-widest rounded-full shadow-[0_0_20px_rgba(220,38,38,0.4)] active:scale-95 transition-transform"
+          >
+            Reiniciar Misión a Cero
+          </button>
+        </div>
+      );
+    }
+
     const isSuccess = feedback.type === 'success';
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center p-6 text-center ${isSuccess ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white'}`}>
@@ -367,14 +387,29 @@ export default function Juego() {
   if (view === 'trivia' && juegoActivo) {
     return (
       <div className="min-h-screen bg-[#050505] text-white p-6 flex flex-col">
-        <header className="mb-8 mt-4">
+        <header className="mb-6 mt-4 flex justify-between items-center">
           <span className="text-yellow-400 font-mono text-sm tracking-widest uppercase">SALA DESBLOQUEADA</span>
-          <h2 className="text-3xl font-black uppercase mt-2">{juegoActivo.titulo}</h2>
+          <div className="flex gap-1">
+            {[1, 2, 3].map((vida) => (
+              <span key={vida} className={`text-xl ${vida <= (grupoDataCache?.vidas || 3) ? 'opacity-100' : 'opacity-30'}`}>❤️</span>
+            ))}
+          </div>
         </header>
+
+        {/* 4. REGLA: Alerta gigante cuando queda 1 sola vida */}
+        {grupoDataCache?.vidas === 1 && (
+          <div className="bg-red-600 text-white p-4 rounded-xl mb-6 border-4 border-black animate-pulse shadow-[0_0_20px_rgba(220,38,38,0.5)]">
+            <h3 className="font-black uppercase text-xl mb-1 text-center">¡CUIDADO! ÚLTIMA VIDA</h3>
+            <p className="font-bold text-xs text-center uppercase tracking-widest">
+              Presten suma atención. Si responden mal pierden TODOS sus puntos y vuelven a cero.
+            </p>
+          </div>
+        )}
         
-        <p className="text-xl text-gray-200 mb-10 leading-relaxed font-bold">{juegoActivo.pregunta}</p>
+        <h2 className="text-3xl font-black uppercase mb-6 text-white">{juegoActivo.titulo}</h2>
+        <p className="text-lg text-gray-200 mb-8 leading-relaxed font-bold">{juegoActivo.pregunta}</p>
         
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 mt-auto mb-4">
           {juegoActivo.opciones.map((op) => (
             <button 
               key={op.id}
