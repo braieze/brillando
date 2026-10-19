@@ -54,7 +54,6 @@ const diccionarioJuegos = {
 };
 
 export default function Juego() {
-  // Inicialización perezosa: Si ya hay un PIN en memoria, arranca directo en el dashboard
   const [view, setView] = useState(() => localStorage.getItem('miGrupoPIN') ? 'dashboard' : 'inicio');
   
   const [pinInput, setPinInput] = useState('');
@@ -62,8 +61,10 @@ export default function Juego() {
   const [nombreEquipo, setNombreEquipo] = useState('');
   const [loading, setLoading] = useState(false);
   
-  // Estado para manejar el juego que se acaba de escanear
   const [juegoActivo, setJuegoActivo] = useState(null);
+  
+  // NUEVO ESTADO: Controla la pantalla completa de victoria o derrota
+  const [feedback, setFeedback] = useState(null);
 
   // 1. Lógica para crear un nuevo grupo
   const handleCrearGrupo = async (e) => {
@@ -81,12 +82,11 @@ export default function Juego() {
         vidas: 3,
         juegosCompletados: [],
         creadoEn: new Date(),
-        integrantes: 1 // Arranca ocupando 1 de los 2 lugares disponibles
+        integrantes: 1 
       });
       
       setPinGenerado(nuevoPin);
       localStorage.setItem('miGrupoPIN', nuevoPin);
-      // Acá NO redireccionamos automáticamente para que puedan ver el PIN en pantalla
     } catch (error) {
       console.error("Error al crear:", error);
       alert("Error de conexión. Intentá de nuevo.");
@@ -94,7 +94,7 @@ export default function Juego() {
     setLoading(false);
   };
 
-  // 2. Lógica para buscar el PIN y unirse (CON BLOQUEO DE MAX 2 DISPOSITIVOS)
+  // 2. Lógica para buscar el PIN y unirse 
   const handleUnirse = async (e) => {
     if (e) e.preventDefault();
     if (pinInput.length !== 4) return;
@@ -110,11 +110,9 @@ export default function Juego() {
         const docRef = querySnapshot.docs[0];
         const datosGrupo = docRef.data();
 
-        // Control estricto de cupos
         if (datosGrupo.integrantes >= 2) {
           alert("ACCESO DENEGADO. Este escuadrón ya está lleno (Máximo 2 dispositivos).");
         } else {
-          // Bloqueamos el cupo sumando +1 al registro de Firebase
           await updateDoc(docRef.ref, {
             integrantes: increment(1)
           });
@@ -134,7 +132,6 @@ export default function Juego() {
   const handleScan = (resultado) => {
     if (!resultado) return;
     
-    // Soporte para versiones nuevas y viejas de la librería
     const textoQR = Array.isArray(resultado) ? resultado[0].rawValue : resultado.text || resultado;
     const juegoEncontrado = diccionarioJuegos[textoQR];
     
@@ -146,7 +143,7 @@ export default function Juego() {
     }
   };
 
-  // 4. Lógica de Validación de Trivia
+  // 4. Lógica de Validación de Trivia (CON ANIMACIÓN NATIVA)
   const validarRespuesta = async (opcionSeleccionada) => {
     const pinGuardado = localStorage.getItem('miGrupoPIN');
     const q = query(collection(db, "grupos"), where("pin", "==", pinGuardado));
@@ -156,25 +153,47 @@ export default function Juego() {
     const docRef = querySnapshot.docs[0].ref;
 
     if (opcionSeleccionada === juegoActivo.correcta) {
-      // Respuesta correcta: Sumamos 50 puntos y agregamos el juego al historial
       await updateDoc(docRef, {
         puntos: increment(50),
         juegosCompletados: arrayUnion(juegoActivo.id)
       });
-      alert('¡SALA SUPERADA! +50 Puntos');
+      // Detona la pantalla de ÉXITO
+      setFeedback({ type: 'success', titulo: '¡SALA SUPERADA!', subtitulo: '+50 PUNTOS' });
     } else {
-      // Respuesta incorrecta: Restamos 1 vida
       await updateDoc(docRef, {
         vidas: increment(-1)
       });
-      alert('RESPUESTA INCORRECTA. Perdiste una vida.');
+      // Detona la pantalla de ERROR
+      setFeedback({ type: 'error', titulo: 'SISTEMA COMPROMETIDO', subtitulo: '-1 VIDA' });
     }
     
-    setJuegoActivo(null);
-    setView('dashboard');
+    // Pausa de 3 segundos antes de volver al dashboard para que disfruten la animación
+    setTimeout(() => {
+      setFeedback(null);
+      setJuegoActivo(null);
+      setView('dashboard');
+    }, 3000);
   };
 
   // ================= VISTAS PREMIUM =================
+
+  // VISTA ANIMADA: FEEDBACK DE TRIVIA
+  if (feedback) {
+    const isSuccess = feedback.type === 'success';
+    return (
+      <div className={`min-h-screen flex flex-col items-center justify-center p-6 text-center ${isSuccess ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white'}`}>
+        <div className="mb-8 animate-bounce">
+          <span className="text-8xl drop-shadow-xl">{isSuccess ? '⚡' : '❌'}</span>
+        </div>
+        <h1 className="text-5xl font-black uppercase tracking-tighter mb-4 leading-none">
+          {feedback.titulo}
+        </h1>
+        <h2 className={`text-2xl font-black font-mono uppercase tracking-widest px-6 py-2 border-4 ${isSuccess ? 'border-black' : 'border-white'} rounded-full`}>
+          {feedback.subtitulo}
+        </h2>
+      </div>
+    );
+  }
   
   if (view === 'dashboard') {
     return (
@@ -284,10 +303,9 @@ export default function Juego() {
               onChange={(e) => setNombreEquipo(e.target.value)}
               required
               autoFocus
-              disabled={!!pinGenerado} // Bloquea el input si ya generó el PIN
+              disabled={!!pinGenerado} 
             />
             
-            {/* Si ya se generó el PIN, lo mostramos gigante */}
             {pinGenerado && (
               <div style={{ marginTop: '20px', padding: '15px', background: 'var(--amarillo)', color: 'var(--tinta)', textAlign: 'center', fontSize: '32px', fontWeight: '900', letterSpacing: '10px' }}>
                 {pinGenerado}
