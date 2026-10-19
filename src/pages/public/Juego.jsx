@@ -1,55 +1,143 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { collection, addDoc, query, where, getDocs, updateDoc, increment, arrayUnion } from "firebase/firestore";
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { db } from '../../config/firebase';
 import DashboardJugador from './DashboardJugador';
 import './Juego.css';
 
-// DICCIONARIO DE DATOS: Mapeo de QRs físicos con los juegos
+// DICCIONARIO INTELIGENTE: Múltiples preguntas por código QR físico
 const diccionarioJuegos = {
   'qr-tiro': {
     id: 1, 
     titulo: 'Tiro al Blanco',
-    pregunta: '¿Qué máscara te cuesta más sacarte cuando estás con otros?',
-    opciones: [
-      { id: 'a', texto: 'Fingir que todo está bien todo el tiempo' },
-      { id: 'b', texto: 'Editar mi personalidad para encajar' },
-      { id: 'c', texto: 'Ocultar mis verdaderos gustos' }
-    ],
-    correcta: 'b' 
+    preguntas: [
+      {
+        texto: '¿Qué máscara te cuesta más sacarte cuando estás con otros?',
+        opciones: [
+          { id: 'a', texto: 'Fingir que todo está bien todo el tiempo' },
+          { id: 'b', texto: 'Editar mi personalidad para encajar' },
+          { id: 'c', texto: 'Ocultar mis verdaderos gustos' }
+        ],
+        correcta: 'b' 
+      },
+      {
+        texto: 'En una discusión, ¿qué actitud tomás para "no quedar mal"?',
+        opciones: [
+          { id: 'a', texto: 'Defiendo mi punto con respeto pero firmeza' },
+          { id: 'b', texto: 'Me callo para evitar conflicto aunque tenga razón' },
+          { id: 'c', texto: 'Le doy la razón al otro para que se calle' }
+        ],
+        correcta: 'a' 
+      },
+      {
+        texto: 'Si te invitan a un lugar que no va con tus principios, ¿qué hacés?',
+        opciones: [
+          { id: 'a', texto: 'Invento una excusa para no ir' },
+          { id: 'b', texto: 'Voy un rato pero no participo' },
+          { id: 'c', texto: 'Digo la verdad de por qué no asisto' }
+        ],
+        correcta: 'c' 
+      }
+    ]
   },
   'qr-fuga': {
     id: 2,
     titulo: 'Fuga Lógica',
-    pregunta: 'Vivimos rodeados de ruido. ¿A qué voces externas le estás dando el control?',
-    opciones: [
-      { id: 'a', texto: 'A las expectativas que otros pusieron sobre mí' },
-      { id: 'b', texto: 'A mis propios principios' },
-      { id: 'c', texto: 'A la verdad de Dios' }
-    ],
-    correcta: 'a'
+    preguntas: [
+      {
+        texto: 'Vivimos rodeados de ruido. ¿A qué voces externas le estás dando el control?',
+        opciones: [
+          { id: 'a', texto: 'A las expectativas que otros pusieron sobre mí' },
+          { id: 'b', texto: 'A mis propios principios' },
+          { id: 'c', texto: 'A la verdad de Dios' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'Cuando tomás una decisión difícil, ¿qué pesa más en tu mente?',
+        opciones: [
+          { id: 'a', texto: 'La opinión de Dios' },
+          { id: 'b', texto: 'El "qué dirán" mis amigos' },
+          { id: 'c', texto: 'Lo que me haga sentir bien en el momento' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿Qué pensamiento automático te frena de intentar algo nuevo?',
+        opciones: [
+          { id: 'a', texto: '"No soy lo suficientemente bueno"' },
+          { id: 'b', texto: '"Voy a aprender en el proceso"' },
+          { id: 'c', texto: '"Si me esfuerzo lo logro"' }
+        ],
+        correcta: 'a'
+      }
+    ]
   },
   'qr-minado': {
     id: 3,
     titulo: 'Campo Minado',
-    pregunta: 'Al intentar salir del molde, ¿cuál es tu mayor obstáculo interno?',
-    opciones: [
-      { id: 'a', texto: 'El miedo al rechazo' },
-      { id: 'b', texto: 'La comodidad de lo conocido' },
-      { id: 'c', texto: 'No saber por dónde empezar' }
-    ],
-    correcta: 'a'
+    preguntas: [
+      {
+        texto: 'Al intentar salir del molde, ¿cuál es tu mayor obstáculo interno?',
+        opciones: [
+          { id: 'a', texto: 'El miedo al rechazo' },
+          { id: 'b', texto: 'La comodidad de lo conocido' },
+          { id: 'c', texto: 'No saber por dónde empezar' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿Cómo reaccionás cuando te señalan un error en tu carácter?',
+        opciones: [
+          { id: 'a', texto: 'Me pongo a la defensiva y ataco' },
+          { id: 'b', texto: 'Lo analizo e intento mejorar' },
+          { id: 'c', texto: 'Me deprimo y me aislo' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'El verdadero arrepentimiento implica...',
+        opciones: [
+          { id: 'a', texto: 'Sentir culpa un rato y seguir igual' },
+          { id: 'b', texto: 'Pedir perdón para zafar' },
+          { id: 'c', texto: 'Un cambio de dirección en mis acciones' }
+        ],
+        correcta: 'c'
+      }
+    ]
   },
   'qr-rompecabezas': {
     id: 4,
     titulo: 'Rompecabezas',
-    pregunta: '¿Qué pieza te falta para mostrarte 100% auténtico?',
-    opciones: [
-      { id: 'a', texto: 'Confianza en mi diseño original' },
-      { id: 'b', texto: 'Dejar de compararme con otros' },
-      { id: 'c', texto: 'Aceptar mis debilidades' }
-    ],
-    correcta: 'b'
+    preguntas: [
+      {
+        texto: '¿Qué pieza te falta para mostrarte 100% auténtico?',
+        opciones: [
+          { id: 'a', texto: 'Confianza en mi diseño original' },
+          { id: 'b', texto: 'Dejar de compararme con otros' },
+          { id: 'c', texto: 'Aceptar mis debilidades' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'Dios no te llamó a ser una copia. Te llamó a ser...',
+        opciones: [
+          { id: 'a', texto: 'Original' },
+          { id: 'b', texto: 'Famoso' },
+          { id: 'c', texto: 'Perfecto' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'El diseño de Dios para tu vida se descubre...',
+        opciones: [
+          { id: 'a', texto: 'Buscando en tu interior lo que te gusta' },
+          { id: 'b', texto: 'Pasando tiempo con el Creador' },
+          { id: 'c', texto: 'Preguntándole a tus padres' }
+        ],
+        correcta: 'b'
+      }
+    ]
   }
 };
 
@@ -62,11 +150,26 @@ export default function Juego() {
   const [loading, setLoading] = useState(false);
   
   const [juegoActivo, setJuegoActivo] = useState(null);
-  
-  // NUEVO ESTADO: Controla la pantalla completa de victoria o derrota
   const [feedback, setFeedback] = useState(null);
 
-  // 1. Lógica para crear un nuevo grupo
+  // Variable de estado local para tener a mano los datos del grupo (útil para el bloqueo de QR)
+  const [grupoDataCache, setGrupoDataCache] = useState(null);
+
+  // Recuperar los datos del grupo actualizados al entrar al dashboard o escanear
+  useEffect(() => {
+    const fetchGrupo = async () => {
+      const pinGuardado = localStorage.getItem('miGrupoPIN');
+      if (pinGuardado) {
+        const q = query(collection(db, "grupos"), where("pin", "==", pinGuardado));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          setGrupoDataCache(snap.docs[0].data());
+        }
+      }
+    };
+    fetchGrupo();
+  }, [view]); // Se refresca cada vez que cambiamos de vista (ej. al abrir el escáner)
+
   const handleCrearGrupo = async (e) => {
     e.preventDefault();
     if (!nombreEquipo.trim()) return alert("Ingresá un nombre para tu equipo");
@@ -94,7 +197,6 @@ export default function Juego() {
     setLoading(false);
   };
 
-  // 2. Lógica para buscar el PIN y unirse 
   const handleUnirse = async (e) => {
     if (e) e.preventDefault();
     if (pinInput.length !== 4) return;
@@ -128,22 +230,40 @@ export default function Juego() {
     setLoading(false);
   };
 
-  // 3. Lógica del Escáner QR
   const handleScan = (resultado) => {
     if (!resultado) return;
     
     const textoQR = Array.isArray(resultado) ? resultado[0].rawValue : resultado.text || resultado;
-    const juegoEncontrado = diccionarioJuegos[textoQR];
+    const baseJuego = diccionarioJuegos[textoQR];
     
-    if (juegoEncontrado) {
-      setJuegoActivo(juegoEncontrado);
+    if (baseJuego) {
+      // 1. REGLA: ¿Ya completaron este juego?
+      if (grupoDataCache?.juegosCompletados?.includes(baseJuego.id)) {
+        alert("⚠️ MISIÓN YA COMPLETADA. Busquen otro puesto para seguir sumando.");
+        setView('dashboard');
+        return;
+      }
+
+      // 2. REGLA: Pregunta Aleatoria
+      // Sorteamos un número del 0 a la cantidad de preguntas que tenga el array
+      const randomIndex = Math.floor(Math.random() * baseJuego.preguntas.length);
+      const preguntaSorteada = baseJuego.preguntas[randomIndex];
+
+      // Armamos el objeto para la trivia combinando el título del juego y la pregunta sorteada
+      setJuegoActivo({
+        id: baseJuego.id,
+        titulo: baseJuego.titulo,
+        pregunta: preguntaSorteada.texto,
+        opciones: preguntaSorteada.opciones,
+        correcta: preguntaSorteada.correcta
+      });
+      
       setView('trivia');
     } else {
-      alert(`Código no reconocido: ${textoQR}`);
+      alert(`Código no reconocido en el sistema.`);
     }
   };
 
-  // 4. Lógica de Validación de Trivia (CON ANIMACIÓN NATIVA)
   const validarRespuesta = async (opcionSeleccionada) => {
     const pinGuardado = localStorage.getItem('miGrupoPIN');
     const q = query(collection(db, "grupos"), where("pin", "==", pinGuardado));
@@ -151,33 +271,43 @@ export default function Juego() {
     
     if (querySnapshot.empty) return;
     const docRef = querySnapshot.docs[0].ref;
+    const datosServer = querySnapshot.docs[0].data();
 
     if (opcionSeleccionada === juegoActivo.correcta) {
+      // Respuesta CORRECTA: +50 Puntos y registrar el ID del juego
       await updateDoc(docRef, {
         puntos: increment(50),
         juegosCompletados: arrayUnion(juegoActivo.id)
       });
-      // Detona la pantalla de ÉXITO
       setFeedback({ type: 'success', titulo: '¡SALA SUPERADA!', subtitulo: '+50 PUNTOS' });
+      
     } else {
-      await updateDoc(docRef, {
-        vidas: increment(-1)
-      });
-      // Detona la pantalla de ERROR
-      setFeedback({ type: 'error', titulo: 'SISTEMA COMPROMETIDO', subtitulo: '-1 VIDA' });
+      // Respuesta INCORRECTA
+      // 3. REGLA: Si pierden la última vida, vuelven a CERO puntos y resetean sus vidas a 3
+      if (datosServer.vidas <= 1) {
+        await updateDoc(docRef, {
+          puntos: 0,
+          vidas: 3
+        });
+        setFeedback({ type: 'error', titulo: 'SISTEMA COMPROMETIDO', subtitulo: 'VIDAS AGOTADAS. PUNTOS A CERO.' });
+      } else {
+        // Si tienen vidas de sobra, solo le restamos 1
+        await updateDoc(docRef, {
+          vidas: increment(-1)
+        });
+        setFeedback({ type: 'error', titulo: 'SISTEMA COMPROMETIDO', subtitulo: '-1 VIDA' });
+      }
     }
     
-    // Pausa de 3 segundos antes de volver al dashboard para que disfruten la animación
     setTimeout(() => {
       setFeedback(null);
       setJuegoActivo(null);
       setView('dashboard');
-    }, 3000);
+    }, 3500); // Le damos 3.5 segundos para que lean bien el mensaje de puntos a cero
   };
 
   // ================= VISTAS PREMIUM =================
 
-  // VISTA ANIMADA: FEEDBACK DE TRIVIA
   if (feedback) {
     const isSuccess = feedback.type === 'success';
     return (
@@ -259,7 +389,6 @@ export default function Juego() {
     );
   }
 
-  // ================= VISTA ONBOARDING (CSS CLÁSICO) =================
   return (
     <div className="onb-screen">
       <div className="onb-visual-area">
