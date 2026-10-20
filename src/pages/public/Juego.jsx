@@ -5,6 +5,10 @@ import { db } from '../../config/firebase';
 import DashboardJugador from './DashboardJugador';
 import './Juego.css';
 
+// ============================================================================
+// DICCIONARIO DE JUEGOS Y PREGUNTAS
+// Mapea el texto de cada código QR físico con su sala y banco de preguntas.
+// ============================================================================
 const diccionarioJuegos = {
   'qr-tiro': {
     id: 1, 
@@ -140,7 +144,24 @@ const diccionarioJuegos = {
   }
 };
 
+// ============================================================================
+// HELPER DE IDENTIDAD DE DISPOSITIVO 
+// Crea y recupera una huella única en el navegador del celular. Permite que
+// si el usuario cierra la pestaña y vuelve a poner el PIN, el sistema
+// reconozca que es el mismo teléfono y no lo bloquee por cupo lleno.
+// ============================================================================
+const obtenerDeviceId = () => {
+  let deviceId = localStorage.getItem('brillando_device_id');
+  if (!deviceId) {
+    deviceId = 'dev_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
+    localStorage.setItem('brillando_device_id', deviceId);
+  }
+  return deviceId;
+};
+
 export default function Juego() {
+  // Inicialización de vista y PIN activo desde localStorage para persistir sesión
+  const [activePin, setActivePin] = useState(() => localStorage.getItem('miGrupoPIN') || '');
   const [view, setView] = useState(() => localStorage.getItem('miGrupoPIN') ? 'dashboard' : 'inicio');
   
   const [pinInput, setPinInput] = useState('');
@@ -148,35 +169,88 @@ export default function Juego() {
   const [nombreEquipo, setNombreEquipo] = useState('');
   const [loading, setLoading] = useState(false);
   
+  // Estados de la mecánica de juego
   const [juegoActivo, setJuegoActivo] = useState(null);
   const [feedback, setFeedback] = useState(null);
 
-  // Escucha en TIEMPO REAL a Firebase para evitar trampas
-  const [grupoDataCache, setGrupoDataCache] = useState(null);
+  // Candado Anti-Spam para bloquear múltiples clics rápidos en respuestas o escáner
+  const [isProcessing, setIsProcessing] = useState(false);
 
+  // Datos del grupo y referencia directa al documento en vivo
+  const [grupoDataCache, setGrupoDataCache] = useState(null);
+  const [grupoDocRef, setGrupoDocRef] = useState(null);
+
+  // ============================================================================
+  // ESCUCHADOR PERMANENTE EN TIEMPO REAL
+  // Depende únicamente de `activePin` y NO de `view`. Así la conexión con
+  // Firebase jamás se corta ni se recarga al cambiar entre Lobby, Escáner y Trivia.
+  // ============================================================================
   useEffect(() => {
-    let unsubscribe;
-    const fetchGrupoLive = () => {
-      const pinGuardado = localStorage.getItem('miGrupoPIN');
-      if (pinGuardado) {
-        const q = query(collection(db, "grupos"), where("pin", "==", pinGuardado));
-        unsubscribe = onSnapshot(q, (snap) => {
-          if (!snap.empty) {
-            setGrupoDataCache(snap.docs[0].data());
-          }
+    if (!activePin) {
+      setGrupoDataCache(null);
+      setGrupoDocRef(null);
+      return;
+    }
+
+    const q = query(collection(db, "grupos"), where("pin", "==", activePin));
+    const unsubscribe = onSnapshot(q, (snap) => {
+      if (!snap.empty) {
+        const docSnap = snap.docs[0];
+        setGrupoDataCache(docSnap.data());
+        setGrupoDocRef(docSnap.ref); // Guardamos la referencia directa para actualizar sin demoras
+      }
+    });
+
+    return () => unsubscribe();
+  }, [activePin]);
+
+  // ============================================================================
+  // DETECTOR DE CONCURRENCIA / RACE CONDITION
+  // Si ambos compañeros escanean el mismo QR a la vez, este efecto detecta en
+  // milisegundos cuando el compañero A resuelve la sala (o pierde la última vida)
+  // y expulsa suavemente al compañero B de la trivia para que no toque opciones de más.
+  // ============================================================================
+  useEffect(() => {
+    // Solo actúa si el jugador está viendo la trivia y no fue él mismo quien tocó el botón
+    if (view === 'trivia' && juegoActivo && !isProcessing && !feedback) {
+      
+      // Caso A: El compañero respondió bien y el juego ya figura en juegosCompletados
+      if (grupoDataCache?.juegosCompletados?.includes(juegoActivo.id)) {
+        setFeedback({
+          type: 'success',
+          titulo: '¡SALA YA RESUELTA!',
+          subtitulo: 'Tu compañero acaba de superar este desafío (+50 PTS)'
+        });
+
+        const timer = setTimeout(() => {
+          setFeedback(null);
+          setJuegoActivo(null);
+          setView('dashboard');
+        }, 3000);
+        return () => clearTimeout(timer);
+      }
+
+      // Caso B: El compañero respondió mal en otro puesto y agotó la última vida del equipo
+      if (grupoDataCache?.vidas !== undefined && grupoDataCache.vidas <= 0) {
+        setFeedback({
+          type: 'gameover',
+          titulo: '¡ATRAPADOS!',
+          subtitulo: 'Se agotaron las vidas del escuadrón.'
         });
       }
-    };
-    fetchGrupoLive();
-    return () => { if (unsubscribe) unsubscribe(); };
-  }, [view]); 
+    }
+  }, [grupoDataCache, view, juegoActivo, isProcessing, feedback]);
 
+  // ============================================================================
+  // 1. CREAR NUEVO GRUPO + REGISTRAR IDENTIDAD DEL CREADOR 
+  // ============================================================================
   const handleCrearGrupo = async (e) => {
     e.preventDefault();
     if (!nombreEquipo.trim()) return alert("Ingresá un nombre para tu equipo");
     
     setLoading(true);
     const nuevoPin = Math.floor(1000 + Math.random() * 9000).toString();
+    const miDeviceId = obtenerDeviceId();
     
     try {
       await addDoc(collection(db, "grupos"), {
@@ -186,22 +260,54 @@ export default function Juego() {
         vidas: 3,
         juegosCompletados: [],
         creadoEn: new Date(),
-        integrantes: 1 
+        integrantes: 1,
+        dispositivos: [miDeviceId] // Guardamos la huella del celular del líder
       });
       
       setPinGenerado(nuevoPin);
       localStorage.setItem('miGrupoPIN', nuevoPin);
+      setActivePin(nuevoPin); // Inicia el túnel en tiempo real inmediatamente
     } catch (error) {
+      console.error("Error al crear grupo:", error);
       alert("Error de conexión. Intentá de nuevo.");
     }
     setLoading(false);
   };
 
+  // ============================================================================
+  // COMPARTIR PIN POR WHATSAPP 
+  // ============================================================================
+  const handleCompartirPin = async (pinParaCompartir) => {
+    const codigo = pinParaCompartir || pinGenerado || activePin;
+    const nombre = nombreEquipo ? nombreEquipo.toUpperCase() : (grupoDataCache?.nombre || 'nuestro escuadrón');
+    const mensaje = `⚡ ¡Armé el grupo "${nombre}" para el juego de Brillando! Sumate con este código PIN: ${codigo}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Código de Escuadrón - Brillando',
+          text: mensaje,
+        });
+      } catch (err) {
+        console.log('Compartir cancelado por el usuario');
+      }
+    } else {
+      // Si el navegador no soporta share nativo, abre WhatsApp directamente
+      const urlWhatsapp = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+      window.open(urlWhatsapp, '_blank');
+    }
+  };
+
+  // ============================================================================
+  // 3. UNIRSE A GRUPO CON RECONOCIMIENTO DE CELULAR (SOLUCIÓN PUNTO 3)
+  // ============================================================================
   const handleUnirse = async (e) => {
     if (e) e.preventDefault();
     if (pinInput.length !== 4) return;
     
     setLoading(true);
+    const miDeviceId = obtenerDeviceId();
+
     try {
       const q = query(collection(db, "grupos"), where("pin", "==", pinInput));
       const querySnapshot = await getDocs(q);
@@ -209,40 +315,66 @@ export default function Juego() {
       if (querySnapshot.empty) {
         alert("ACCESO DENEGADO. El PIN no existe.");
       } else {
-        const docRef = querySnapshot.docs[0];
-        const datosGrupo = docRef.data();
+        const docSnap = querySnapshot.docs[0];
+        const datosGrupo = docSnap.data();
+        const dispositivosRegistrados = datosGrupo.dispositivos || [];
 
-        if (datosGrupo.integrantes >= 2) {
-          alert("ACCESO DENEGADO. Este escuadrón ya está lleno (Máximo 2 dispositivos).");
-        } else {
-          await updateDoc(docRef.ref, {
-            integrantes: increment(1)
-          });
+        // Verificamos si este celular ya pertenecía al grupo anteriormente
+        const yaEsMiembro = dispositivosRegistrados.includes(miDeviceId);
+
+        if (yaEsMiembro) {
+          // Si cerró la pestaña por error y volvió a entrar, pasa directo sin ocupar nuevo cupo
           localStorage.setItem('miGrupoPIN', pinInput);
+          setActivePin(pinInput);
           setView('dashboard');
+        } else {
+          // Si es un dispositivo nuevo, verificamos el límite estricto de 2 celulares
+          const cupoActual = dispositivosRegistrados.length > 0 
+            ? dispositivosRegistrados.length 
+            : (datosGrupo.integrantes || 1);
+
+          if (cupoActual >= 2) {
+            alert("ACCESO DENEGADO. Este escuadrón ya está lleno (Máximo 2 dispositivos).");
+          } else {
+            // Registramos la huella del segundo celular y sumamos 1 integrante
+            await updateDoc(docSnap.ref, {
+              integrantes: increment(1),
+              dispositivos: arrayUnion(miDeviceId)
+            });
+            localStorage.setItem('miGrupoPIN', pinInput);
+            setActivePin(pinInput);
+            setView('dashboard');
+          }
         }
       }
     } catch (error) {
+      console.error("Error al unirse:", error);
       alert("Error de conexión al buscar el grupo.");
     }
     setLoading(false);
   };
 
+  // ============================================================================
+  // LÓGICA DEL ESCÁNER QR (CON PREVENCIÓN DE DOBLE LECTURA)
+  // ============================================================================
   const handleScan = (resultado) => {
-    if (!resultado) return;
+    // Si no hay resultado o ya estamos procesando una lectura, ignoramos
+    if (!resultado || isProcessing) return;
     
-    const textoQR = Array.isArray(resultado) ? resultado[0].rawValue : resultado.text || resultado;
-    const baseJuego = diccionarioJuegos[textoQR];
+    const textoQR = Array.isArray(resultado) ? resultado[0]?.rawValue : (resultado?.text || resultado);
+    if (!textoQR) return;
+
+    const baseJuego = diccionarioJuegos[textoQR.trim()];
     
     if (baseJuego) {
-      // 1. REGLA: Usamos el Cache en Tiempo Real para bloquear dobles escaneos
+      // Validamos contra el cache en vivo si el equipo ya superó esta estación
       if (grupoDataCache?.juegosCompletados?.includes(baseJuego.id)) {
         alert("⚠️ MISIÓN YA COMPLETADA. Busquen otro puesto para seguir sumando.");
         setView('dashboard');
         return;
       }
 
-      // 2. REGLA: Pregunta 100% Aleatoria
+      // Selección aleatoria del banco de preguntas de esa estación
       const randomIndex = Math.floor(Math.random() * baseJuego.preguntas.length);
       const preguntaSorteada = baseJuego.preguntas[randomIndex];
 
@@ -256,55 +388,107 @@ export default function Juego() {
       
       setView('trivia');
     } else {
-      alert(`Código no reconocido en el sistema.`);
+      alert(`Código QR no reconocido en el sistema.`);
     }
   };
 
+  // ============================================================================
+  // VALIDACIÓN DE TRIVIA BLINDADA 
+  // ============================================================================
   const validarRespuesta = async (opcionSeleccionada) => {
-    const pinGuardado = localStorage.getItem('miGrupoPIN');
-    const q = query(collection(db, "grupos"), where("pin", "==", pinGuardado));
-    const querySnapshot = await getDocs(q);
-    
-    if (querySnapshot.empty) return;
-    const docRef = querySnapshot.docs[0].ref;
-    const datosServer = querySnapshot.docs[0].data();
+    // CANDADO ANTI-SPAM: Si ya tocó un botón o no hay juego activo, bloqueamos clics extra
+    if (isProcessing || !juegoActivo || !grupoDocRef) return;
+    setIsProcessing(true);
 
-    if (opcionSeleccionada === juegoActivo.correcta) {
-      await updateDoc(docRef, {
-        puntos: increment(50),
-        juegosCompletados: arrayUnion(juegoActivo.id)
-      });
-      setFeedback({ type: 'success', titulo: '¡SALA SUPERADA!', subtitulo: '+50 PUNTOS' });
-      
-      setTimeout(() => {
-        setFeedback(null);
-        setJuegoActivo(null);
-        setView('dashboard');
-      }, 3000);
-      
-    } else {
-      // 3. REGLA: Muerte Súbita
-      if (datosServer.vidas <= 1) {
-        await updateDoc(docRef, {
-          puntos: 0,
-          vidas: 3
+    try {
+      // Verifica por última vez si el compañero ya ganó esta sala hace un instante
+      if (grupoDataCache?.juegosCompletados?.includes(juegoActivo.id)) {
+        setFeedback({ type: 'success', titulo: '¡SALA YA RESUELTA!', subtitulo: 'Tu compañero ya sumó estos puntos' });
+        setTimeout(() => {
+          setFeedback(null);
+          setJuegoActivo(null);
+          setIsProcessing(false);
+          setView('dashboard');
+        }, 2500);
+        return;
+      }
+
+      if (opcionSeleccionada === juegoActivo.correcta) {
+        // RESPUESTA CORRECTA: Usa grupoDocRef directo (sin hacer getDocs extra)
+        await updateDoc(grupoDocRef, {
+          puntos: increment(50),
+          juegosCompletados: arrayUnion(juegoActivo.id)
         });
-        // Dispara la pantalla de GAME OVER sin temporizador
-        setFeedback({ type: 'gameover', titulo: '¡ATRAPADOS!', subtitulo: 'Quedaron encerrados en la sala de escape.' });
-      } else {
-        await updateDoc(docRef, { vidas: increment(-1) });
-        setFeedback({ type: 'error', titulo: 'SISTEMA COMPROMETIDO', subtitulo: '-1 VIDA' });
+        
+        setFeedback({ type: 'success', titulo: '¡SALA SUPERADA!', subtitulo: '+50 PUNTOS' });
         
         setTimeout(() => {
           setFeedback(null);
           setJuegoActivo(null);
+          setIsProcessing(false);
           setView('dashboard');
         }, 3000);
+
+      } else {
+        // RESPUESTA INCORRECTA: Calculamos las vidas con seguridad matemática sobre el estado en vivo
+        const vidasActuales = grupoDataCache?.vidas !== undefined ? Number(grupoDataCache.vidas) : 3;
+
+        if (vidasActuales <= 1) {
+          // MUERTE SÚBITA REAL: Era su última vida (vidasActuales === 1)
+          // Dejamos vidas en 0 y puntos en 0 hasta que toquen el botón de reiniciar
+          await updateDoc(grupoDocRef, {
+            puntos: 0,
+            vidas: 0
+          });
+          setFeedback({ type: 'gameover', titulo: '¡ATRAPADOS!', subtitulo: 'Quedaron encerrados en la sala de escape.' });
+          setIsProcessing(false);
+        } else {
+          // AÚN TIENEN VIDAS (tenían 3 o 2 vidas): Restamos exactamente 1 vida
+          const nuevasVidas = Math.max(1, vidasActuales - 1);
+          await updateDoc(grupoDocRef, {
+            vidas: nuevasVidas
+          });
+          setFeedback({ type: 'error', titulo: 'SISTEMA COMPROMETIDO', subtitulo: '-1 VIDA' });
+          
+          setTimeout(() => {
+            setFeedback(null);
+            setJuegoActivo(null);
+            setIsProcessing(false);
+            setView('dashboard');
+          }, 3000);
+        }
       }
+    } catch (error) {
+      console.error("Error al validar respuesta:", error);
+      alert("Hubo una micro-caída de red. Intentá tocar la opción nuevamente.");
+      setIsProcessing(false);
     }
   };
 
-  // ================= VISTAS PREMIUM =================
+  // ============================================================================
+  // REINICIO MANUAL DESPUÉS DE GAME OVER 
+  // Restaura las 3 vidas limpias en Firebase cuando el equipo acepta el Game Over
+  // ============================================================================
+  const handleReiniciarMision = async () => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    try {
+      if (grupoDocRef) {
+        await updateDoc(grupoDocRef, {
+          vidas: 3,
+          puntos: 0
+        });
+      }
+    } catch (error) {
+      console.error("Error al reiniciar vidas:", error);
+    }
+    setFeedback(null);
+    setJuegoActivo(null);
+    setIsProcessing(false);
+    setView('dashboard');
+  };
+
+  // ================= VISTAS DE FEEDBACK A PANTALLA COMPLETA =================
 
   if (feedback) {
     if (feedback.type === 'gameover') {
@@ -320,10 +504,11 @@ export default function Juego() {
             {feedback.subtitulo}<br/><span className="text-white">Han perdido todos sus puntos.</span>
           </p>
           <button 
-            onClick={() => { setFeedback(null); setJuegoActivo(null); setView('dashboard'); }}
-            className="w-full max-w-sm py-5 bg-red-600 text-white font-black text-sm uppercase tracking-widest rounded-full shadow-[0_0_20px_rgba(220,38,38,0.4)] active:scale-95 transition-transform"
+            onClick={handleReiniciarMision}
+            disabled={isProcessing}
+            className="w-full max-w-sm py-5 bg-red-600 text-white font-black text-sm uppercase tracking-widest rounded-full shadow-[0_0_20px_rgba(220,38,38,0.4)] active:scale-95 transition-transform disabled:opacity-50"
           >
-            Reiniciar Misión a Cero
+            {isProcessing ? 'Reiniciando Sistema...' : 'Reiniciar Misión a Cero'}
           </button>
         </div>
       );
@@ -345,12 +530,16 @@ export default function Juego() {
     );
   }
   
+  // ================= VISTA: DASHBOARD DEL JUGADOR =================
   if (view === 'dashboard') {
     return (
       <DashboardJugador 
         onEscanear={() => setView('escaner')} 
         onSalir={() => { 
+          // Al salir volvemos al inicio, pero su deviceId sigue registrado en Firebase
+          // por si desea volver a ingresar el mismo PIN más tarde.
           localStorage.removeItem('miGrupoPIN'); 
+          setActivePin('');
           setPinGenerado('');
           setPinInput('');
           setNombreEquipo('');
@@ -360,6 +549,7 @@ export default function Juego() {
     );
   }
 
+  // ================= VISTA: ESCÁNER QR =================
   if (view === 'escaner') {
     return (
       <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center p-5">
@@ -369,7 +559,7 @@ export default function Juego() {
         <div className="w-full max-w-md rounded-2xl overflow-hidden border-2 border-yellow-400 relative mb-8">
           <Scanner 
             onScan={handleScan}
-            options={{ delayBetweenScanAttempts: 1000 }} 
+            options={{ delayBetweenScanAttempts: 1200 }} 
           />
           <div className="absolute top-1/2 left-0 w-full h-1 bg-yellow-400 shadow-[0_0_15px_#facc15] animate-pulse"></div>
         </div>
@@ -384,20 +574,23 @@ export default function Juego() {
     );
   }
 
+  // ================= VISTA: TRIVIA =================
   if (view === 'trivia' && juegoActivo) {
+    const vidasMostradas = grupoDataCache?.vidas !== undefined ? grupoDataCache.vidas : 3;
+
     return (
       <div className="min-h-screen bg-[#050505] text-white p-6 flex flex-col">
         <header className="mb-6 mt-4 flex justify-between items-center">
           <span className="text-yellow-400 font-mono text-sm tracking-widest uppercase">SALA DESBLOQUEADA</span>
           <div className="flex gap-1">
             {[1, 2, 3].map((vida) => (
-              <span key={vida} className={`text-xl ${vida <= (grupoDataCache?.vidas || 3) ? 'opacity-100' : 'opacity-30'}`}>❤️</span>
+              <span key={vida} className={`text-xl ${vida <= vidasMostradas ? 'opacity-100' : 'opacity-30'}`}>❤️</span>
             ))}
           </div>
         </header>
 
-        {/* 4. REGLA: Alerta gigante cuando queda 1 sola vida */}
-        {grupoDataCache?.vidas === 1 && (
+        {/* Alerta parpadeante cuando al equipo le queda exactamente 1 vida */}
+        {vidasMostradas === 1 && (
           <div className="bg-red-600 text-white p-4 rounded-xl mb-6 border-4 border-black animate-pulse shadow-[0_0_20px_rgba(220,38,38,0.5)]">
             <h3 className="font-black uppercase text-xl mb-1 text-center">¡CUIDADO! ÚLTIMA VIDA</h3>
             <p className="font-bold text-xs text-center uppercase tracking-widest">
@@ -414,7 +607,8 @@ export default function Juego() {
             <button 
               key={op.id}
               onClick={() => validarRespuesta(op.id)}
-              className="text-left bg-[#111] border-2 border-white/10 p-5 rounded-xl text-sm font-bold active:bg-yellow-400 active:text-black transition-colors"
+              disabled={isProcessing} // Bloquea los botones apenas se toca una respuesta
+              className="text-left bg-[#111] border-2 border-white/10 p-5 rounded-xl text-sm font-bold active:bg-yellow-400 active:text-black transition-colors disabled:opacity-50"
             >
               <span className="text-yellow-400 mr-2">{op.id.toUpperCase()}.</span> {op.texto}
             </button>
@@ -424,6 +618,7 @@ export default function Juego() {
     );
   }
 
+  // ================= VISTAS DE ONBOARDING (INICIO / CREAR / UNIR) =================
   return (
     <div className="onb-screen">
       <div className="onb-visual-area">
@@ -470,9 +665,20 @@ export default function Juego() {
               disabled={!!pinGenerado} 
             />
             
+            {/* Caja de PIN generado + Botón para compartir por WhatsApp (SOLUCIÓN PUNTO 2) */}
             {pinGenerado && (
-              <div style={{ marginTop: '20px', padding: '15px', background: 'var(--amarillo)', color: 'var(--tinta)', textAlign: 'center', fontSize: '32px', fontWeight: '900', letterSpacing: '10px' }}>
-                {pinGenerado}
+              <div style={{ marginTop: '20px' }}>
+                <div style={{ padding: '15px', background: 'var(--amarillo)', color: 'var(--tinta)', textAlign: 'center', fontSize: '32px', fontWeight: '900', letterSpacing: '10px', borderRadius: '12px' }}>
+                  {pinGenerado}
+                </div>
+                <button 
+                  type="button"
+                  onClick={() => handleCompartirPin(pinGenerado)}
+                  className="onb-btn secondary"
+                  style={{ marginTop: '12px', width: '100%', borderColor: 'var(--amarillo)', color: 'var(--amarillo)', fontWeight: 'bold' }}
+                >
+                  📲 Compartir PIN por WhatsApp
+                </button>
               </div>
             )}
 
@@ -481,7 +687,7 @@ export default function Juego() {
                 {loading ? 'Generando...' : 'Crear y Generar PIN'}
               </button>
             ) : (
-              <button type="button" className="onb-btn primary mt-8" style={{ marginTop: '30px' }} onClick={() => setView('dashboard')}>
+              <button type="button" className="onb-btn primary mt-8" style={{ marginTop: '16px' }} onClick={() => setView('dashboard')}>
                 Entrar a la Sala
               </button>
             )}
