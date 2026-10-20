@@ -161,8 +161,6 @@ const obtenerDeviceId = () => {
 // ============================================================================
 // HELPER 2: TIMEOUT ANTI-CONGELAMIENTO (SOLUCIÓN PUNTO 5)
 // Envuelve cualquier promesa de Firebase con un límite de 5 segundos.
-// Si el Wi-Fi o 4G del salón colapsa en ese instante, evita que el celular
-// quede bloqueado para siempre y lanza un error controlado.
 // ============================================================================
 const ejecutarConTimeout = (promesa, ms = 5000) => {
   let timeoutId;
@@ -183,7 +181,7 @@ export default function Juego() {
   const [pinGenerado, setPinGenerado] = useState('');
   const [nombreEquipo, setNombreEquipo] = useState('');
   
-  // Nuevos estados para los nombres de Capitán 1 (creador) y Capitán 2 (quien se une)
+  // Nombres de Capitán 1 (creador) y Capitán 2 (quien se une)
   const [nombreCapitan1, setNombreCapitan1] = useState('');
   const [nombreCapitan2, setNombreCapitan2] = useState('');
   const [loading, setLoading] = useState(false);
@@ -192,11 +190,9 @@ export default function Juego() {
   const [juegoActivo, setJuegoActivo] = useState(null);
   const [feedback, setFeedback] = useState(null);
 
-  // SOLUCIÓN PUNTO 2 (ANTI-TOQUE ACCIDENTAL):
   // Controla si las opciones de la trivia ya se desplegaron o siguen ocultas
   const [mostrarOpciones, setMostrarOpciones] = useState(false);
 
-  // SOLUCIÓN PUNTO 4 (PREVENCIÓN DE DOBLE INSTANCIA DE CÁMARA):
   // Bloquea por 1 segundo el botón de abrir cámara para evitar doble invocación
   const [scannerCooldown, setScannerCooldown] = useState(false);
 
@@ -210,7 +206,6 @@ export default function Juego() {
 
   // ============================================================================
   // 1. ESCUCHADOR PERMANENTE DEL GRUPO EN TIEMPO REAL
-  // Mantiene los datos del escuadrón sincronizados sin cortarse entre vistas.
   // ============================================================================
   useEffect(() => {
     if (!activePin) {
@@ -232,33 +227,36 @@ export default function Juego() {
   }, [activePin]);
 
   // ============================================================================
-  // 2. ESCUCHADOR DE RANKING GLOBAL EN VIVO (SOLUCIÓN PUNTO 3: "TOP -")
-  // Escucha todos los grupos, los ordena por puntaje de mayor a menor y calcula
-  // en qué puesto exacto está parado este escuadrón. Además sincroniza el campo
-  // `ranking` en el documento para que DashboardJugador lo muestre al instante.
+  // 2. ESCUCHADOR DE RANKING GLOBAL CON DESEMPATE POR TIEMPO
+  // Ordena por mayor puntaje y, en caso de empate, queda arriba quien llegó
+  // primero a ese puntaje (`ultimaActualizacionPuntos` menor).
   // ============================================================================
   useEffect(() => {
     if (!activePin) return;
 
     const qTodos = query(collection(db, "grupos"));
     const unsubscribeRanking = onSnapshot(qTodos, (snap) => {
-      const listaGrupos = snap.docs.map(doc => ({
-        pin: doc.data().pin,
-        puntos: Number(doc.data().puntos || 0),
-        rankingGuardado: doc.data().ranking
-      }));
+      const listaGrupos = snap.docs.map(doc => {
+        const data = doc.data();
+        return {
+          pin: data.pin,
+          puntos: Number(data.puntos || 0),
+          tiempo: Number(data.ultimaActualizacionPuntos || Number.MAX_SAFE_INTEGER),
+          rankingGuardado: data.ranking
+        };
+      });
 
-      // Ordenamos de mayor a menor puntaje
-      listaGrupos.sort((a, b) => b.puntos - a.puntos);
+      // Ordenamos de mayor a menor puntaje; si empatan, gana quien llegó antes
+      listaGrupos.sort((a, b) => {
+        if (b.puntos !== a.puntos) return b.puntos - a.puntos;
+        return a.tiempo - b.tiempo;
+      });
 
-      // Buscamos la posición de nuestro PIN
       const index = listaGrupos.findIndex(g => g.pin === activePin);
       if (index !== -1 && listaGrupos[index].puntos > 0) {
         const puestoCalculado = index + 1;
         setRankingActual(puestoCalculado);
 
-        // Si el documento en Firebase todavía tiene '-' o un puesto viejo, lo actualizamos
-        // para que DashboardJugador.jsx (que lee data.ranking) reciba el número real
         if (grupoDocRef && listaGrupos[index].rankingGuardado !== puestoCalculado) {
           updateDoc(grupoDocRef, { ranking: puestoCalculado }).catch(() => {});
         }
@@ -275,8 +273,6 @@ export default function Juego() {
 
   // ============================================================================
   // 3. DETECTOR DE CONCURRENCIA ENTRE CAPITÁN 1 Y CAPITÁN 2
-  // Si ambos capitanes escanean el mismo QR a la vez, avisa cuando el otro
-  // compañero resuelve la sala o pierde la última vida.
   // ============================================================================
   useEffect(() => {
     if (view === 'trivia' && juegoActivo && !isProcessing && !feedback) {
@@ -333,6 +329,7 @@ export default function Juego() {
           ranking: '-',
           juegosCompletados: [],
           creadoEn: new Date(),
+          ultimaActualizacionPuntos: 0, // Inicializado en 0 para desempates
           integrantes: 1,
           dispositivos: [miDeviceId]
         })
@@ -359,7 +356,6 @@ export default function Juego() {
     const equipo = nombreEquipo ? nombreEquipo.trim().toUpperCase() : (grupoDataCache?.nombre || 'NUESTRO ESCUADRÓN');
     const cap1 = nombreCapitan1 ? nombreCapitan1.trim().toUpperCase() : (grupoDataCache?.capitan1 || 'CAPITÁN 1');
 
-    // Mensaje estructurado con link oficial y aclaración de Capitanes 1 y 2
     const mensaje = 
 `⚡ *¡ARMÉ EL ESCUADRÓN "${equipo}" PARA EL JUEGO DE BRILLANDO!* ⚡
 
@@ -408,17 +404,21 @@ export default function Juego() {
         const datosGrupo = docSnap.data();
         const dispositivosRegistrados = datosGrupo.dispositivos || [];
 
-        // Verificamos si este celular ya estaba registrado como Capitán 1 o Capitán 2
         const indiceDispositivo = dispositivosRegistrados.indexOf(miDeviceId);
 
         if (indiceDispositivo !== -1) {
-          // Reconoció el celular: reingresa sin ocupar un cupo extra
+          // Si este celular ya pertenecía al grupo, actualiza su nombre si era el Cap 2 y entra directo
+          if (indiceDispositivo === 1 && datosGrupo.capitan2 === 'PENDIENTE') {
+            await ejecutarConTimeout(
+              updateDoc(docSnap.ref, { capitan2: nombreCapLimpio })
+            );
+          }
           localStorage.setItem('miGrupoPIN', pinInput);
           localStorage.setItem('miRolCapitan', `CAPITÁN ${indiceDispositivo + 1}: ${nombreCapLimpio}`);
           setActivePin(pinInput);
           setView('dashboard');
         } else {
-          // Es un celular nuevo: validamos el máximo estricto de 2 dispositivos (Capitán 1 y Capitán 2)
+          // Celular nuevo: validamos el máximo estricto de 2 dispositivos
           const cupoActual = dispositivosRegistrados.length > 0 
             ? dispositivosRegistrados.length 
             : (datosGrupo.integrantes || 1);
@@ -450,9 +450,7 @@ export default function Juego() {
   };
 
   // ============================================================================
-  // 7. APERTURA SEGURA DE CÁMARA (SOLUCIÓN PUNTO 4: ANTI-DOBLE TOQUE)
-  // Bloquea durante 1 segundo el cambio a la cámara para evitar que un doble
-  // toque rápido trabe el hardware del celular.
+  // 7. APERTURA SEGURA DE CÁMARA (ANTI-DOBLE TOQUE)
   // ============================================================================
   const handleAbrirEscanerSeguro = () => {
     if (scannerCooldown || isProcessing) return;
@@ -475,18 +473,15 @@ export default function Juego() {
     const baseJuego = diccionarioJuegos[textoQR.trim()];
     
     if (baseJuego) {
-      // Bloquea si el juego ya está dentro de juegosCompletados
       if (grupoDataCache?.juegosCompletados?.includes(baseJuego.id)) {
         alert("⚠️ MISIÓN YA COMPLETADA. Busquen otro puesto para seguir sumando.");
         setView('dashboard');
         return;
       }
 
-      // Sorteamos una pregunta aleatoria del banco de esa estación
       const randomIndex = Math.floor(Math.random() * baseJuego.preguntas.length);
       const preguntaSorteada = baseJuego.preguntas[randomIndex];
 
-      // SOLUCIÓN PUNTO 2: Iniciamos con las opciones ocultas para que no respondan sin querer al enfocar
       setMostrarOpciones(false);
       setJuegoActivo({
         id: baseJuego.id,
@@ -503,14 +498,13 @@ export default function Juego() {
   };
 
   // ============================================================================
-  // 9. VALIDACIÓN DE TRIVIA CON TIMEOUT DE 5s Y RESETEO TOTAL EN GAME OVER
+  // 9. VALIDACIÓN DE TRIVIA CON MARCA DE TIEMPO PARA DESEMPATES
   // ============================================================================
   const validarRespuesta = async (opcionSeleccionada) => {
     if (isProcessing || !juegoActivo || !grupoDocRef) return;
     setIsProcessing(true);
 
     try {
-      // Verifica si el otro Capitán ya ganó esta sala hace un instante
       if (grupoDataCache?.juegosCompletados?.includes(juegoActivo.id)) {
         setFeedback({ type: 'success', titulo: '¡SALA YA RESUELTA!', subtitulo: 'El otro Capitán ya sumó estos puntos' });
         setTimeout(() => {
@@ -524,11 +518,12 @@ export default function Juego() {
       }
 
       if (opcionSeleccionada === juegoActivo.correcta) {
-        // RESPUESTA CORRECTA: Protegida con timeout de 5 segundos
+        // RESPUESTA CORRECTA: Sumamos 50 puntos, guardamos el juego y la hora exacta para desempates
         await ejecutarConTimeout(
           updateDoc(grupoDocRef, {
             puntos: increment(50),
-            juegosCompletados: arrayUnion(juegoActivo.id)
+            juegosCompletados: arrayUnion(juegoActivo.id),
+            ultimaActualizacionPuntos: Date.now()
           })
         );
         
@@ -547,21 +542,19 @@ export default function Juego() {
         const vidasActuales = grupoDataCache?.vidas !== undefined ? Number(grupoDataCache.vidas) : 3;
 
         if (vidasActuales <= 1) {
-          // SOLUCIÓN PUNTO 1 (EL RESETEO TOTAL ABSOLUTO):
-          // Al perder la última vida, limpiamos puntos: 0, vidas: 0 y vaciamos juegosCompletados: []
-          // para que puedan volver a escanear cualquier QR desde cero sin quedar bloqueados.
+          // RESETEO TOTAL ABSOLUTO: Puntos a 0, vidas a 0, historial vacío y tiempo en 0
           await ejecutarConTimeout(
             updateDoc(grupoDocRef, {
               puntos: 0,
               vidas: 0,
               ranking: '-',
-              juegosCompletados: [] // <-- Historial en blanco para poder rejugar todas las estaciones
+              juegosCompletados: [],
+              ultimaActualizacionPuntos: 0
             })
           );
           setFeedback({ type: 'gameover', titulo: '¡ATRAPADOS!', subtitulo: 'Quedaron encerrados en la sala de escape.' });
           setIsProcessing(false);
         } else {
-          // Aún les quedan vidas: restamos 1 vida
           const nuevasVidas = Math.max(1, vidasActuales - 1);
           await ejecutarConTimeout(
             updateDoc(grupoDocRef, {
@@ -581,15 +574,13 @@ export default function Juego() {
       }
     } catch (error) {
       console.error("Error al validar respuesta:", error);
-      // SOLUCIÓN PUNTO 5: Si Firebase tarda más de 5 segundos, soltamos el candado y avisamos
       alert("Señal débil. Volvé a intentarlo.");
       setIsProcessing(false);
     }
   };
 
   // ============================================================================
-  // 10. REINICIO MANUAL DESPUÉS DE GAME OVER (SOLUCIÓN PUNTO 1)
-  // Restaura las 3 vidas, deja puntos en 0 y asegura juegosCompletados vacío []
+  // 10. REINICIO MANUAL DESPUÉS DE GAME OVER
   // ============================================================================
   const handleReiniciarMision = async () => {
     if (isProcessing) return;
@@ -601,7 +592,8 @@ export default function Juego() {
             vidas: 3,
             puntos: 0,
             ranking: '-',
-            juegosCompletados: [] // Garantiza que todos los puestos vuelvan a estar "Pendientes"
+            juegosCompletados: [],
+            ultimaActualizacionPuntos: 0
           })
         );
       }
@@ -663,35 +655,18 @@ export default function Juego() {
   // ================= VISTA: DASHBOARD DEL JUGADOR =================
   if (view === 'dashboard') {
     return (
-      <div className="relative">
-        {/* Barra superior de Capitanes + Botón rápido para reenviar PIN e invitación por WhatsApp */}
-        <div className="bg-[#0a0f1c] border-b border-blue-500/20 px-5 py-2.5 flex items-center justify-between text-[11px] font-mono text-gray-300">
-          <div className="truncate pr-2">
-            <span className="text-yellow-400 font-bold">CAP 1:</span> {grupoDataCache?.capitan1 || '---'} 
-            <span className="mx-2 text-gray-600">|</span>
-            <span className="text-blue-400 font-bold">CAP 2:</span> {grupoDataCache?.capitan2 || 'ESPERANDO...'}
-          </div>
-          <button
-            onClick={() => handleCompartirPin(activePin)}
-            className="shrink-0 rounded-full bg-yellow-400/10 border border-yellow-400/40 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-yellow-400 active:scale-95"
-          >
-            📲 Invitar Cap 2
-          </button>
-        </div>
-
-        <DashboardJugador 
-          rankingEnVivo={rankingActual}
-          onEscanear={handleAbrirEscanerSeguro} 
-          onSalir={() => { 
-            localStorage.removeItem('miGrupoPIN'); 
-            setActivePin('');
-            setPinGenerado('');
-            setPinInput('');
-            setNombreEquipo('');
-            setView('inicio'); 
-          }} 
-        />
-      </div>
+      <DashboardJugador 
+        rankingEnVivo={rankingActual}
+        onEscanear={handleAbrirEscanerSeguro} 
+        onSalir={() => { 
+          localStorage.removeItem('miGrupoPIN'); 
+          setActivePin('');
+          setPinGenerado('');
+          setPinInput('');
+          setNombreEquipo('');
+          setView('inicio'); 
+        }} 
+      />
     );
   }
 
@@ -753,7 +728,7 @@ export default function Juego() {
           </p>
         </div>
         
-        {/* SOLUCIÓN PUNTO 2: Primero mostramos el botón "RESPONDER", luego las opciones en fila */}
+        {/* Primero mostramos el botón "Responder Pregunta", luego las opciones en fila */}
         {!mostrarOpciones ? (
           <div className="mt-auto mb-8 flex flex-col gap-3">
             <button
@@ -848,7 +823,6 @@ export default function Juego() {
               disabled={!!pinGenerado} 
             />
             
-            {/* Caja de PIN generado + Botón para compartir por WhatsApp con el link oficial */}
             {pinGenerado && (
               <div style={{ marginTop: '20px' }}>
                 <div style={{ padding: '15px', background: 'var(--amarillo)', color: 'var(--tinta)', textAlign: 'center', fontSize: '32px', fontWeight: '900', letterSpacing: '10px', borderRadius: '12px' }}>
