@@ -7,12 +7,15 @@ import './Juego.css';
 
 // ============================================================================
 // DICCIONARIO DE JUEGOS Y PREGUNTAS
-// Mapea el texto de cada código QR físico con su sala y banco de preguntas.
+// Mapea el texto de cada código QR físico con su sala, puntaje, info y banco de preguntas.
 // ============================================================================
 const diccionarioJuegos = {
-  'qr-tiro': {
+  'qr-basquet': {
     id: 1, 
-    titulo: 'Tiro al Blanco',
+    titulo: 'Aro de Basquet',
+    puntos: 25,
+    tipo: 'normal',
+    info: 'Embocar la pelota de basquet: tienen 3 tiros y ganan si embocan al menos 1 de esos tiros. Vale 25 puntos porque se juega de una.',
     preguntas: [
       {
         texto: '¿Qué máscara te cuesta más sacarte cuando estás con otros?',
@@ -43,9 +46,12 @@ const diccionarioJuegos = {
       }
     ]
   },
-  'qr-fuga': {
+  'qr-bowling': {
     id: 2,
-    titulo: 'Fuga Lógica',
+    titulo: 'Bowling con botellas de agua',
+    puntos: 25,
+    tipo: 'normal',
+    info: 'Se enfrentan 2 equipos: quien tire más botellas con la pelota tirada con la mano gana el acceso al QR. Vale 25 puntos.',
     preguntas: [
       {
         texto: 'Vivimos rodeados de ruido. ¿A qué voces externas le estás dando el control?',
@@ -76,9 +82,12 @@ const diccionarioJuegos = {
       }
     ]
   },
-  'qr-minado': {
+  'qr-ppt': {
     id: 3,
-    titulo: 'Campo Minado',
+    titulo: 'Piedra papel o tijera',
+    puntos: 25,
+    tipo: 'normal',
+    info: 'Se enfrentan 2 equipos y el ganador a 3 rounds (no se cuentan los empates) accede al QR. El juego termina 2-0 o 2-1. Vale 25 puntos.',
     preguntas: [
       {
         texto: 'Al intentar salir del molde, ¿cuál es tu mayor obstáculo interno?',
@@ -109,9 +118,12 @@ const diccionarioJuegos = {
       }
     ]
   },
-  'qr-rompecabezas': {
+  'qr-arco': {
     id: 4,
-    titulo: 'Rompecabezas',
+    titulo: 'Arco con Agujeritos',
+    puntos: 50,
+    tipo: 'normal',
+    info: 'Hay un arco con una tela con agujeros: se enfrentan 2 equipos y quien emboque la mayor cantidad en 3 oportunidades gana. Vale 50 puntos.',
     preguntas: [
       {
         texto: '¿Qué pieza te falta para mostrarte 100% auténtico?',
@@ -137,6 +149,202 @@ const diccionarioJuegos = {
           { id: 'a', texto: 'Buscando en tu interior lo que te gusta' },
           { id: 'b', texto: 'Pasando tiempo con el Creador' },
           { id: 'c', texto: 'Preguntándole a tus padres' }
+        ],
+        correcta: 'b'
+      }
+    ]
+  },
+  'qr-aro': {
+    id: 5,
+    titulo: 'Embocar el aro',
+    puntos: 50,
+    tipo: 'normal',
+    info: 'Son 3 intentos: si embocás al menos 1 de 3 veces el aro en la botella, accedés al QR. Vale 50 puntos.',
+    preguntas: [
+      {
+        texto: 'Cuando nadie te está mirando, ¿quién sos realmente?',
+        opciones: [
+          { id: 'a', texto: 'La misma persona que muestro en público' },
+          { id: 'b', texto: 'Alguien totalmente distinto' },
+          { id: 'c', texto: 'Depende del estado de ánimo' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿Qué hacés frente a la presión de tu grupo de amigos?',
+        opciones: [
+          { id: 'a', texto: 'Cedo para no quedar afuera' },
+          { id: 'b', texto: 'Mantengo mis convicciones con respeto' },
+          { id: 'c', texto: 'Cambio de tema para zafar' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'Salir del molde requiere principalmente...',
+        opciones: [
+          { id: 'a', texto: 'Tener muchos seguidores' },
+          { id: 'b', texto: 'Valentía para vivir en la verdad' },
+          { id: 'c', texto: 'No escuchar a nadie nunca' }
+        ],
+        correcta: 'b'
+      }
+    ]
+  },
+  'qr-vasitos': {
+    id: 6,
+    titulo: 'Torre de vasitos',
+    puntos: 50,
+    tipo: 'normal',
+    info: 'Se enfrentan 2 equipos con 2 torres: quien primero junte todos los vasitos accede al QR. Dificultad: hay una pelota en la cima que no se tiene que caer ni tocar con la mano. Vale 50 puntos.',
+    preguntas: [
+      {
+        texto: 'Para construir una vida firme que no se derrumbe, la base debe ser:',
+        opciones: [
+          { id: 'a', texto: 'La aprobación de la gente' },
+          { id: 'b', texto: 'La roca de la palabra de Dios' },
+          { id: 'c', texto: 'Mis propios logros y esfuerzos' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: '¿Qué pasa cuando intentamos sostener todo por nuestra propia fuerza?',
+        opciones: [
+          { id: 'a', texto: 'Nos agotamos y tarde o temprano caemos' },
+          { id: 'b', texto: 'Nos volvemos invencibles' },
+          { id: 'c', texto: 'No necesitamos de nadie más' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'El equilibrio y el dominio propio en momentos de presión vienen de:',
+        opciones: [
+          { id: 'a', texto: 'Reprimir lo que siento' },
+          { id: 'b', texto: 'Un corazón en paz conectado con Dios' },
+          { id: 'c', texto: 'Hacer todo a las apuradas' }
+        ],
+        correcta: 'b'
+      }
+    ]
+  },
+  'qr-elastico': {
+    id: 7,
+    titulo: 'Elastico Vaso',
+    puntos: 70,
+    tipo: 'normal',
+    info: 'Se juega en equipo: quien agarra 3 vasos y los emboca en otro vaso en menor tiempo gana. Dificultad: los vasos se llevan únicamente con un elástico. Vale 70 puntos.',
+    preguntas: [
+      {
+        texto: '¿Por qué Dios nos diseñó para caminar en equipo y no aislados?',
+        opciones: [
+          { id: 'a', texto: 'Porque juntos llegamos adonde solos no podemos' },
+          { id: 'b', texto: 'Para echarle la culpa a otro si algo sale mal' },
+          { id: 'c', texto: 'Para competir entre nosotros' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'Cuando un amigo de tu grupo está tirando para atrás o pasando un mal momento, ¿qué hacés?',
+        opciones: [
+          { id: 'a', texto: 'Lo dejo de lado para avanzar más rápido' },
+          { id: 'b', texto: 'Lo escucho, lo levanto y tiramos juntos' },
+          { id: 'c', texto: 'Hago de cuenta que no pasa nada' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'La verdadera unidad en un escuadrón se logra cuando:',
+        opciones: [
+          { id: 'a', texto: 'Uno manda a los gritos y el resto obedece' },
+          { id: 'b', texto: 'Hay empatía, comunicación y un mismo propósito' },
+          { id: 'c', texto: 'Cada uno hace la suya' }
+        ],
+        correcta: 'b'
+      }
+    ]
+  },
+  'qr-tateti': {
+    id: 8,
+    titulo: 'Tateti con botellas',
+    puntos: 80,
+    tipo: 'normal',
+    info: 'Se enfrentan 2 equipos (3 personas por equipo, una detrás de otra): hacen bottle challenge y quien deja la botella de pie corre a mover la ficha del tatetí hasta que un equipo gane. Vale 80 puntos.',
+    preguntas: [
+      {
+        texto: 'Cada decisión diaria es una jugada en tu vida. ¿Cómo elegís dar el próximo paso?',
+        opciones: [
+          { id: 'a', texto: 'Por impulso y sin pensar en las consecuencias' },
+          { id: 'b', texto: 'Con propósito y mirando la meta correcta' },
+          { id: 'c', texto: 'Copiando lo que hace la mayoría' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'Si intentás algo bueno y fallás en el primer intento, ¿cuál es la actitud correcta?',
+        opciones: [
+          { id: 'a', texto: 'Abandonar porque no nací para eso' },
+          { id: 'b', texto: 'Perseverar y volver a levantarme con fe' },
+          { id: 'c', texto: 'Enojarme con mi equipo' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'En la carrera de la fe, ganar de verdad significa:',
+        opciones: [
+          { id: 'a', texto: 'Mantenerme fiel al llamado de Dios hasta el final' },
+          { id: 'b', texto: 'Pasar por encima de los demás' },
+          { id: 'c', texto: 'Aparentar que nunca me equivoco' }
+        ],
+        correcta: 'a'
+      }
+    ]
+  },
+  'qr-secreto-1': {
+    id: 9,
+    titulo: 'QR Secreto #1',
+    puntos: 100,
+    tipo: 'bonus',
+    info: '¡Encontraste uno de los 2 códigos QR escondidos en el salón! Sumás 100 puntos gratis de forma directa.',
+    preguntas: []
+  },
+  'qr-secreto-2': {
+    id: 10,
+    titulo: 'QR Secreto #2',
+    puntos: 100,
+    tipo: 'bonus',
+    info: '¡Encontraste uno de los 2 códigos QR escondidos en el salón! Sumás 100 puntos gratis de forma directa.',
+    preguntas: []
+  },
+  'qr-trampa': {
+    id: 11,
+    titulo: 'QR Escondido · Trampa',
+    puntos: -100,
+    tipo: 'trampa',
+    info: '¡Cuidado! Escaneaste el QR trampa escondido en el salón. Si respondés bien la pregunta mantenés tus puntos intactos; si respondés mal se te restan 100 puntos.',
+    preguntas: [
+      {
+        texto: '¡ALERTA DE TRAMPA! No todo lo que brilla es oro. ¿Cómo detectás un engaño que quiere atraparte?',
+        opciones: [
+          { id: 'a', texto: 'Me dejo llevar por lo que parece fácil y atractivo' },
+          { id: 'b', texto: 'Pruebo todo sin medir las consecuencias' },
+          { id: 'c', texto: 'Lo confronto con la verdad de Dios antes de actuar' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: '¡ALERTA DE TRAMPA! Cuando aparece una tentación disfrazada de atajo, ¿qué hacés?',
+        opciones: [
+          { id: 'a', texto: 'Me aparto a tiempo y cuido mi corazón' },
+          { id: 'b', texto: 'Caigo porque nadie se va a enterar' },
+          { id: 'c', texto: 'Le digo a otro que pruebe primero' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¡ALERTA DE TRAMPA! ¿Qué nos protege de caer en las trampas del molde actual?',
+        opciones: [
+          { id: 'a', texto: 'Seguir todas las modas sin cuestionar' },
+          { id: 'b', texto: 'Tener discernimiento, identidad clara y amigos reales' },
+          { id: 'c', texto: 'Creer que soy más inteligente que todos' }
         ],
         correcta: 'b'
       }
@@ -192,6 +400,9 @@ export default function Juego() {
 
   // Controla si las opciones de la trivia ya se desplegaron o siguen ocultas
   const [mostrarOpciones, setMostrarOpciones] = useState(false);
+
+  // Controla si el cuadro de información (botón "i") del juego está desplegado
+  const [mostrarInfoJuego, setMostrarInfoJuego] = useState(false);
 
   // Bloquea por 1 segundo el botón de abrir cámara para evitar doble invocación
   const [scannerCooldown, setScannerCooldown] = useState(false);
@@ -279,16 +490,21 @@ export default function Juego() {
       
       // Caso A: El otro capitán ya superó esta sala
       if (grupoDataCache?.juegosCompletados?.includes(juegoActivo.id)) {
+        const textoSubtitulo = juegoActivo.tipo === 'trampa'
+          ? 'El otro Capitán ya resolvió este QR trampa'
+          : `El otro Capitán acaba de superar este desafío (+${juegoActivo.puntos} PTS)`;
+
         setFeedback({
           type: 'success',
           titulo: '¡SALA YA RESUELTA!',
-          subtitulo: 'El otro Capitán acaba de superar este desafío (+50 PTS)'
+          subtitulo: textoSubtitulo
         });
 
         const timer = setTimeout(() => {
           setFeedback(null);
           setJuegoActivo(null);
           setMostrarOpciones(false);
+          setMostrarInfoJuego(false);
           setView('dashboard');
         }, 3000);
         return () => clearTimeout(timer);
@@ -462,9 +678,9 @@ export default function Juego() {
   };
 
   // ============================================================================
-  // 8. LECTURA DEL CÓDIGO QR + PREPARACIÓN DE TRIVIA SIN TOQUE ACCIDENTAL
+  // 8. LECTURA DEL CÓDIGO QR + PREPARACIÓN DE TRIVIA / BONUS / TRAMPA
   // ============================================================================
-  const handleScan = (resultado) => {
+  const handleScan = async (resultado) => {
     if (!resultado || isProcessing) return;
     
     const textoQR = Array.isArray(resultado) ? resultado[0]?.rawValue : (resultado?.text || resultado);
@@ -479,13 +695,50 @@ export default function Juego() {
         return;
       }
 
+      // CASO ESPECIAL: Si es uno de los 2 QR escondidos de 100 puntos gratis (tipo 'bonus')
+      if (baseJuego.tipo === 'bonus') {
+        if (!grupoDocRef) return;
+        setIsProcessing(true);
+        try {
+          await ejecutarConTimeout(
+            updateDoc(grupoDocRef, {
+              puntos: increment(baseJuego.puntos),
+              juegosCompletados: arrayUnion(baseJuego.id),
+              ultimaActualizacionPuntos: Date.now()
+            })
+          );
+          setFeedback({
+            type: 'success',
+            titulo: `¡${baseJuego.titulo.toUpperCase()}!`,
+            subtitulo: `+${baseJuego.puntos} PUNTOS GRATIS`
+          });
+          setTimeout(() => {
+            setFeedback(null);
+            setJuegoActivo(null);
+            setMostrarOpciones(false);
+            setMostrarInfoJuego(false);
+            setIsProcessing(false);
+            setView('dashboard');
+          }, 3000);
+        } catch (error) {
+          console.error("Error al acreditar QR secreto:", error);
+          alert("Señal débil. Volvé a intentarlo.");
+          setIsProcessing(false);
+        }
+        return;
+      }
+
       const randomIndex = Math.floor(Math.random() * baseJuego.preguntas.length);
       const preguntaSorteada = baseJuego.preguntas[randomIndex];
 
       setMostrarOpciones(false);
+      setMostrarInfoJuego(false);
       setJuegoActivo({
         id: baseJuego.id,
         titulo: baseJuego.titulo,
+        puntos: baseJuego.puntos,
+        tipo: baseJuego.tipo || 'normal',
+        info: baseJuego.info || '',
         pregunta: preguntaSorteada.texto,
         opciones: preguntaSorteada.opciones,
         correcta: preguntaSorteada.correcta
@@ -498,7 +751,7 @@ export default function Juego() {
   };
 
   // ============================================================================
-  // 9. VALIDACIÓN DE TRIVIA CON MARCA DE TIEMPO PARA DESEMPATES
+  // 9. VALIDACIÓN DE TRIVIA CON PUNTAJES PERSONALIZADOS, QR TRAMPA Y DESEMPATE
   // ============================================================================
   const validarRespuesta = async (opcionSeleccionada) => {
     if (isProcessing || !juegoActivo || !grupoDocRef) return;
@@ -511,28 +764,79 @@ export default function Juego() {
           setFeedback(null);
           setJuegoActivo(null);
           setMostrarOpciones(false);
+          setMostrarInfoJuego(false);
           setIsProcessing(false);
           setView('dashboard');
         }, 2500);
         return;
       }
 
+      // LÓGICA ESPECIAL SI EL QR ESCANEADO ES EL QR TRAMPA (-100 PUNTOS SI FALLA / MANTIENE SI ACIERTA)
+      if (juegoActivo.tipo === 'trampa') {
+        if (opcionSeleccionada === juegoActivo.correcta) {
+          // Si responde bien el QR trampa, mantiene sus puntos como están
+          await ejecutarConTimeout(
+            updateDoc(grupoDocRef, {
+              juegosCompletados: arrayUnion(juegoActivo.id)
+            })
+          );
+
+          setFeedback({
+            type: 'success',
+            titulo: '¡ZAFASTE DE LA TRAMPA!',
+            subtitulo: 'MANTENÉS TUS PUNTOS INTACTOS'
+          });
+        } else {
+          // Si responde mal el QR trampa, se le restan 100 puntos (sin bajar de 0)
+          const puntosActuales = Number(grupoDataCache?.puntos || 0);
+          const puntosRestados = Math.max(0, puntosActuales - 100);
+
+          await ejecutarConTimeout(
+            updateDoc(grupoDocRef, {
+              puntos: puntosRestados,
+              juegosCompletados: arrayUnion(juegoActivo.id),
+              ultimaActualizacionPuntos: Date.now()
+            })
+          );
+
+          setFeedback({
+            type: 'error',
+            titulo: '¡CAÍSTE EN LA TRAMPA!',
+            subtitulo: '-100 PUNTOS'
+          });
+        }
+
+        setTimeout(() => {
+          setFeedback(null);
+          setJuegoActivo(null);
+          setMostrarOpciones(false);
+          setMostrarInfoJuego(false);
+          setIsProcessing(false);
+          setView('dashboard');
+        }, 3000);
+        return;
+      }
+
+      // LÓGICA NORMAL PARA LOS 8 JUEGOS DE LA KERMESSE (25, 50, 70 u 80 PUNTOS)
       if (opcionSeleccionada === juegoActivo.correcta) {
-        // RESPUESTA CORRECTA: Sumamos 50 puntos, guardamos el juego y la hora exacta para desempates
+        const puntosDelJuego = Number(juegoActivo.puntos || 50);
+
+        // RESPUESTA CORRECTA: Sumamos los puntos específicos del juego y guardamos la hora exacta
         await ejecutarConTimeout(
           updateDoc(grupoDocRef, {
-            puntos: increment(50),
+            puntos: increment(puntosDelJuego),
             juegosCompletados: arrayUnion(juegoActivo.id),
             ultimaActualizacionPuntos: Date.now()
           })
         );
         
-        setFeedback({ type: 'success', titulo: '¡SALA SUPERADA!', subtitulo: '+50 PUNTOS' });
+        setFeedback({ type: 'success', titulo: '¡SALA SUPERADA!', subtitulo: `+${puntosDelJuego} PUNTOS` });
         
         setTimeout(() => {
           setFeedback(null);
           setJuegoActivo(null);
           setMostrarOpciones(false);
+          setMostrarInfoJuego(false);
           setIsProcessing(false);
           setView('dashboard');
         }, 3000);
@@ -567,6 +871,7 @@ export default function Juego() {
             setFeedback(null);
             setJuegoActivo(null);
             setMostrarOpciones(false);
+            setMostrarInfoJuego(false);
             setIsProcessing(false);
             setView('dashboard');
           }, 3000);
@@ -600,6 +905,7 @@ export default function Juego() {
       setFeedback(null);
       setJuegoActivo(null);
       setMostrarOpciones(false);
+      setMostrarInfoJuego(false);
       setIsProcessing(false);
       setView('dashboard');
     } catch (error) {
@@ -695,14 +1001,16 @@ export default function Juego() {
     );
   }
 
-  // ================= VISTA: TRIVIA (CON TRANSICIÓN ANTI-TOQUE ACCIDENTAL) =================
+  // ================= VISTA: TRIVIA (CON TRANSICIÓN ANTI-TOQUE ACCIDENTAL Y BOTÓN DE INFO "i") =================
   if (view === 'trivia' && juegoActivo) {
     const vidasMostradas = grupoDataCache?.vidas !== undefined ? grupoDataCache.vidas : 3;
 
     return (
       <div className="min-h-screen bg-[#050505] text-white p-6 flex flex-col">
         <header className="mb-6 mt-4 flex justify-between items-center">
-          <span className="text-yellow-400 font-mono text-sm tracking-widest uppercase">SALA DESBLOQUEADA</span>
+          <span className={`font-mono text-sm tracking-widest uppercase ${juegoActivo.tipo === 'trampa' ? 'text-red-500 font-black' : 'text-yellow-400'}`}>
+            {juegoActivo.tipo === 'trampa' ? '⚠️ ALERTA: QR TRAMPA (-100 PTS SI FALLÁS)' : `SALA DESBLOQUEADA · VALE +${juegoActivo.puntos} PTS`}
+          </span>
           <div className="flex gap-1">
             {[1, 2, 3].map((vida) => (
               <span key={vida} className={`text-xl ${vida <= vidasMostradas ? 'opacity-100' : 'opacity-30'}`}>❤️</span>
@@ -711,7 +1019,7 @@ export default function Juego() {
         </header>
 
         {/* Alerta parpadeante cuando al equipo le queda exactamente 1 vida */}
-        {vidasMostradas === 1 && (
+        {vidasMostradas === 1 && juegoActivo.tipo !== 'trampa' && (
           <div className="bg-red-600 text-white p-4 rounded-xl mb-6 border-4 border-black animate-pulse shadow-[0_0_20px_rgba(220,38,38,0.5)]">
             <h3 className="font-black uppercase text-xl mb-1 text-center">¡CUIDADO! ÚLTIMA VIDA</h3>
             <p className="font-bold text-xs text-center uppercase tracking-widest">
@@ -722,7 +1030,34 @@ export default function Juego() {
         
         {/* Contenedor de la pregunta que se desplaza suavemente hacia arriba al tocar "RESPONDER" */}
         <div className={`transition-all duration-500 ease-out flex flex-col ${mostrarOpciones ? 'mt-0 mb-6' : 'my-auto py-8'}`}>
-          <h2 className="text-3xl font-black uppercase mb-4 text-yellow-400">{juegoActivo.titulo}</h2>
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <h2 className={`text-3xl font-black uppercase ${juegoActivo.tipo === 'trampa' ? 'text-red-500' : 'text-yellow-400'}`}>
+              {juegoActivo.titulo}
+            </h2>
+            
+            {/* Botón "i" (Información del juego) */}
+            {juegoActivo.info && (
+              <button
+                type="button"
+                onClick={() => setMostrarInfoJuego(!mostrarInfoJuego)}
+                title="Ver instrucciones del juego"
+                className="shrink-0 size-9 rounded-full border-2 border-yellow-400/60 bg-yellow-400/10 text-yellow-400 font-mono font-black text-sm flex items-center justify-center active:scale-95 transition-transform"
+              >
+                i
+              </button>
+            )}
+          </div>
+
+          {/* Cuadro desplegable con la explicación de qué hay que hacer en ese juego */}
+          {mostrarInfoJuego && juegoActivo.info && (
+            <div className="mb-5 rounded-2xl border border-blue-500/40 bg-[#0a1224] p-4 text-xs text-gray-200 leading-relaxed shadow-lg">
+              <p className="font-mono text-[10px] font-black uppercase tracking-widest text-blue-400 mb-1">
+                ℹ️ ¿Qué hay que hacer en este juego?
+              </p>
+              <p>{juegoActivo.info}</p>
+            </div>
+          )}
+
           <p className={`text-gray-100 leading-relaxed font-bold transition-all duration-500 ${mostrarOpciones ? 'text-lg' : 'text-2xl'}`}>
             {juegoActivo.pregunta}
           </p>
@@ -740,7 +1075,7 @@ export default function Juego() {
             </button>
             <button
               type="button"
-              onClick={() => { setJuegoActivo(null); setMostrarOpciones(false); setView('dashboard'); }}
+              onClick={() => { setJuegoActivo(null); setMostrarOpciones(false); setMostrarInfoJuego(false); setView('dashboard'); }}
               className="w-full rounded-full border border-white/15 bg-white/5 py-3.5 text-xs font-bold uppercase tracking-widest text-gray-400"
             >
               Volver al Escuadrón

@@ -10,51 +10,218 @@ import {
   Target,
   LogOut,
   Share2,
-  Users
+  Users,
+  Sparkles,
+  AlertTriangle
 } from 'lucide-react';
 
 // ============================================================================
-// CONFIGURACIÓN DE ESTACIONES / DESAFÍOS DE LA KERMESSE
+// CONFIGURACIÓN DE ESTACIONES / DESAFÍOS DE LA KERMESSE (11 QRs SINCRONIZADOS CON JUEGO.JSX)
 // El estado ('Completado' o 'Pendiente') se calcula en vivo según `juegosCompletados`.
 // ============================================================================
 const desafios = [
-  { id: 1, titulo: 'Tiro al Blanco', puntos: 50, icon: Target, tone: 'yellow' },
-  { id: 2, titulo: 'Fuga Lógica', puntos: 50, icon: Flame, tone: 'blue' },
-  { id: 3, titulo: 'Campo Minado', puntos: 50, icon: ShieldCheck, tone: 'blue' },
-  { id: 4, titulo: 'Rompecabezas', puntos: 50, icon: Trophy, tone: 'yellow' },
+  {
+    id: 1,
+    titulo: 'Aro de Basquet',
+    puntos: 25,
+    tipo: 'normal',
+    icon: Target,
+    tone: 'yellow',
+    info: 'Embocar la pelota de basquet: tienen 3 tiros y ganan si embocan al menos 1 de esos tiros. Vale 25 puntos porque se juega de una.'
+  },
+  {
+    id: 2,
+    titulo: 'Bowling con botellas de agua',
+    puntos: 25,
+    tipo: 'normal',
+    icon: Flame,
+    tone: 'blue',
+    info: 'Se enfrentan 2 equipos: quien tire más botellas con la pelota tirada con la mano gana el acceso al QR. Vale 25 puntos.'
+  },
+  {
+    id: 3,
+    titulo: 'Piedra papel o tijera',
+    puntos: 25,
+    tipo: 'normal',
+    icon: ShieldCheck,
+    tone: 'blue',
+    info: 'Se enfrentan 2 equipos y el ganador a 3 rounds (no se cuentan los empates) accede al QR. El juego termina 2-0 o 2-1. Vale 25 puntos.'
+  },
+  {
+    id: 4,
+    titulo: 'Arco con Agujeritos',
+    puntos: 50,
+    tipo: 'normal',
+    icon: Target,
+    tone: 'yellow',
+    info: 'Hay un arco con una tela con agujeros: se enfrentan 2 equipos y quien emboque la mayor cantidad en 3 oportunidades gana. Vale 50 puntos.'
+  },
+  {
+    id: 5,
+    titulo: 'Embocar el aro',
+    puntos: 50,
+    tipo: 'normal',
+    icon: Trophy,
+    tone: 'yellow',
+    info: 'Son 3 intentos: si embocás al menos 1 de 3 veces el aro en la botella, accedés al QR. Vale 50 puntos.'
+  },
+  {
+    id: 6,
+    titulo: 'Torre de vasitos',
+    puntos: 50,
+    tipo: 'normal',
+    icon: Flame,
+    tone: 'blue',
+    info: 'Se enfrentan 2 equipos con 2 torres: quien primero junte todos los vasitos accede al QR. Hay una pelota en la cima que no se tiene que caer ni tocar con la mano. Vale 50 puntos.'
+  },
+  {
+    id: 7,
+    titulo: 'Elastico Vaso',
+    puntos: 70,
+    tipo: 'normal',
+    icon: ShieldCheck,
+    tone: 'blue',
+    info: 'Se juega en equipo: quien agarra 3 vasos y los emboca en otro vaso en menor tiempo gana. La dificultad está en que se llevan con un elástico. Vale 70 puntos.'
+  },
+  {
+    id: 8,
+    titulo: 'Tateti con botellas',
+    puntos: 80,
+    tipo: 'normal',
+    icon: Trophy,
+    tone: 'yellow',
+    info: 'Se enfrentan 2 equipos (3 personas por equipo, una detrás de otra): hacen bottle challenge y quien deja la botella de pie puede ir a mover la ficha para el tatetí hasta que uno gane. Vale 80 puntos.'
+  },
+  {
+    id: 9,
+    titulo: 'QR Secreto #1',
+    puntos: 100,
+    tipo: 'bonus',
+    icon: Sparkles,
+    tone: 'yellow',
+    info: 'Código QR escondido en el salón. Si lo encuentran y lo escanean, suman 100 puntos gratis.'
+  },
+  {
+    id: 10,
+    titulo: 'QR Secreto #2',
+    puntos: 100,
+    tipo: 'bonus',
+    icon: Sparkles,
+    tone: 'yellow',
+    info: 'Código QR escondido en el salón. Si lo encuentran y lo escanean, suman 100 puntos gratis.'
+  },
+  {
+    id: 11,
+    titulo: 'QR Escondido · Trampa',
+    puntos: -100,
+    tipo: 'trampa',
+    icon: AlertTriangle,
+    tone: 'red',
+    info: 'Código QR trampa escondido en el salón. Te da una pregunta: si respondés bien mantenés tus puntos como están; si respondés mal se te restan 100 puntos.'
+  }
 ];
 
 // Mapeo de gradientes brutalistas
 const toneClasses = {
   yellow: 'from-yellow-300 via-yellow-500 to-orange-600',
   blue: 'from-blue-400 via-blue-600 to-blue-900',
+  red: 'from-red-500 via-red-600 to-red-950'
 };
 
 // ============================================================================
-// COMPONENTE DE TARJETA DE CADA MISIÓN
+// COMPONENTE DE TARJETA DE CADA MISIÓN (CON BOTÓN DE INFORMACIÓN "i")
 // ============================================================================
 function DesafioCard({ desafio, isDone }) {
+  const [mostrarInfo, setMostrarInfo] = useState(false);
   const Icon = desafio.icon;
+  const esTrampa = desafio.tipo === 'trampa';
 
   return (
-    <article className={`flex items-center justify-between rounded-2xl border ${isDone ? 'border-yellow-400/30 bg-yellow-400/5' : 'border-white/[0.05] bg-[#0a0a0a]'} p-4 shadow-lg transition-colors`}>
-      <div className="flex items-center gap-4">
-        <div className="relative flex size-12 items-center justify-center">
-          <div className={`absolute inset-0 rotate-45 rounded-xl bg-gradient-to-br ${toneClasses[desafio.tone]} opacity-20`} />
-          <Icon className={`relative z-10 size-6 ${isDone ? 'text-yellow-400' : 'text-blue-500'}`} />
+    <article
+      className={`flex flex-col rounded-2xl border ${
+        isDone
+          ? esTrampa
+            ? 'border-red-500/40 bg-red-500/5'
+            : 'border-yellow-400/30 bg-yellow-400/5'
+          : 'border-white/[0.05] bg-[#0a0a0a]'
+      } p-4 shadow-lg transition-colors`}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="relative flex size-12 shrink-0 items-center justify-center">
+            <div className={`absolute inset-0 rotate-45 rounded-xl bg-gradient-to-br ${toneClasses[desafio.tone] || toneClasses.blue} opacity-20`} />
+            <Icon
+              className={`relative z-10 size-6 ${
+                isDone
+                  ? esTrampa
+                    ? 'text-red-400'
+                    : 'text-yellow-400'
+                  : esTrampa
+                  ? 'text-red-500'
+                  : 'text-blue-500'
+              }`}
+            />
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-sm font-black uppercase tracking-wide text-white truncate">
+              {desafio.titulo}
+            </h3>
+            <p
+              className={`text-[10px] font-bold uppercase tracking-widest ${
+                isDone
+                  ? esTrampa
+                    ? 'text-red-400'
+                    : 'text-yellow-400'
+                  : 'text-gray-500'
+              }`}
+            >
+              {isDone ? 'Completado ✓' : 'Pendiente'}
+            </p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-sm font-black uppercase tracking-wide text-white">{desafio.titulo}</h3>
-          <p className={`text-[10px] font-bold uppercase tracking-widest ${isDone ? 'text-yellow-400' : 'text-gray-500'}`}>
-            {isDone ? 'Completado ✓' : 'Pendiente'}
+
+        {/* Derecha: Botón "i" de información + Puntaje del juego */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          {desafio.info && (
+            <button
+              type="button"
+              onClick={() => setMostrarInfo(!mostrarInfo)}
+              title="Ver explicación del juego"
+              className={`size-7 rounded-full border font-mono text-xs font-black flex items-center justify-center transition-colors ${
+                mostrarInfo
+                  ? 'border-yellow-400 bg-yellow-400 text-black'
+                  : 'border-white/20 bg-white/5 text-gray-300 hover:border-yellow-400/50 hover:text-yellow-400'
+              }`}
+            >
+              i
+            </button>
+          )}
+
+          <div className="text-right min-w-[44px]">
+            <span
+              className={`text-sm font-black ${
+                esTrampa
+                  ? 'text-red-500'
+                  : isDone
+                  ? 'text-yellow-400'
+                  : 'text-gray-500'
+              }`}
+            >
+              {desafio.puntos > 0 ? `+${desafio.puntos}` : desafio.puntos}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Cuadro desplegable con las reglas cuando tocan el botón "i" */}
+      {mostrarInfo && desafio.info && (
+        <div className="mt-3 rounded-xl border border-blue-500/30 bg-[#0a1224] p-3 text-xs text-gray-200 leading-relaxed">
+          <p className="font-mono text-[10px] font-black uppercase tracking-widest text-blue-400 mb-1">
+            ℹ️ ¿Cómo se juega?
           </p>
+          <p>{desafio.info}</p>
         </div>
-      </div>
-      <div className="text-right">
-        <span className={`text-sm font-black ${isDone ? 'text-yellow-400' : 'text-gray-600'}`}>
-          +{desafio.puntos}
-        </span>
-      </div>
+      )}
     </article>
   );
 }
@@ -113,9 +280,9 @@ export default function DashboardJugador({ onEscanear, onSalir, rankingEnVivo })
   }, []);
 
   // ============================================================================
-  // 2. CÁLCULO DE RANKING GLOBAL EN TIEMPO REAL (SOLUCIÓN DEFINITIVA A "TOP -")
+  // 2. CÁLCULO DE RANKING GLOBAL EN TIEMPO REAL CON DESEMPATE POR TIEMPO
   // Descarga los puntajes de la colección `grupos`, los ordena de mayor a menor
-  // y determina en qué puesto exacto está este equipo, del 1 al 500+.
+  // (y desempata por quién llegó primero) y determina en qué puesto exacto está este equipo.
   // ============================================================================
   useEffect(() => {
     const pinGuardado = localStorage.getItem('miGrupoPIN');
@@ -123,13 +290,20 @@ export default function DashboardJugador({ onEscanear, onSalir, rankingEnVivo })
 
     const qTodos = query(collection(db, "grupos"));
     const unsubscribeRanking = onSnapshot(qTodos, (snapshot) => {
-      const todosLosGrupos = snapshot.docs.map(doc => ({
-        pin: doc.data().pin,
-        puntos: Number(doc.data().puntos || 0)
-      }));
+      const todosLosGrupos = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          pin: data.pin,
+          puntos: Number(data.puntos || 0),
+          tiempo: Number(data.ultimaActualizacionPuntos || Number.MAX_SAFE_INTEGER)
+        };
+      });
 
-      // Ordenamos de mayor a menor puntaje
-      todosLosGrupos.sort((a, b) => b.puntos - a.puntos);
+      // Ordenamos de mayor a menor puntaje; en caso de empate gana quien llegó primero
+      todosLosGrupos.sort((a, b) => {
+        if (b.puntos !== a.puntos) return b.puntos - a.puntos;
+        return a.tiempo - b.tiempo;
+      });
 
       // Buscamos la posición de nuestro grupo
       const posicionIndex = todosLosGrupos.findIndex(g => g.pin === pinGuardado);
@@ -293,7 +467,10 @@ Entrá al link, tocá *"Ya tengo un PIN"* e ingresá el código *${grupoActual.p
 
         {/* LISTA DE DESAFÍOS DE LA KERMESSE */}
         <div className="mb-4 flex items-end justify-between">
-          <h2 className="text-sm font-black uppercase tracking-widest text-gray-300">Registro de Misiones</h2>
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-widest text-gray-300">Registro de Misiones</h2>
+            <p className="text-[10px] font-mono text-gray-500 mt-0.5">Tocá el botón (i) para ver las reglas de cada puesto</p>
+          </div>
           <span className="text-[10px] font-bold uppercase text-yellow-400">
             {grupoActual.juegosCompletados.length} de {desafios.length} Completadas
           </span>
