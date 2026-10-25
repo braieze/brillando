@@ -76,12 +76,12 @@ const desafios = [
   },
   {
     id: 7,
-    titulo: 'Elastico Vaso',
+    titulo: 'El Cronómetro',
     puntos: 70,
     tipo: 'normal',
     icon: ShieldCheck,
     tone: 'blue',
-    info: 'Se juega en equipo: quien agarra 3 vasos y los emboca en otro vaso en menor tiempo gana. La dificultad está en que se llevan con un elástico. Vale 70 puntos.'
+    info: 'Desafío de tiempo: Tienen que tocar el espacio en la notebook, iniciar el cronómetro y pararlo en 10 segundos clavados. Quien esté más cerca, gana. Vale 70 puntos.'
   },
   {
     id: 8,
