@@ -493,11 +493,11 @@ export default function Juego() {
 
   // ============================================================================
   // TEMPORIZADOR DE 20 SEGUNDOS (LÓGICA DEL COUNTDOWN)
-  // Empieza a correr SOLAMENTE cuando tocan "Responder Pregunta" (mostrarOpciones === true)
+  // Empieza a correr NI BIEN escanean el QR y se abre la pantalla de trivia
   // ============================================================================
   useEffect(() => {
     let timerId;
-    if (view === 'trivia' && juegoActivo && mostrarOpciones && !isProcessing && !feedback) {
+    if (view === 'trivia' && juegoActivo && !isProcessing && !feedback) {
       if (timeLeft > 0) {
         timerId = setTimeout(() => {
           setTimeLeft(prev => prev - 1);
@@ -508,7 +508,7 @@ export default function Juego() {
       }
     }
     return () => clearTimeout(timerId);
-  }, [view, juegoActivo, mostrarOpciones, isProcessing, feedback, timeLeft]);
+  }, [view, juegoActivo, isProcessing, feedback, timeLeft]);
 
 
   // ============================================================================
@@ -764,7 +764,7 @@ export default function Juego() {
 
       setMostrarOpciones(false);
       setMostrarInfoJuego(false);
-      setTimeLeft(20); // Resetea el reloj a 20s
+      setTimeLeft(20); // Resetea el reloj a 20s y empieza a correr ni bien entra a la vista 'trivia'
       setJuegoActivo({
         id: baseJuego.id,
         titulo: baseJuego.titulo,
@@ -983,7 +983,7 @@ export default function Juego() {
         {/* BARRA SUPERIOR DE ESTADO */}
         <header className="mb-6 mt-4 flex justify-between items-center relative z-10">
           <span className="font-mono text-sm tracking-widest uppercase text-yellow-400">
-            SALA DESBLOQUEADA
+            SALA DESBLOQUEADA · ⏱️ {timeLeft}s
           </span>
           <div className="flex gap-1">
             {[1, 2, 3].map((vida) => (
@@ -1002,15 +1002,13 @@ export default function Juego() {
           </div>
         )}
 
-        {/* INDICADOR DE TIEMPO (Solo visible cuando se muestran las opciones) */}
-        {mostrarOpciones && (
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-800 z-0">
-            <div 
-              className={`h-full transition-all duration-1000 ease-linear ${timeLeft <= 5 ? 'bg-red-500' : 'bg-yellow-400'}`}
-              style={{ width: `${(timeLeft / 20) * 100}%` }}
-            ></div>
-          </div>
-        )}
+        {/* INDICADOR DE TIEMPO (Visible desde el instante en que se escanea el QR) */}
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-800 z-0">
+          <div 
+            className={`h-full transition-all duration-1000 ease-linear ${timeLeft <= 5 ? 'bg-red-500' : 'bg-yellow-400'}`}
+            style={{ width: `${(timeLeft / 20) * 100}%` }}
+          ></div>
+        </div>
         
         {/* CONTENEDOR PRINCIPAL: PREGUNTA Y BOTÓN DE INFO */}
         <div className={`transition-all duration-500 ease-out flex flex-col relative z-10 ${mostrarOpciones ? 'mt-0 mb-4' : 'my-auto py-8'}`}>
@@ -1048,7 +1046,7 @@ export default function Juego() {
           </p>
 
           {/* Reloj numérico gigante si quedan 5 segundos o menos */}
-          {mostrarOpciones && timeLeft <= 5 && (
+          {timeLeft <= 5 && (
             <div className="text-center mt-4 animate-ping">
               <span className="text-5xl font-black text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]">
                 {timeLeft}
@@ -1065,7 +1063,7 @@ export default function Juego() {
               onClick={() => setMostrarOpciones(true)}
               className="w-full rounded-full bg-yellow-400 py-5 text-sm font-black uppercase tracking-widest text-black shadow-[0_0_25px_rgba(250,204,21,0.3)] transition-transform active:scale-95"
             >
-              Responder (20 Segundos)
+              Responder ({timeLeft}s restantes)
             </button>
             <button
               type="button"
