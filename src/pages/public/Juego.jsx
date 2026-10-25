@@ -316,7 +316,7 @@ const diccionarioJuegos = {
   'qr-trampa': {
     id: 11,
     titulo: 'SISTEMA COMPROMETIDO',
-    puntos: -50,
+    puntos: -100,
     tipo: 'trampa',
     info: '¡Cuidado! Escaneaste el QR trampa escondido en el salón. Resta 50 puntos automáticamente al equipo que lo escanee.',
     preguntas: []
