@@ -104,16 +104,35 @@ export default function Landing() {
     if (!formData.email) return;
 
     try {
-      const inscriptosRef = collection(db, "inscriptos");
-      const q = query(inscriptosRef, where("email", "==", formData.email.trim()));
-      const querySnapshot = await getDocs(q);
+      const emailTrimmed = formData.email.trim();
+      
+      // Consultamos ambas colecciones
+      const preCongresoRef = collection(db, "inscriptos");
+      const congresoRef = collection(db, "inscriptos_congreso");
+      
+      const q1 = query(preCongresoRef, where("email", "==", emailTrimmed));
+      const q2 = query(congresoRef, where("email", "==", emailTrimmed));
 
-      if (!querySnapshot.empty) {
-        const perfiles = [];
-        querySnapshot.forEach((doc) => {
-          perfiles.push({ id: doc.id, ...doc.data() });
+      // Ejecutamos ambas consultas a la vez para no perder tiempo
+      const [snap1, snap2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+
+      if (!snap1.empty || !snap2.empty) {
+        // Usamos un Map para evitar mostrar botones duplicados si un usuario existe en ambas
+        const perfilesMap = new Map();
+        
+        snap1.forEach((doc) => {
+          const data = doc.data();
+          const key = `${data.nombre}-${data.apellido}`.toLowerCase();
+          perfilesMap.set(key, { id: doc.id, ...data });
         });
-        setUsuariosPrevios(perfiles); 
+
+        snap2.forEach((doc) => {
+          const data = doc.data();
+          const key = `${data.nombre}-${data.apellido}`.toLowerCase();
+          perfilesMap.set(key, { id: doc.id, ...data });
+        });
+
+        setUsuariosPrevios(Array.from(perfilesMap.values())); 
       } else {
         setUsuariosPrevios([]); 
       }
@@ -196,7 +215,8 @@ export default function Landing() {
     setIsDuplicate(false);
 
     try {
-      const inscriptosRef = collection(db, "inscriptos");
+      // Cambio principal: ahora las inscripciones van a inscriptos_congreso
+      const inscriptosRef = collection(db, "inscriptos_congreso");
       
       const nuevoInscripto = {
         nombre: formData.nombre,
