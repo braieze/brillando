@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Landing.css';
 import QRCode from 'react-qr-code';
 import { db } from '../../config/firebase'; 
-import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore'; 
+import { collection, addDoc, serverTimestamp, query, where, getDocs, setDoc, deleteDoc, doc } from 'firebase/firestore';
 import { isBefore, parseISO } from 'date-fns'; 
 import emailjs from '@emailjs/browser'; 
 
@@ -240,6 +240,44 @@ export default function Landing() {
       setErrorMsg("Hubo un error de conexión. Por favor, intentá de nuevo.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const migrarDatosEnMasa = async () => {
+    const confirmar = window.confirm("¿Estás seguro de iniciar la migración en masa?");
+    if (!confirmar) return;
+
+    try {
+      // 1. Buscamos en la colección vieja solo a los del congreso
+      const inscriptosRef = collection(db, "inscriptos");
+      const q = query(inscriptosRef, where("evento_origen", "==", "congreso"));
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        alert("No se encontraron registros para migrar.");
+        return;
+      }
+
+      let contador = 0;
+
+      // 2. Hacemos un loop por cada documento encontrado
+      for (const documento of snapshot.docs) {
+        const data = documento.data();
+        const idOriginal = documento.id; // ¡CLAVE! Guardamos el ID exacto
+
+        // 3. Lo copiamos a la nueva colección forzando el mismo ID
+        await setDoc(doc(db, "inscriptos_congreso", idOriginal), data);
+
+        // 4. Lo borramos de la colección vieja para que no quede duplicado
+        await deleteDoc(doc(db, "inscriptos", idOriginal));
+
+        contador++;
+      }
+
+      alert(`¡Migración exitosa! Se movieron ${contador} inscriptos correctamente.`);
+    } catch (error) {
+      console.error("Error migrando datos:", error);
+      alert("Hubo un error en la migración. Revisá la consola.");
     }
   };
 
@@ -833,6 +871,11 @@ export default function Landing() {
             <span>La identidad real no se copia.</span>
           </div>
         </div>
+        <div style={{ textAlign: 'center', padding: '50px', background: 'red' }}>
+          <button onClick={migrarDatosEnMasa} style={{ padding: '20px', fontSize: '20px', cursor: 'pointer' }}>
+            MIGRAR DATOS EN MASA AL CONGRESO
+          </button>
+      </div>
       </footer>
     </>
   );
