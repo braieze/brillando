@@ -49,7 +49,7 @@ const unificarDuplicados = (lista) => {
 };
 
 /* ============================================================
-   FILA CON SWIPE-TO-DELETE
+   FILA CON SWIPE-TO-DELETE Y FEEDBACK VISUAL CLARO
    ============================================================ */
 const FilaInscripto = React.memo(({ persona, asistio, onToggle, onDelete }) => {
   const [dragX, setDragX] = useState(0);
@@ -112,10 +112,11 @@ const FilaInscripto = React.memo(({ persona, asistio, onToggle, onDelete }) => {
 
         <button
           className={`bd-toggle-btn ${asistio ? 'is-adentro' : ''}`}
+          style={asistio ? { backgroundColor: '#16a34a', color: '#ffffff', borderColor: 'var(--bd-tinta)', fontWeight: 'bold' } : {}}
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => { e.stopPropagation(); vibrar(15); onToggle(); }}
         >
-          {asistio ? 'Adentro ✓' : 'Ingresar'}
+          {asistio ? '✅ ADENTRO' : 'INGRESAR'}
         </button>
       </div>
     </div>
@@ -126,10 +127,10 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   const [inscriptos, setInscriptos] = useState([]);
-  const [eventoActivo, setEventoActivo] = useState('pre'); 
+  // Inicia por defecto en 'congreso' para el evento principal del 31 de Octubre
+  const [eventoActivo, setEventoActivo] = useState('congreso'); 
   const [busqueda, setBusqueda] = useState('');
   const [filtroIglesia, setFiltroIglesia] = useState('TODAS');
-  const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
 
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [ultimoEscaneo, setUltimoEscaneo] = useState('');
@@ -139,8 +140,12 @@ export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [manualForm, setManualForm] = useState({ nombre: '', apellido: '', iglesia: '' });
 
+  // Determina dinámicamente qué colección de Firebase leer y modificar
+  const coleccionActual = eventoActivo === 'pre' ? 'inscriptos' : 'inscriptos_congreso';
+
   useEffect(() => {
-    const inscriptosRef = collection(db, 'inscriptos');
+    setInscriptos([]); // Limpia la lista visualmente al cambiar de pestaña
+    const inscriptosRef = collection(db, coleccionActual);
     const unsubscribe = onSnapshot(inscriptosRef, (snapshot) => {
       const rawData = snapshot.docs.map((d) => ({ 
         id: d.id, 
@@ -152,11 +157,11 @@ export default function Dashboard() {
       setInscriptos(cleanData);
     });
     return () => unsubscribe();
-  }, []);
+  }, [coleccionActual]);
 
   const marcarAsistencia = async (id, estadoActual) => {
     try {
-      const inscriptoRef = doc(db, 'inscriptos', id);
+      const inscriptoRef = doc(db, coleccionActual, id);
       const campoAsistencia = eventoActivo === 'pre' ? 'asistio_pre' : 'asistio_congreso';
       await updateDoc(inscriptoRef, { [campoAsistencia]: !estadoActual });
     } catch (error) {
@@ -190,8 +195,8 @@ export default function Dashboard() {
       setIsScannerOpen(false); 
     } else {
       vibrar([40, 60, 40]);
-      alert(`El escáner leyó:\n"${textoQR}"\n\nNo coincide con nadie en la base.`);
-      setScanResult({ type: 'error', msg: 'CÓDIGO INVÁLIDO', sub: 'No está registrado' });
+      alert(`El escáner leyó:\n"${textoQR}"\n\nNo figura en la lista de ${eventoActivo === 'pre' ? 'Pre-Congreso' : 'Congreso'}.`);
+      setScanResult({ type: 'error', msg: 'NO ENCONTRADO', sub: 'No registrado en este evento' });
       setTimeout(() => { setScanResult(null); setUltimoEscaneo(''); }, 2000);
     }
   };
@@ -212,8 +217,8 @@ export default function Dashboard() {
   };
 
   const eliminarInscripto = async (id, nombre) => {
-    if (window.confirm(`¿Eliminar a ${nombre} del sistema? Esta acción no se puede deshacer.`)) {
-      try { await deleteDoc(doc(db, 'inscriptos', id)); } 
+    if (window.confirm(`¿Eliminar a ${nombre} de la lista? Esta acción no se puede deshacer.`)) {
+      try { await deleteDoc(doc(db, coleccionActual, id)); } 
       catch (error) { alert('Error al eliminar el registro.'); }
     }
   };
@@ -221,22 +226,24 @@ export default function Dashboard() {
   const handleInscripcionManual = async (e) => {
     e.preventDefault();
     try {
-      await addDoc(collection(db, 'inscriptos'), {
-        nombre: manualForm.nombre,
-        apellido: manualForm.apellido,
+      await addDoc(collection(db, coleccionActual), {
+        nombre: manualForm.nombre.trim(),
+        apellido: manualForm.apellido.trim(),
         iglesia: normalizarIglesia(manualForm.iglesia),
         email: 'inscripcion_puerta@iceb.com',
         edad: 0,
         fechaInscripcion: serverTimestamp(),
         asistio_pre: eventoActivo === 'pre',
         asistio_congreso: eventoActivo === 'congreso',
-        evento_origen: 'puerta_emergencia',
+        evento_origen: eventoActivo === 'pre' ? 'puerta_pre' : 'congreso',
       });
       setIsModalOpen(false);
       setManualForm({ nombre: '', apellido: '', iglesia: '' });
       vibrar(60);
+      setScanResult({ type: 'success', msg: 'INSCRIPTO Y ADENTRO', sub: `${manualForm.nombre} ${manualForm.apellido}` });
+      setTimeout(() => setScanResult(null), 1500);
     } catch (error) {
-      alert('Error guardando el registro manual.');
+      alert('Error guardando la inscripción manual.');
     }
   };
 
@@ -277,7 +284,7 @@ export default function Dashboard() {
   const scannedPersonYaIngreso = scannedPerson ? (eventoActivo === 'pre' ? scannedPerson.asistio_pre : scannedPerson.asistio_congreso) : false;
 
   return (
-    <div className="bd-root">
+    <div className="bd-root" style={{ paddingBottom: '100px' }}>
       {scannedPerson && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'var(--bd-crema)', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '20px', background: scannedPersonYaIngreso ? 'var(--bd-rojo)' : 'var(--bd-azul)', color: 'white', borderBottom: '4px solid var(--bd-tinta)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -300,12 +307,12 @@ export default function Dashboard() {
                 ❌ PASE YA UTILIZADO
               </div>
             ) : (
-              <button onClick={confirmarIngreso} style={{ background: 'var(--bd-amarillo)', color: 'var(--bd-tinta)', padding: '25px', border: '5px solid var(--bd-tinta)', fontWeight: 'bold', fontSize: '24px', fontFamily: 'var(--bd-display)', textTransform: 'uppercase', width: '100%', boxShadow: '8px 8px 0 var(--bd-tinta)' }}>
+              <button onClick={confirmarIngreso} style={{ background: 'var(--bd-amarillo)', color: 'var(--bd-tinta)', padding: '25px', border: '5px solid var(--bd-tinta)', fontWeight: 'bold', fontSize: '24px', fontFamily: 'var(--bd-display)', textTransform: 'uppercase', width: '100%', boxShadow: '8px 8px 0 var(--bd-tinta)', cursor: 'pointer' }}>
                 CONFIRMAR INGRESO →
               </button>
             )}
 
-            <button onClick={() => { setScannedPerson(null); setUltimoEscaneo(''); setIsScannerOpen(true); }} style={{ marginTop: '30px', padding: '15px', background: 'transparent', border: '3px solid var(--bd-tinta)', fontWeight: 'bold', fontSize: '16px', fontFamily: 'var(--bd-mono)', textTransform: 'uppercase', color: 'var(--bd-tinta)' }}>
+            <button onClick={() => { setScannedPerson(null); setUltimoEscaneo(''); setIsScannerOpen(true); }} style={{ marginTop: '30px', padding: '15px', background: 'transparent', border: '3px solid var(--bd-tinta)', fontWeight: 'bold', fontSize: '16px', fontFamily: 'var(--bd-mono)', textTransform: 'uppercase', color: 'var(--bd-tinta)', cursor: 'pointer' }}>
               ← ESCANEAR OTRO PASE
             </button>
           </div>
@@ -365,24 +372,38 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bd-filterbar">
-          <button className="bd-filter-toggle" onClick={() => setFiltrosAbiertos((v) => !v)}>
-            Buscar / Filtrar {filtrosActivos && <span className="bd-filter-badge">1</span>}
-          </button>
-
-          <span className="bd-filter-count">{inscriptosFiltrados.length} resultado{inscriptosFiltrados.length !== 1 ? 's' : ''}</span>
-
-          {filtrosAbiertos && (
-            <div className="bd-filter-panel">
-              <input type="text" placeholder="Buscar nombre o apellido…" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} className="bd-input" />
-              <div className="bd-select-wrap">
-                <select value={filtroIglesia} onChange={(e) => setFiltroIglesia(e.target.value)} className="bd-select">
-                  {iglesiasUnicas.map((ig) => <option key={ig} value={ig}>{ig}</option>)}
+        {/* BUSCADOR SIEMPRE VISIBLE PARA AGILIZAR LA FILA */}
+        <div className="bd-filterbar" style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+          <div className="bd-filter-panel" style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', padding: '15px', background: 'rgba(0,0,0,0.03)', border: '3px solid var(--bd-tinta)' }}>
+            <input 
+              type="text" 
+              placeholder="🔍 Buscar por nombre o apellido..." 
+              value={busqueda} 
+              onChange={(e) => setBusqueda(e.target.value)} 
+              className="bd-input" 
+              style={{ fontSize: '16px', padding: '12px' }}
+            />
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div className="bd-select-wrap" style={{ flex: 1, minWidth: '200px' }}>
+                <select value={filtroIglesia} onChange={(e) => setFiltroIglesia(e.target.value)} className="bd-select" style={{ width: '100%' }}>
+                  {iglesiasUnicas.map((ig) => <option key={ig} value={ig}>{ig === 'TODAS' ? '📍 Todas las iglesias' : ig}</option>)}
                 </select>
               </div>
-              {filtrosActivos && <button className="bd-clear-btn" onClick={limpiarFiltros}>Limpiar filtros</button>}
+              {filtrosActivos && (
+                <button className="bd-clear-btn" onClick={limpiarFiltros} style={{ padding: '10px 15px', cursor: 'pointer' }}>
+                  ✕ Limpiar
+                </button>
+              )}
             </div>
-          )}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 4px' }}>
+            <span className="bd-filter-count" style={{ fontWeight: 'bold' }}>
+              Mostrando {inscriptosFiltrados.length} persona{inscriptosFiltrados.length !== 1 ? 's' : ''}
+            </span>
+            <span style={{ fontFamily: 'var(--bd-mono)', fontSize: '12px', opacity: 0.7 }}>
+              Base activa: {eventoActivo === 'pre' ? 'PRE-CONGRESO' : 'CONGRESO 31 OCT'}
+            </span>
+          </div>
         </div>
 
         <div className="bd-list">
@@ -401,13 +422,20 @@ export default function Dashboard() {
         </div>
       </main>
 
+      {/* BOTONES INFERIORES INTUITIVOS PARA COLABORADORES */}
       {!isScannerOpen && !scannedPerson && (
-        <div style={{ position: 'fixed', bottom: '20px', left: '20px', right: '20px', zIndex: 45, display: 'flex', gap: '10px' }}>
-          <button onClick={() => setIsScannerOpen(true)} style={{ flex: 2, background: 'var(--bd-tinta)', color: 'var(--bd-crema)', border: '4px solid var(--bd-tinta)', padding: '16px', fontFamily: 'var(--bd-mono)', fontSize: '15px', fontWeight: 'bold', textTransform: 'uppercase', boxShadow: '6px 6px 0 var(--bd-amarillo)' }}>
-            [+] ESCANEAR QR
+        <div style={{ position: 'fixed', bottom: '20px', left: '20px', right: '20px', zIndex: 45, display: 'flex', gap: '12px', maxWidth: '800px', margin: '0 auto' }}>
+          <button 
+            onClick={() => setIsScannerOpen(true)} 
+            style={{ flex: 1.4, background: 'var(--bd-tinta)', color: 'var(--bd-crema)', border: '4px solid var(--bd-tinta)', padding: '18px 14px', fontFamily: 'var(--bd-mono)', fontSize: '15px', fontWeight: 'bold', textTransform: 'uppercase', boxShadow: '6px 6px 0 var(--bd-amarillo)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+          >
+            📷 ESCANEAR QR
           </button>
-          <button onClick={() => setIsModalOpen(true)} style={{ flex: 1, background: 'var(--bd-amarillo)', color: 'var(--bd-tinta)', border: '4px solid var(--bd-tinta)', padding: '16px', fontFamily: 'var(--bd-mono)', fontSize: '13px', fontWeight: 'bold', textTransform: 'uppercase', boxShadow: '6px 6px 0 var(--bd-tinta)' }}>
-            RESCATE ✎
+          <button 
+            onClick={() => setIsModalOpen(true)} 
+            style={{ flex: 1, background: 'var(--bd-amarillo)', color: 'var(--bd-tinta)', border: '4px solid var(--bd-tinta)', padding: '18px 14px', fontFamily: 'var(--bd-mono)', fontSize: '14px', fontWeight: 'bold', textTransform: 'uppercase', boxShadow: '6px 6px 0 var(--bd-tinta)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+          >
+            ✚ INSCRIBIR AHORA
           </button>
         </div>
       )}
@@ -430,18 +458,27 @@ export default function Dashboard() {
         <div className="bd-modal">
           <div className="bd-modal-header">
             <div>
-              <h3>Modo rescate</h3>
-              <p>Anotá al instante a quien llegó sin pase.</p>
+              <h3>Inscripción Rápida en Puerta</h3>
+              <p>Anotá e ingresá al instante a quien llegó sin QR ({eventoActivo === 'pre' ? 'Pre-Congreso' : 'Congreso'}).</p>
             </div>
             <button className="bd-modal-close" onClick={() => setIsModalOpen(false)}>✕</button>
           </div>
           <form onSubmit={handleInscripcionManual} className="bd-modal-form">
-            <label className="bd-field"><span>Nombre</span><input type="text" required value={manualForm.nombre} onChange={(e) => setManualForm({ ...manualForm, nombre: e.target.value })} className="bd-input" autoFocus /></label>
-            <label className="bd-field"><span>Apellido</span><input type="text" required value={manualForm.apellido} onChange={(e) => setManualForm({ ...manualForm, apellido: e.target.value })} className="bd-input" /></label>
-            <label className="bd-field"><span>Iglesia</span><input type="text" required value={manualForm.iglesia} onChange={(e) => setManualForm({ ...manualForm, iglesia: e.target.value })} className="bd-input" /></label>
+            <label className="bd-field">
+              <span>Nombre</span>
+              <input type="text" placeholder="Ej: Mateo" required value={manualForm.nombre} onChange={(e) => setManualForm({ ...manualForm, nombre: e.target.value })} className="bd-input" autoFocus />
+            </label>
+            <label className="bd-field">
+              <span>Apellido</span>
+              <input type="text" placeholder="Ej: González" required value={manualForm.apellido} onChange={(e) => setManualForm({ ...manualForm, apellido: e.target.value })} className="bd-input" />
+            </label>
+            <label className="bd-field">
+              <span>Iglesia</span>
+              <input type="text" placeholder="Nombre de su iglesia o 'Sin iglesia'" required value={manualForm.iglesia} onChange={(e) => setManualForm({ ...manualForm, iglesia: e.target.value })} className="bd-input" />
+            </label>
             <div className="bd-modal-actions">
               <button type="button" className="bd-btn bd-btn--ghost" onClick={() => setIsModalOpen(false)}>Cancelar</button>
-              <button type="submit" className="bd-btn bd-btn--azul">Admitir ahora</button>
+              <button type="submit" className="bd-btn bd-btn--azul">Inscribir e Ingresar ✓</button>
             </div>
           </form>
         </div>
