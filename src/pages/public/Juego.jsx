@@ -475,7 +475,7 @@ export const LISTA_JUEGOS_OFICIAL = [
     id: 12,
     codigoQR: 'qr-12',
     aliases: ['qr-tateti-ppt', '12', 'tatetippt'],
-    titulo: 'Ta Te Ti Pa Pe Ti',
+    titulo: 'Pa Pe Ti',
     icono: '⚔️',
     puntos: 50,
     color: 'azul',

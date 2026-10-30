@@ -143,7 +143,7 @@ const CATALOGO_POR_DEFECTO = [
   },
   {
     id: 12,
-    titulo: 'Ta Te Ti Pa Pe Ti',
+    titulo: 'Pa Pe Ti',
     icono: '⚔️',
     puntos: 50,
     color: 'azul',
