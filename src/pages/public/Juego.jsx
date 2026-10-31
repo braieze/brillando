@@ -14,7 +14,7 @@ const FORZAR_DESBLOQUEO_ESCANER = true;
 const FECHA_APERTURA_ESCANER = new Date('2026-10-31T16:30:00-03:00');
 
 const estaEscanerHabilitado = () => {
-  if (FORZAR_DESBLOQUEO_ESCANER) return false;
+  if (FORZAR_DESBLOQUEO_ESCANER) return true;
   return new Date() >= FECHA_APERTURA_ESCANER;
 };
 
