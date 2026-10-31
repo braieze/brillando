@@ -6,13 +6,30 @@ import DashboardJugador from './DashboardJugador';
 import './Juego.css';
 
 // ============================================================================
-// CATÁLOGO OFICIAL DE LOS 23 JUEGOS DEL CONGRESO (DATOS + MODAL + PREGUNTAS)
+// 🔒 BLOQUEO HORARIO DEL ESCÁNER QR (CONTROL RÁPIDO)
+// - Se desbloquea automáticamente el Sábado 31/10 a las 16:30 hs.
+// - Si querés desbloquearlo antes manualmente, cambiá `false` por `true` acá abajo:
+// ============================================================================
+const FORZAR_DESBLOQUEO_ESCANER = false;
+const FECHA_APERTURA_ESCANER = new Date('2026-10-31T16:30:00-03:00');
+
+const estaEscanerHabilitado = () => {
+  if (FORZAR_DESBLOQUEO_ESCANER) return true;
+  return new Date() >= FECHA_APERTURA_ESCANER;
+};
+
+// ============================================================================
+// CATÁLOGO OFICIAL DE LOS 23 JUEGOS DEL CONGRESO
+// - `codigoQR` y `aliases`: SOLO funcionan escaneando con la cámara.
+// - `codigoEncargado`: Clave secreta que SOLO sabe el encargado de la mesa
+//   para dársela al grupo si no les abre la cámara (Anti-Trampa).
 // ============================================================================
 export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 1,
     codigoQR: 'qr-1',
-    aliases: ['qr-cronometro', '1', 'crono'],
+    aliases: ['qr-cronometro', 'crono'],
+    codigoEncargado: 'RELOJ84',
     titulo: 'Crono 10"',
     icono: '⏱️',
     puntos: 50,
@@ -23,29 +40,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿Cuántos meses del año tienen 28 días o más?',
+        texto: 'En matemática, ¿cómo se llama la famosa fórmula x = [-b ± √(b² - 4ac)] / (2a) usada para resolver ecuaciones de segundo grado?',
         opciones: [
-          { id: 'a', texto: 'Todos los 12 meses' },
-          { id: 'b', texto: 'Solo febrero' },
-          { id: 'c', texto: 'Ninguno' }
+          { id: 'a', texto: 'Fórmula de Bhaskara (o Resolvente)' },
+          { id: 'b', texto: 'Teorema de Thales' },
+          { id: 'c', texto: 'Regla de Ruffini' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'Si un reloj tarda 5 segundos en dar 5 campanadas, ¿cuántos segundos hay entre la primera y la segunda campanada?',
+        texto: 'En la Tabla Periódica de los elementos, ¿qué elemento químico tiene el símbolo "Au"?',
         opciones: [
-          { id: 'a', texto: '5 segundos' },
-          { id: 'b', texto: '1 segundo (aprox)' },
-          { id: 'c', texto: '10 segundos' }
+          { id: 'a', texto: 'Plata' },
+          { id: 'b', texto: 'Oro' },
+          { id: 'c', texto: 'Aluminio' }
         ],
         correcta: 'b'
       },
       {
-        texto: '¿Cuántos segundos exactos hay en un minuto y medio?',
+        texto: 'En la final del Mundial de Qatar 2022 entre Argentina y Francia, ¿cómo salió el partido al terminar los 120 minutos (antes de los penales)?',
         opciones: [
-          { id: 'a', texto: '90 segundos' },
-          { id: 'b', texto: '60 segundos' },
-          { id: 'c', texto: '150 segundos' }
+          { id: 'a', texto: '2 a 2' },
+          { id: 'b', texto: '3 a 3' },
+          { id: 'c', texto: '4 a 3' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'En física cinemática, ¿qué magnitud se calcula con la fórmula d = v · t (velocidad multiplicada por tiempo)?',
+        opciones: [
+          { id: 'a', texto: 'La aceleración' },
+          { id: 'b', texto: 'La distancia recorrida' },
+          { id: 'c', texto: 'La energía cinética' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: '¿Cuál es el resultado exacto de la operación combinada: 2³ + √144 ÷ 3 ?',
+        opciones: [
+          { id: 'a', texto: '12' },
+          { id: 'b', texto: '10' },
+          { id: 'c', texto: '6' }
         ],
         correcta: 'a'
       }
@@ -54,7 +89,8 @@ export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 2,
     codigoQR: 'qr-2',
-    aliases: ['qr-basquet', '2', 'basquet'],
+    aliases: ['qr-basquet', 'basquet'],
+    codigoEncargado: 'ARO39',
     titulo: 'Básquet',
     icono: '🏀',
     puntos: 30,
@@ -65,38 +101,57 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Participás en una carrera y adelantás al corredor que va en segundo lugar. ¿En qué posición quedás ahora?',
+        texto: 'En geometría, ¿a qué figura corresponde la fórmula de área A = π · r² (Pi por radio al cuadrado)?',
         opciones: [
-          { id: 'a', texto: 'Primero' },
-          { id: 'b', texto: 'Segundo' },
-          { id: 'c', texto: 'Tercero' }
-        ],
-        correcta: 'b'
-      },
-      {
-        texto: 'La palabra "MÁSCARA" tiene 7 letras. Si la leés normalmente, ¿cuál es la cuarta letra?',
-        opciones: [
-          { id: 'a', texto: 'S' },
-          { id: 'b', texto: 'C' },
-          { id: 'c', texto: 'A' }
-        ],
-        correcta: 'b'
-      },
-      {
-        texto: 'Un partido de básquet tiene 4 cuartos de 10 minutos cada uno. ¿Cuántos minutos de juego neto son en total?',
-        opciones: [
-          { id: 'a', texto: '40 minutos' },
-          { id: 'b', texto: '45 minutos' },
-          { id: 'c', texto: '60 minutos' }
+          { id: 'a', texto: 'Al área de un círculo' },
+          { id: 'b', texto: 'Al volumen de una esfera' },
+          { id: 'c', texto: 'Al perímetro de un triángulo' }
         ],
         correcta: 'a'
+      },
+      {
+        texto: '¿Cuál es el símbolo químico del Sodio en la Tabla Periódica?',
+        opciones: [
+          { id: 'a', texto: 'So' },
+          { id: 'b', texto: 'Na' },
+          { id: 'c', texto: 'Sd' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: '¿Qué club europeo ganó la UEFA Champions League de la temporada 2022/2023 venciendo al Inter en la final con gol de Rodri?',
+        opciones: [
+          { id: 'a', texto: 'Real Madrid' },
+          { id: 'b', texto: 'Manchester City' },
+          { id: 'c', texto: 'Bayern Múnich' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'En básquet profesional (FIBA), ¿a qué altura reglamentaria del suelo se encuentra el aro?',
+        opciones: [
+          { id: 'a', texto: 'A 3,05 metros' },
+          { id: 'b', texto: 'A 2,75 metros' },
+          { id: 'c', texto: 'A 3,50 metros' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'En un triángulo rectángulo cuyos catetos miden 3 cm y 4 cm, ¿cuánto mide su hipotenusa según Pitágoras?',
+        opciones: [
+          { id: 'a', texto: '7 cm' },
+          { id: 'b', texto: '5 cm' },
+          { id: 'c', texto: '6 cm' }
+        ],
+        correcta: 'b'
       }
     ]
   },
   {
     id: 3,
     codigoQR: 'qr-3',
-    aliases: ['qr-vasitos', '3', 'pasajero'],
+    aliases: ['qr-vasitos', 'pasajero'],
+    codigoEncargado: 'TREN71',
     titulo: 'Pasajero',
     icono: '🚶‍♂️',
     puntos: 50,
@@ -107,38 +162,57 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'El padre de María tiene 3 hijas: Abril, Mayo y... ¿cómo se llama la tercera hija?',
+        texto: '¿Qué ley fundamental de la física se expresa mediante la fórmula F = m · a (Fuerza = masa por aceleración)?',
         opciones: [
-          { id: 'a', texto: 'María' },
-          { id: 'b', texto: 'Junio' },
-          { id: 'c', texto: 'Marzo' }
+          { id: 'a', texto: 'La Segunda Ley de Newton' },
+          { id: 'b', texto: 'El Principio de Arquímedes' },
+          { id: 'c', texto: 'La Ley de Ohm' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'A la palabra "ESCAPE" sacale todas las vocales. ¿Cuántas letras consonantes te quedan?',
+        texto: '¿Cuál es el símbolo químico del Hierro en la Tabla Periódica?',
         opciones: [
-          { id: 'a', texto: '4 consonantes' },
-          { id: 'b', texto: '2 consonantes' },
-          { id: 'c', texto: '3 consonantes (S, C, P)' }
+          { id: 'a', texto: 'Hi' },
+          { id: 'b', texto: 'Fe' },
+          { id: 'c', texto: 'Ir' }
         ],
-        correcta: 'c'
+        correcta: 'b'
       },
       {
-        texto: 'Un colectivo sale con 10 pasajeros. En la primera parada bajan 4 y suben 2. ¿Cuántos pasajeros siguen en el colectivo?',
+        texto: '¿Quién es el máximo goleador histórico de la Selección Argentina de fútbol?',
         opciones: [
-          { id: 'a', texto: '8 pasajeros' },
-          { id: 'b', texto: '6 pasajeros' },
-          { id: 'c', texto: '12 pasajeros' }
+          { id: 'a', texto: 'Gabriel Batistuta' },
+          { id: 'b', texto: 'Lionel Messi' },
+          { id: 'c', texto: 'Sergio Agüero' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'Si despejás la "x" en la ecuación 3x - 7 = 20, ¿cuál es el valor de x?',
+        opciones: [
+          { id: 'a', texto: 'x = 9' },
+          { id: 'b', texto: 'x = 7' },
+          { id: 'c', texto: 'x = 11' }
         ],
         correcta: 'a'
+      },
+      {
+        texto: '¿Cuál es el único metal que se encuentra en estado líquido a temperatura ambiente?',
+        opciones: [
+          { id: 'a', texto: 'El Plomo (Pb)' },
+          { id: 'b', texto: 'El Mercurio (Hg)' },
+          { id: 'c', texto: 'El Titanio (Ti)' }
+        ],
+        correcta: 'b'
       }
     ]
   },
   {
     id: 4,
     codigoQR: 'qr-4',
-    aliases: ['qr-ppt', '4', 'ppt'],
+    aliases: ['qr-ppt', 'ppt'],
+    codigoEncargado: 'MANO52',
     titulo: 'Piedra, Papel o Tijera (Emojis)',
     icono: '✊',
     puntos: 40,
@@ -149,38 +223,57 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Leé esta lista de frutas: Manzana, Pera, Uva, Banana, Kiwi, Limón. ¿Cuántas frutas de la lista empiezan con la letra "K"?',
+        texto: '¿Cuál es el símbolo químico del Potasio en la Tabla Periódica?',
         opciones: [
-          { id: 'a', texto: 'Ninguna' },
-          { id: 'b', texto: 'Una (Kiwi)' },
-          { id: 'c', texto: 'Dos' }
+          { id: 'a', texto: 'Po' },
+          { id: 'b', texto: 'K' },
+          { id: 'c', texto: 'Pt' }
         ],
         correcta: 'b'
       },
       {
-        texto: 'Entrás a una cabaña oscura con un solo fósforo. Hay una vela, una lámpara y una chimenea. ¿Qué encendés primero?',
+        texto: 'En trigonometría, dentro de un triángulo rectángulo, ¿cómo se define el Seno de un ángulo (sen α)?',
         opciones: [
-          { id: 'a', texto: 'La vela' },
-          { id: 'b', texto: 'El fósforo' },
-          { id: 'c', texto: 'La chimenea' }
-        ],
-        correcta: 'b'
-      },
-      {
-        texto: 'En el clásico Piedra, Papel o Tijera, ¿qué elemento le gana al Papel?',
-        opciones: [
-          { id: 'a', texto: 'La Tijera' },
-          { id: 'b', texto: 'La Piedra' },
-          { id: 'c', texto: 'Empatan' }
+          { id: 'a', texto: 'Cateto Opuesto sobre Hipotenusa' },
+          { id: 'b', texto: 'Cateto Adyacente sobre Hipotenusa' },
+          { id: 'c', texto: 'Cateto Opuesto sobre Cateto Adyacente' }
         ],
         correcta: 'a'
+      },
+      {
+        texto: '¿Qué selección ganó la Copa América 2024 disputada en Estados Unidos con gol de Lautaro Martínez en el alargue?',
+        opciones: [
+          { id: 'a', texto: 'Colombia' },
+          { id: 'b', texto: 'Argentina' },
+          { id: 'c', texto: 'Uruguay' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: '¿A qué compuesto químico corresponde la fórmula molecular CO₂?',
+        opciones: [
+          { id: 'a', texto: 'Monóxido de carbono' },
+          { id: 'b', texto: 'Dióxido de carbono' },
+          { id: 'c', texto: 'Agua oxigenada' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'En probabilidad, si tirás dos monedas al aire al mismo tiempo, ¿cuál es la probabilidad de que ambas salgan "Cara"?',
+        opciones: [
+          { id: 'a', texto: '1/2 (50%)' },
+          { id: 'b', texto: '1/4 (25%)' },
+          { id: 'c', texto: '1/3 (33,3%)' }
+        ],
+        correcta: 'b'
       }
     ]
   },
   {
     id: 5,
     codigoQR: 'qr-5',
-    aliases: ['qr-aro', '5', 'emboca'],
+    aliases: ['qr-aro', 'emboca'],
+    codigoEncargado: 'ARO96',
     titulo: 'Emboca Emboca',
     icono: '🎯',
     puntos: 30,
@@ -191,29 +284,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Identificá qué palabra representa lo contrario a vivir con apariencias: MÁSCARA - FILTRO - AUTENTICIDAD - ENGAÑO.',
+        texto: 'En electricidad, ¿cómo se llama la ley cuya fórmula es V = I · R (Voltaje = Intensidad de corriente por Resistencia)?',
         opciones: [
-          { id: 'a', texto: 'Filtro' },
-          { id: 'b', texto: 'Engaño' },
-          { id: 'c', texto: 'Autenticidad' }
+          { id: 'a', texto: 'Ley de Ohm' },
+          { id: 'b', texto: 'Ley de Coulomb' },
+          { id: 'c', texto: 'Ley de Faraday' }
         ],
-        correcta: 'c'
+        correcta: 'a'
       },
       {
-        texto: 'Tenés 3 puertas para escapar: la 1 está llena de fuego, la 2 tiene un león de peluche, la 3 tiene electricidad. ¿Cuál elegís?',
+        texto: '¿Cuál es el primer elemento de la Tabla Periódica (con número atómico 1)?',
         opciones: [
-          { id: 'a', texto: 'La puerta 1' },
-          { id: 'b', texto: 'La puerta 3' },
-          { id: 'c', texto: 'La puerta 2 (es de peluche)' }
+          { id: 'a', texto: 'Helio (He)' },
+          { id: 'b', texto: 'Hidrógeno (H)' },
+          { id: 'c', texto: 'Litio (Li)' }
         ],
-        correcta: 'c'
+        correcta: 'b'
       },
       {
-        texto: '¿Cuánto es el doble de 15 más 10?',
+        texto: '¿En qué club de Estados Unidos juega Lionel Messi tras su paso por el PSG?',
         opciones: [
-          { id: 'a', texto: '40' },
-          { id: 'b', texto: '25' },
-          { id: 'c', texto: '50' }
+          { id: 'a', texto: 'Los Angeles Galaxy' },
+          { id: 'b', texto: 'Inter Miami' },
+          { id: 'c', texto: 'New York City FC' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'En álgebra, ¿a qué es igual el desarrollo del binomio al cuadrado (a + b)² ?',
+        opciones: [
+          { id: 'a', texto: 'a² + b²' },
+          { id: 'b', texto: 'a² + 2ab + b²' },
+          { id: 'c', texto: '2a + 2b' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: '¿Cuántos grados suman siempre los tres ángulos interiores de cualquier triángulo?',
+        opciones: [
+          { id: 'a', texto: '180°' },
+          { id: 'b', texto: '360°' },
+          { id: 'c', texto: '90°' }
         ],
         correcta: 'a'
       }
@@ -222,7 +333,8 @@ export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 6,
     codigoQR: 'qr-6',
-    aliases: ['qr-bowling-pinos', '6', 'bowling1'],
+    aliases: ['qr-bowling-pinos', 'bowling1'],
+    codigoEncargado: 'PINO43',
     titulo: 'Bowling (Pinos)',
     icono: '🎳',
     puntos: 30,
@@ -233,29 +345,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Hay 10 pinos de bowling parados. En tu primer tiro derribás 6. ¿Cuántos pinos quedan de pie?',
+        texto: '¿Qué elemento químico tiene el símbolo "Ag" en la Tabla Periódica?',
         opciones: [
-          { id: 'a', texto: '4 pinos' },
-          { id: 'b', texto: '6 pinos' },
-          { id: 'c', texto: 'Ninguno' }
+          { id: 'a', texto: 'Argón' },
+          { id: 'b', texto: 'Plata' },
+          { id: 'c', texto: 'Azufre' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: '¿Con qué fórmula se calcula el área de un triángulo de base "b" y altura "h"?',
+        opciones: [
+          { id: 'a', texto: '(b · h) / 2' },
+          { id: 'b', texto: 'b · h' },
+          { id: 'c', texto: '2 · (b + h)' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Cuál de estas tres afirmaciones es FALSA?',
+        texto: '¿Qué número de camiseta usó Emiliano "Dibu" Martínez al consagrarse campeón del mundo en Qatar 2022?',
         opciones: [
-          { id: 'a', texto: 'El agua moja' },
-          { id: 'b', texto: '5 + 5 es igual a 10' },
-          { id: 'c', texto: 'El hielo hierve a 0 grados' }
+          { id: 'a', texto: 'El 1' },
+          { id: 'b', texto: 'El 23' },
+          { id: 'c', texto: 'El 12' }
         ],
-        correcta: 'c'
+        correcta: 'b'
       },
       {
-        texto: '¿Qué pesa más: 1 kilo de plumas o 1 kilo de plomo?',
+        texto: 'En matemática, ¿cuál es el valor del logaritmo en base 10 de 1000 (log₁₀ 1000)?',
         opciones: [
-          { id: 'a', texto: 'El plomo' },
-          { id: 'b', texto: 'Pesan exactamente lo mismo (1 kilo)' },
-          { id: 'c', texto: 'Las plumas' }
+          { id: 'a', texto: '3' },
+          { id: 'b', texto: '10' },
+          { id: 'c', texto: '100' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿Cuál es el gas más abundante en la atmósfera de la Tierra (aproximadamente el 78% del aire)?',
+        opciones: [
+          { id: 'a', texto: 'Oxígeno (O₂)' },
+          { id: 'b', texto: 'Nitrógeno (N₂)' },
+          { id: 'c', texto: 'Dióxido de carbono (CO₂)' }
         ],
         correcta: 'b'
       }
@@ -264,7 +394,8 @@ export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 7,
     codigoQR: 'qr-7',
-    aliases: ['qr-dados', '7', 'dados'],
+    aliases: ['qr-dados', 'dados'],
+    codigoEncargado: 'DADO68',
     titulo: 'Dados Chinos',
     icono: '🎲',
     puntos: 40,
@@ -275,38 +406,57 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Un dado común tiene caras numeradas del 1 al 6. ¿Cuál es el número máximo que podés sacar tirando 2 dados juntos?',
+        texto: 'En un dado estándar de 6 caras, las caras opuestas siempre suman el mismo número. ¿Cuánto suman dos caras opuestas?',
         opciones: [
-          { id: 'a', texto: '10' },
-          { id: 'b', texto: '12' },
-          { id: 'c', texto: '6' }
-        ],
-        correcta: 'b'
-      },
-      {
-        texto: 'Si apilás 5 dados y se te caen 2 al piso, ¿cuántos dados quedaron en la torre?',
-        opciones: [
-          { id: 'a', texto: '3 dados' },
-          { id: 'b', texto: '2 dados' },
-          { id: 'c', texto: '5 dados' }
+          { id: 'a', texto: 'Suman 7' },
+          { id: 'b', texto: 'Suman 6' },
+          { id: 'c', texto: 'Suman 8' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Cuántos lados tiene un cuadrado?',
+        texto: '¿Cuál es la fórmula para calcular el volumen de un cubo de arista "L"?',
         opciones: [
-          { id: 'a', texto: '3 lados' },
-          { id: 'b', texto: '4 lados' },
-          { id: 'c', texto: '6 lados' }
+          { id: 'a', texto: 'V = 6 · L²' },
+          { id: 'b', texto: 'V = L³' },
+          { id: 'c', texto: 'V = L · 3' }
         ],
         correcta: 'b'
+      },
+      {
+        texto: '¿Qué elemento de la Tabla Periódica tiene el símbolo "Cu"?',
+        opciones: [
+          { id: 'a', texto: 'Carbono' },
+          { id: 'b', texto: 'Cobre' },
+          { id: 'c', texto: 'Calcio' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: '¿Qué jugador argentino convirtió el penal definitivo en la tanda contra Francia en la final del Mundial 2022?',
+        opciones: [
+          { id: 'a', texto: 'Gonzalo Montiel' },
+          { id: 'b', texto: 'Leandro Paredes' },
+          { id: 'c', texto: 'Paulo Dybala' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'En matemática, ¿cuánto vale el factorial de 5 (escrito como 5!, es decir 5×4×3×2×1)?',
+        opciones: [
+          { id: 'a', texto: '120' },
+          { id: 'b', texto: '60' },
+          { id: 'c', texto: '25' }
+        ],
+        correcta: 'a'
       }
     ]
   },
   {
     id: 8,
     codigoQR: 'qr-8',
-    aliases: ['qr-tejo', '8', 'tejo', 'qr-arco'],
+    aliases: ['qr-tejo', 'tejo', 'qr-arco'],
+    codigoEncargado: 'TEJO29',
     titulo: 'Tejo',
     icono: '🥏',
     puntos: 50,
@@ -317,29 +467,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Sumá mentalmente: 100 + 200 + 300 + 400 = ?',
+        texto: '¿Qué físico formuló la famosa ecuación de equivalencia entre masa y energía E = m · c²?',
         opciones: [
-          { id: 'a', texto: '900' },
-          { id: 'b', texto: '1000' },
-          { id: 'c', texto: '1100' }
+          { id: 'a', texto: 'Isaac Newton' },
+          { id: 'b', texto: 'Albert Einstein' },
+          { id: 'c', texto: 'Nikola Tesla' }
         ],
         correcta: 'b'
       },
       {
-        texto: 'Si en un tablero juegan 2 equipos con 5 fichas cada uno, ¿cuántas fichas hay en el tablero en total?',
+        texto: 'En la Tabla Periódica, ¿a qué grupo pertenecen el Helio (He), el Neón (Ne) y el Argón (Ar)?',
         opciones: [
-          { id: 'a', texto: '10 fichas' },
-          { id: 'b', texto: '5 fichas' },
-          { id: 'c', texto: '15 fichas' }
+          { id: 'a', texto: 'Gases Nobles' },
+          { id: 'b', texto: 'Metales Alcalinos' },
+          { id: 'c', texto: 'Halógenos' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Qué mes del calendario tiene 28 días todos los años (y 29 en año bisiesto)?',
+        texto: '¿Cuál es el club con más títulos de la UEFA Champions League en toda la historia?',
         opciones: [
-          { id: 'a', texto: 'Febrero' },
-          { id: 'b', texto: 'Marzo' },
-          { id: 'c', texto: 'Abril' }
+          { id: 'a', texto: 'AC Milan' },
+          { id: 'b', texto: 'Real Madrid' },
+          { id: 'c', texto: 'FC Barcelona' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: '¿Cómo se calcula el perímetro (longitud de la circunferencia) de un círculo de radio "r"?',
+        opciones: [
+          { id: 'a', texto: 'P = 2 · π · r' },
+          { id: 'b', texto: 'P = π · r²' },
+          { id: 'c', texto: 'P = 4 · π · r' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿Cuál es el resultado de (3² + 4²) ÷ 5 ?',
+        opciones: [
+          { id: 'a', texto: '5' },
+          { id: 'b', texto: '7' },
+          { id: 'c', texto: '25' }
         ],
         correcta: 'a'
       }
@@ -348,7 +516,8 @@ export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 9,
     codigoQR: 'qr-9',
-    aliases: ['qr-pasavasos', '9', 'pasavasos'],
+    aliases: ['qr-pasavasos', 'pasavasos'],
+    codigoEncargado: 'VASO15',
     titulo: 'Pasa Vasos',
     icono: '🥤',
     puntos: 40,
@@ -359,29 +528,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Tenés una pila de 15 vasos azules y 1 vaso rojo. ¿Cuántos vasos hay en total en la pila?',
+        texto: '¿Cuál es la fórmula química de la sal de mesa común?',
         opciones: [
-          { id: 'a', texto: '15 vasos' },
-          { id: 'b', texto: '16 vasos' },
-          { id: 'c', texto: '14 vasos' }
-        ],
-        correcta: 'b'
-      },
-      {
-        texto: 'Si un vaso está lleno de agua hasta la mitad, ¿qué porcentaje del vaso está vacío?',
-        opciones: [
-          { id: 'a', texto: '50%' },
-          { id: 'b', texto: '25%' },
-          { id: 'c', texto: '100%' }
+          { id: 'a', texto: 'NaCl (Cloruro de sodio)' },
+          { id: 'b', texto: 'H₂SO₄' },
+          { id: 'c', texto: 'CaCO₃' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Cuál es el lema principal de Brillando 2026?',
+        texto: 'En geometría, ¿con qué fórmula se calcula el volumen de un cilindro de radio "r" y altura "h"?',
         opciones: [
-          { id: 'a', texto: 'Salí del molde / Auténticos' },
-          { id: 'b', texto: 'Seguí la corriente' },
-          { id: 'c', texto: 'Más filtros que nunca' }
+          { id: 'a', texto: 'V = π · r² · h' },
+          { id: 'b', texto: 'V = 2 · π · r · h' },
+          { id: 'c', texto: 'V = (π · r² · h) / 3' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿En qué club inglés brilló Julián Álvarez antes de ser transferido al Atlético de Madrid en 2024?',
+        opciones: [
+          { id: 'a', texto: 'Liverpool' },
+          { id: 'b', texto: 'Manchester City' },
+          { id: 'c', texto: 'Chelsea' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'En la escala de pH químico (que va de 0 a 14), ¿qué valor corresponde a una sustancia neutra como el agua pura?',
+        opciones: [
+          { id: 'a', texto: 'pH = 7' },
+          { id: 'b', texto: 'pH = 0' },
+          { id: 'c', texto: 'pH = 14' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'Si el 20% de un número es 30, ¿cuál es ese número?',
+        opciones: [
+          { id: 'a', texto: '150' },
+          { id: 'b', texto: '120' },
+          { id: 'c', texto: '600' }
         ],
         correcta: 'a'
       }
@@ -390,7 +577,8 @@ export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 10,
     codigoQR: 'qr-10',
-    aliases: ['qr-malabarista', '10', 'malabarista'],
+    aliases: ['qr-malabarista', 'malabarista'],
+    codigoEncargado: 'AIRE64',
     titulo: 'Malabarista',
     icono: '🤹',
     puntos: 40,
@@ -401,29 +589,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿Cuántos segundos tiene que aguantar el jugador sin que el globo toque el piso si el desafío dura 1 minuto?',
+        texto: '¿Con qué gas noble (cuyo símbolo es "He") se inflan los globos para que floten hacia el techo?',
         opciones: [
-          { id: 'a', texto: '30 segundos' },
-          { id: 'b', texto: '60 segundos' },
-          { id: 'c', texto: '100 segundos' }
+          { id: 'a', texto: 'Hidrógeno' },
+          { id: 'b', texto: 'Helio' },
+          { id: 'c', texto: 'Nitrógeno' }
         ],
         correcta: 'b'
       },
       {
-        texto: 'Si inflás un globo con aire común y lo soltás sin atarlo, ¿qué pasa?',
+        texto: 'En la Tierra, ¿cuál es el valor aproximado de la aceleración de la gravedad (g)?',
         opciones: [
-          { id: 'a', texto: 'Se desinfla saliendo disparado' },
-          { id: 'b', texto: 'Queda congelado' },
-          { id: 'c', texto: 'Se convierte en piedra' }
+          { id: 'a', texto: '9,8 m/s²' },
+          { id: 'b', texto: '3,14 m/s²' },
+          { id: 'c', texto: '15,2 m/s²' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'Si tenés 2 globos en cada mano, ¿cuántos globos tenés en total?',
+        texto: 'En una función lineal de fórmula y = m·x + b, ¿qué representa la letra "m"?',
         opciones: [
-          { id: 'a', texto: '2 globos' },
-          { id: 'b', texto: '4 globos' },
-          { id: 'c', texto: '6 globos' }
+          { id: 'a', texto: 'La pendiente de la recta' },
+          { id: 'b', texto: 'La ordenada al origen' },
+          { id: 'c', texto: 'El vértice de la parábola' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿Cuántas Copas del Mundo de la FIFA tiene la Selección de Brasil en su historia?',
+        opciones: [
+          { id: 'a', texto: '4 Mundiales' },
+          { id: 'b', texto: '5 Mundiales' },
+          { id: 'c', texto: '3 Mundiales' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'En la ecuación de los gases ideales P · V = n · R · T, ¿qué representan las letras P y V?',
+        opciones: [
+          { id: 'a', texto: 'Peso y Velocidad' },
+          { id: 'b', texto: 'Presión y Volumen' },
+          { id: 'c', texto: 'Potencia y Voltaje' }
         ],
         correcta: 'b'
       }
@@ -432,7 +638,8 @@ export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 11,
     codigoQR: 'qr-11',
-    aliases: ['qr-aldente', '11', 'aldente'],
+    aliases: ['qr-aldente', 'aldente'],
+    codigoEncargado: 'PASTA81',
     titulo: 'Al Dente',
     icono: '🍝',
     puntos: 50,
@@ -443,29 +650,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'En el juego "Al Dente", ¿con qué parte del cuerpo se sostiene el fideo espagueti largo?',
+        texto: '¿A qué compuesto orgánico fundamental para la energía del cuerpo corresponde la fórmula C₆H₁₂O₆?',
         opciones: [
-          { id: 'a', texto: 'Con la boca' },
-          { id: 'b', texto: 'Con el pie' },
-          { id: 'c', texto: 'Con el codo' }
+          { id: 'a', texto: 'A la Glucosa' },
+          { id: 'b', texto: 'Al Etanol' },
+          { id: 'c', texto: 'Al Metano' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿De qué país es originaria tradicionalmente la pasta (espagueti, mostachol)?',
+        texto: '¿Cuál es el único número primo que además es un número par?',
         opciones: [
-          { id: 'a', texto: 'Italia' },
-          { id: 'b', texto: 'Brasil' },
-          { id: 'c', texto: 'Sudáfrica' }
+          { id: 'a', texto: 'El 2' },
+          { id: 'b', texto: 'El 4' },
+          { id: 'c', texto: 'El 0' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'Si tenés que levantar 6 fideos mostachol y ya levantaste 4, ¿cuántos te faltan para ganar?',
+        texto: '¿En qué club italiano fue capitán y goleador Lautaro Martínez al consagrarse campeón de la Serie A 2023/2024?',
         opciones: [
-          { id: 'a', texto: '2 fideos' },
-          { id: 'b', texto: '3 fideos' },
-          { id: 'c', texto: '1 fideo' }
+          { id: 'a', texto: 'AC Milan' },
+          { id: 'b', texto: 'Inter de Milán' },
+          { id: 'c', texto: 'Juventus' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: '¿Qué elemento de la Tabla Periódica tiene el símbolo "Ca" y es clave para los huesos?',
+        opciones: [
+          { id: 'a', texto: 'Carbono' },
+          { id: 'b', texto: 'Calcio' },
+          { id: 'c', texto: 'Cadmio' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'En análisis matemático, ¿cuál es la derivada de la función f(x) = x² ?',
+        opciones: [
+          { id: 'a', texto: "f'(x) = 2x" },
+          { id: 'b', texto: "f'(x) = x" },
+          { id: 'c', texto: "f'(x) = x³ / 3" }
         ],
         correcta: 'a'
       }
@@ -474,8 +699,9 @@ export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 12,
     codigoQR: 'qr-12',
-    aliases: ['qr-tateti-ppt', '12', 'tatetippt'],
-    titulo: 'Pa Pe Ti',
+    aliases: ['qr-tateti-ppt', 'tatetippt'],
+    codigoEncargado: 'DUELO37',
+    titulo: 'Ta Te Ti Pa Pe Ti',
     icono: '⚔️',
     puntos: 50,
     color: 'azul',
@@ -485,38 +711,57 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿Cuántos casilleros en total tiene un tablero clásico de Ta-Te-Ti (3x3)?',
+        texto: 'En álgebra, ¿cómo se llama la identidad notable a² - b² = (a - b) · (a + b)?',
         opciones: [
-          { id: 'a', texto: '6 casilleros' },
-          { id: 'b', texto: '9 casilleros' },
-          { id: 'c', texto: '12 casilleros' }
-        ],
-        correcta: 'b'
-      },
-      {
-        texto: '¿Cuántas fichas propias en línea necesitás alinear para ganar en el Ta-Te-Ti?',
-        opciones: [
-          { id: 'a', texto: '3 en línea' },
-          { id: 'b', texto: '5 en línea' },
-          { id: 'c', texto: '2 en línea' }
+          { id: 'a', texto: 'Diferencia de cuadrados' },
+          { id: 'b', texto: 'Trinomio cuadrado perfecto' },
+          { id: 'c', texto: 'Factor común por grupos' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'En el Piedra, Papel o Tijera, ¿qué elemento vence a la Piedra?',
+        texto: '¿Qué elemento químico tiene el símbolo "Pb" en la Tabla Periódica?',
         opciones: [
-          { id: 'a', texto: 'La Tijera' },
-          { id: 'b', texto: 'El Papel' },
-          { id: 'c', texto: 'Ninguno' }
+          { id: 'a', texto: 'Platino' },
+          { id: 'b', texto: 'Plomo' },
+          { id: 'c', texto: 'Potasio' }
         ],
         correcta: 'b'
+      },
+      {
+        texto: '¿Qué selección europea ganó la Eurocopa 2024 tras vencer 2-1 a Inglaterra en la final?',
+        opciones: [
+          { id: 'a', texto: 'Francia' },
+          { id: 'b', texto: 'España' },
+          { id: 'c', texto: 'Alemania' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'Si una matriz cuadrada de 2x2 tiene filas [3, 1] y [2, 4], ¿cuál es su determinante (3·4 - 1·2)?',
+        opciones: [
+          { id: 'a', texto: '10' },
+          { id: 'b', texto: '14' },
+          { id: 'c', texto: '12' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'En física, ¿a qué magnitud corresponde la fórmula Ec = ½ · m · v²?',
+        opciones: [
+          { id: 'a', texto: 'Energía Cinética' },
+          { id: 'b', texto: 'Energía Potencial Gravitatoria' },
+          { id: 'c', texto: 'Trabajo Mecánico' }
+        ],
+        correcta: 'a'
       }
     ]
   },
   {
     id: 13,
     codigoQR: 'qr-13',
-    aliases: ['qr-tuerca', '13', 'tuerca'],
+    aliases: ['qr-tuerca', 'tuerca'],
+    codigoEncargado: 'METAL92',
     titulo: 'Vuelta de Tuerca',
     icono: '🔩',
     puntos: 40,
@@ -527,38 +772,57 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Si apilás 5 tuercas y cada tuerca vale 10 puntos imaginarios, ¿cuánto suman las 5?',
+        texto: 'El acero es una aleación formada principalmente por Hierro (Fe) y un pequeño porcentaje de... ¿qué otro elemento?',
         opciones: [
-          { id: 'a', texto: '50' },
-          { id: 'b', texto: '25' },
-          { id: 'c', texto: '15' }
+          { id: 'a', texto: 'Carbono (C)' },
+          { id: 'b', texto: 'Calcio (Ca)' },
+          { id: 'c', texto: 'Cloro (Cl)' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿De qué material suelen estar hechas las tuercas de ferretería?',
+        texto: 'En física, ¿cómo se calcula el Torque o Momento de una fuerza (τ) aplicado con una llave sobre una tuerca?',
         opciones: [
-          { id: 'a', texto: 'De metal / acero' },
-          { id: 'b', texto: 'De algodón' },
-          { id: 'c', texto: 'De papel' }
+          { id: 'a', texto: 'Fuerza por distancia al eje (F · d)' },
+          { id: 'b', texto: 'Masa dividido volumen (m / V)' },
+          { id: 'c', texto: 'Velocidad sobre tiempo (v / t)' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Qué herramienta hace pareja siempre con una tuerca?',
+        texto: '¿Qué delantero noruego del Manchester City rompió el récord de goles en una sola temporada de Premier League en 2023?',
         opciones: [
-          { id: 'a', texto: 'El tornillo / bulón' },
-          { id: 'b', texto: 'La cuchara' },
-          { id: 'c', texto: 'El peine' }
+          { id: 'a', texto: 'Martin Ødegaard' },
+          { id: 'b', texto: 'Erling Haaland' },
+          { id: 'c', texto: 'Alexander Sørloth' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: '¿Cuántos lados tiene un hexágono regular (la forma clásica de una tuerca)?',
+        opciones: [
+          { id: 'a', texto: '6 lados' },
+          { id: 'b', texto: '8 lados' },
+          { id: 'c', texto: '5 lados' }
         ],
         correcta: 'a'
+      },
+      {
+        texto: 'En matemática, todo número (distinto de cero) elevado a la potencia 0 (por ejemplo, 25⁰) da como resultado:',
+        opciones: [
+          { id: 'a', texto: '0' },
+          { id: 'b', texto: '1' },
+          { id: 'c', texto: 'El mismo número' }
+        ],
+        correcta: 'b'
       }
     ]
   },
   {
     id: 14,
     codigoQR: 'qr-14',
-    aliases: ['qr-tateti', '14', 'tateti'],
+    aliases: ['qr-tateti', 'tateti'],
+    codigoEncargado: 'CRUZ58',
     titulo: 'Ta Te Ti',
     icono: '❌',
     puntos: 30,
@@ -569,29 +833,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Tenés una soga de 1 metro y le hacés 2 cortes. ¿En cuántos pedazos queda dividida la soga?',
+        texto: '¿Cuál es el nombre del teorema cuya fórmula es a² + b² = c² para triángulos rectángulos?',
         opciones: [
-          { id: 'a', texto: 'En 2 pedazos' },
-          { id: 'b', texto: 'En 3 pedazos' },
-          { id: 'c', texto: 'En 4 pedazos' }
-        ],
-        correcta: 'b'
-      },
-      {
-        texto: '¿Qué número falta en esta serie de pares? 2, 4, 6, 8, __, 12.',
-        opciones: [
-          { id: 'a', texto: '10' },
-          { id: 'b', texto: '9' },
-          { id: 'c', texto: '11' }
+          { id: 'a', texto: 'Teorema de Pitágoras' },
+          { id: 'b', texto: 'Teorema de Euclides' },
+          { id: 'c', texto: 'Teorema de Gauss' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'Seguí la tabla del 5: Si 1x5 = 5, 2x5 = 10, 3x5 = 15, 4x5 = 20... ¿Cuánto es 5x5?',
+        texto: 'En la Tabla Periódica, ¿qué elemento tiene el símbolo "W" (conocido también como Wolframio)?',
         opciones: [
-          { id: 'a', texto: '25' },
-          { id: 'b', texto: '30' },
-          { id: 'c', texto: '15' }
+          { id: 'a', texto: 'Tungsteno' },
+          { id: 'b', texto: 'Bismuto' },
+          { id: 'c', texto: 'Vanadio' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿Cuántos Balones de Oro ganó Lionel Messi a lo largo de su carrera hasta 2024?',
+        opciones: [
+          { id: 'a', texto: '7 Balones de Oro' },
+          { id: 'b', texto: '8 Balones de Oro' },
+          { id: 'c', texto: '6 Balones de Oro' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'En la famosa sucesión de Fibonacci (1, 1, 2, 3, 5, 8, 13...), ¿qué número sigue después del 13?',
+        opciones: [
+          { id: 'a', texto: '21' },
+          { id: 'b', texto: '18' },
+          { id: 'c', texto: '26' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿A qué es igual la raíz cúbica de 27 (∛27)?',
+        opciones: [
+          { id: 'a', texto: '3' },
+          { id: 'b', texto: '9' },
+          { id: 'c', texto: '6' }
         ],
         correcta: 'a'
       }
@@ -600,7 +882,8 @@ export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 15,
     codigoQR: 'qr-15',
-    aliases: ['qr-rompecabezas', '15', 'rompecabezas'],
+    aliases: ['qr-rompecabezas', 'rompecabezas'],
+    codigoEncargado: 'PIEZA47',
     titulo: 'Rompecabezas',
     icono: '🧩',
     puntos: 40,
@@ -611,38 +894,57 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Si un rompecabezas tiene 4 esquinas y ya pusiste 3, ¿cuántas esquinas te falta colocar?',
+        texto: '¿Qué elemento químico es la base fundamental de toda la química orgánica y de los diamantes (símbolo "C")?',
         opciones: [
-          { id: 'a', texto: '1 esquina' },
-          { id: 'b', texto: '2 esquinas' },
-          { id: 'c', texto: '4 esquinas' }
+          { id: 'a', texto: 'Carbono' },
+          { id: 'b', texto: 'Cobalto' },
+          { id: 'c', texto: 'Cromo' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'Cuando te tapás los ojos con una venda, ¿qué sentido dejás de usar temporalmente?',
+        texto: 'En geometría, ¿cuánto suman los ángulos interiores de cualquier cuadrilátero (como un rectángulo o un rombo)?',
         opciones: [
-          { id: 'a', texto: 'La vista' },
-          { id: 'b', texto: 'El oído' },
-          { id: 'c', texto: 'El tacto' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿Cuántas piezas tiene un rompecabezas de 3 filas por 3 columnas?',
-        opciones: [
-          { id: 'a', texto: '6 piezas' },
-          { id: 'b', texto: '9 piezas' },
-          { id: 'c', texto: '12 piezas' }
+          { id: 'a', texto: '180°' },
+          { id: 'b', texto: '360°' },
+          { id: 'c', texto: '270°' }
         ],
         correcta: 'b'
+      },
+      {
+        texto: '¿Qué mediocampista argentino fue elegido "Mejor Jugador Joven" del Mundial de Qatar 2022?',
+        opciones: [
+          { id: 'a', texto: 'Enzo Fernández' },
+          { id: 'b', texto: 'Alexis Mac Allister' },
+          { id: 'c', texto: 'Thiago Almada' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿Con qué fórmula se calcula el área de un trapecio de base mayor "B", base menor "b" y altura "h"?',
+        opciones: [
+          { id: 'a', texto: '[(B + b) · h] / 2' },
+          { id: 'b', texto: 'B · b · h' },
+          { id: 'c', texto: '(B - b) / h' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿En qué parte del átomo se encuentran los protones y los neutrones?',
+        opciones: [
+          { id: 'a', texto: 'En el núcleo atómico' },
+          { id: 'b', texto: 'En la nube electrónica exterior' },
+          { id: 'c', texto: 'Fuera del átomo' }
+        ],
+        correcta: 'a'
       }
     ]
   },
   {
     id: 16,
     codigoQR: 'qr-16',
-    aliases: ['qr-piramide', '16', 'piramide'],
+    aliases: ['qr-piramide', 'piramide'],
+    codigoEncargado: 'CIMA76',
     titulo: 'Pirámide',
     icono: '🔺',
     puntos: 40,
@@ -653,29 +955,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿En qué país famoso de África se encuentran las grandes pirámides antiguas?',
+        texto: 'En geometría espacial, ¿cuál es la fórmula para calcular el volumen de una pirámide con área de base "Ab" y altura "h"?',
         opciones: [
-          { id: 'a', texto: 'Egipto' },
-          { id: 'b', texto: 'Japón' },
-          { id: 'c', texto: 'Canadá' }
+          { id: 'a', texto: 'V = (Ab · h) / 3' },
+          { id: 'b', texto: 'V = Ab · h' },
+          { id: 'c', texto: 'V = (Ab · h) / 2' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'Si la base de tu pirámide tiene 7 vasos y el piso de arriba tiene 6, ¿cuántos vasos suman entre esos dos pisos?',
+        texto: 'Usando la fórmula de Gauss n·(n+1)/2, ¿cuánto da la suma de los números del 1 al 7 (1+2+3+4+5+6+7)?',
         opciones: [
-          { id: 'a', texto: '13 vasos' },
-          { id: 'b', texto: '12 vasos' },
-          { id: 'c', texto: '14 vasos' }
+          { id: 'a', texto: '28' },
+          { id: 'b', texto: '21' },
+          { id: 'c', texto: '35' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Cuántos vasos quedan en la punta más alta (la cima) de una pirámide?',
+        texto: '¿Qué elemento químico tiene el símbolo "Sn" en la Tabla Periódica?',
         opciones: [
-          { id: 'a', texto: '1 solo vaso' },
-          { id: 'b', texto: '3 vasos' },
-          { id: 'c', texto: '7 vasos' }
+          { id: 'a', texto: 'Selenio' },
+          { id: 'b', texto: 'Estaño' },
+          { id: 'c', texto: 'Estroncio' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: '¿Qué selección sudamericana es la máxima ganadora histórica de la Copa América junto con Argentina?',
+        opciones: [
+          { id: 'a', texto: 'Uruguay' },
+          { id: 'b', texto: 'Brasil' },
+          { id: 'c', texto: 'Chile' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'En trigonometría, ¿cuánto vale el Coseno de 0° (cos 0°)?',
+        opciones: [
+          { id: 'a', texto: '1' },
+          { id: 'b', texto: '0' },
+          { id: 'c', texto: '-1' }
         ],
         correcta: 'a'
       }
@@ -684,7 +1004,8 @@ export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 17,
     codigoQR: 'qr-17',
-    aliases: ['qr-memoria', '17', 'memoria'],
+    aliases: ['qr-memoria', 'memoria'],
+    codigoEncargado: 'MENTE23',
     titulo: 'Memoria',
     icono: '🧠',
     puntos: 50,
@@ -695,29 +1016,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Mirás esta secuencia: ROJO - AZUL - AMARILLO. ¿Cuál fue el color del medio?',
+        texto: '¿Cuáles son los primeros 5 dígitos decimales del número irracional Pi (π = 3, ...)?',
         opciones: [
-          { id: 'a', texto: 'Rojo' },
-          { id: 'b', texto: 'Azul' },
-          { id: 'c', texto: 'Amarillo' }
-        ],
-        correcta: 'b'
-      },
-      {
-        texto: '¿Qué órgano del cuerpo humano usamos principalmente para recordar secuencias y pensar?',
-        opciones: [
-          { id: 'a', texto: 'El cerebro' },
-          { id: 'b', texto: 'El estómago' },
-          { id: 'c', texto: 'El pulmón' }
+          { id: 'a', texto: '3,14159...' },
+          { id: 'b', texto: '3,14951...' },
+          { id: 'c', texto: '3,15149...' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'Si tenés que recordar 3 secuencias de 4 pelotitas cada una, ¿cuántas pelotitas memorizaste en total?',
+        texto: '¿Qué elemento químico tiene el símbolo "P" en la Tabla Periódica?',
         opciones: [
-          { id: 'a', texto: '12 pelotitas' },
-          { id: 'b', texto: '7 pelotitas' },
-          { id: 'c', texto: '10 pelotitas' }
+          { id: 'a', texto: 'Potasio' },
+          { id: 'b', texto: 'Fósforo' },
+          { id: 'c', texto: 'Plata' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: '¿En qué año ganó Argentina su segundo Mundial de fútbol en México con Diego Maradona como capitán?',
+        opciones: [
+          { id: 'a', texto: 'En 1978' },
+          { id: 'b', texto: 'En 1986' },
+          { id: 'c', texto: 'En 1990' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'En informática y matemática binaria, ¿a qué número decimal equivale el código binario 1010?',
+        opciones: [
+          { id: 'a', texto: 'Al número 10' },
+          { id: 'b', texto: 'Al número 8' },
+          { id: 'c', texto: 'Al número 12' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'En combinatoria, ¿de cuántas formas distintas se pueden ordenar en fila 3 pelotitas de colores diferentes (3!)?',
+        opciones: [
+          { id: 'a', texto: 'De 6 formas' },
+          { id: 'b', texto: 'De 3 formas' },
+          { id: 'c', texto: 'De 9 formas' }
         ],
         correcta: 'a'
       }
@@ -726,7 +1065,8 @@ export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 18,
     codigoQR: 'qr-18',
-    aliases: ['qr-minions', '18', 'minions'],
+    aliases: ['qr-minions', 'minions'],
+    codigoEncargado: 'LENTE51',
     titulo: 'Minions Nerds',
     icono: '🤓',
     puntos: 40,
@@ -737,29 +1077,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿De qué color son los famosos personajes Minions?',
+        texto: 'Las bananas son ricas en Potasio. ¿Cuál es el número atómico del Potasio (K) en la Tabla Periódica?',
         opciones: [
-          { id: 'a', texto: 'Amarillos' },
-          { id: 'b', texto: 'Verdes' },
-          { id: 'c', texto: 'Rojos' }
+          { id: 'a', texto: '19' },
+          { id: 'b', texto: '11' },
+          { id: 'c', texto: '8' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Cuál de estas tres palabras empieza con la letra "B" de Brillando?',
+        texto: '¿Quién es el autor de la Ley de Gravitación Universal cuya fórmula es F = G · (m₁ · m₂) / r² ?',
         opciones: [
-          { id: 'a', texto: 'Bendición' },
-          { id: 'b', texto: 'Victoria' },
-          { id: 'c', texto: 'Fuerza' }
+          { id: 'a', texto: 'Isaac Newton' },
+          { id: 'b', texto: 'Galileo Galilei' },
+          { id: 'c', texto: 'Johannes Kepler' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Cuántas letras tiene la palabra "MINION"?',
+        texto: '¿Qué jugador francés convirtió los 3 goles de su selección en la final del Mundial de Qatar 2022?',
         opciones: [
-          { id: 'a', texto: '6 letras' },
-          { id: 'b', texto: '5 letras' },
-          { id: 'c', texto: '8 letras' }
+          { id: 'a', texto: 'Antoine Griezmann' },
+          { id: 'b', texto: 'Kylian Mbappé' },
+          { id: 'c', texto: 'Olivier Giroud' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'En trigonometría, ¿a qué es igual siempre la identidad fundamental sen²(x) + cos²(x) ?',
+        opciones: [
+          { id: 'a', texto: 'Es igual a 1' },
+          { id: 'b', texto: 'Es igual a 0' },
+          { id: 'c', texto: 'Es igual a π' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿Cuál es el hueso más largo del cuerpo humano?',
+        opciones: [
+          { id: 'a', texto: 'El fémur' },
+          { id: 'b', texto: 'El húmero' },
+          { id: 'c', texto: 'La tibia' }
         ],
         correcta: 'a'
       }
@@ -768,7 +1126,8 @@ export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 19,
     codigoQR: 'qr-19',
-    aliases: ['qr-bowling', '19', 'bowling2'],
+    aliases: ['qr-bowling', 'bowling2'],
+    codigoEncargado: 'BOTE34',
     titulo: 'Bowling (Botellas)',
     icono: '🎳',
     puntos: 40,
@@ -779,29 +1138,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Un pozo en la tierra mide 2 metros de ancho por 2 de profundidad. ¿Cuánta tierra hay ADENTRO del agujero del pozo?',
+        texto: 'En física, ¿cómo se define la Cantidad de Movimiento Lineal (o Momento Lineal "p") de una bola en movimiento?',
         opciones: [
-          { id: 'a', texto: '4 metros de tierra' },
-          { id: 'b', texto: 'Ninguna (es un pozo vacío)' },
-          { id: 'c', texto: '2 metros de tierra' }
-        ],
-        correcta: 'b'
-      },
-      {
-        texto: 'Tenés 10 botellas paradas y en un tiro derribás todas menos 3. ¿Cuántas botellas quedaron paradas?',
-        opciones: [
-          { id: 'a', texto: '3 botellas' },
-          { id: 'b', texto: '7 botellas' },
-          { id: 'c', texto: 'Ninguna' }
+          { id: 'a', texto: 'p = masa · velocidad (m · v)' },
+          { id: 'b', texto: 'p = fuerza / área (F / A)' },
+          { id: 'c', texto: 'p = masa / tiempo (m / t)' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'Si en el primer tiro tirás 3 botellas y en el segundo tirás 4, ¿cuántas botellas derribaste en total?',
+        texto: '¿Qué diferencia la fórmula química del Agua Oxigenada (H₂O₂) de la del Agua común (H₂O)?',
         opciones: [
-          { id: 'a', texto: '7 botellas' },
-          { id: 'b', texto: '6 botellas' },
-          { id: 'c', texto: '8 botellas' }
+          { id: 'a', texto: 'Tiene un átomo extra de Oxígeno por molécula' },
+          { id: 'b', texto: 'Tiene un átomo extra de Hidrógeno' },
+          { id: 'c', texto: 'Contiene átomos de Carbono' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿Qué director técnico argentino sacó campeón a la Selección en la Copa América 2021, Finalissima 2022, Mundial 2022 y Copa América 2024?',
+        opciones: [
+          { id: 'a', texto: 'Lionel Scaloni' },
+          { id: 'b', texto: 'Marcelo Gallardo' },
+          { id: 'c', texto: 'Diego Simeone' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿Cuáles son las dos soluciones (raíces) de la ecuación cuadrática x² - 5x + 6 = 0 ?',
+        opciones: [
+          { id: 'a', texto: 'x = 2 y x = 3' },
+          { id: 'b', texto: 'x = 1 y x = 6' },
+          { id: 'c', texto: 'x = -2 y x = -3' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿Con qué fórmula se calcula el volumen de una esfera de radio "r"?',
+        opciones: [
+          { id: 'a', texto: 'V = (4/3) · π · r³' },
+          { id: 'b', texto: 'V = 4 · π · r²' },
+          { id: 'c', texto: 'V = 2 · π · r³' }
         ],
         correcta: 'a'
       }
@@ -810,7 +1187,8 @@ export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 20,
     codigoQR: 'qr-20',
-    aliases: ['qr-pescador', '20', 'pescador'],
+    aliases: ['qr-pescador', 'pescador'],
+    codigoEncargado: 'CAÑA89',
     titulo: 'Pescador',
     icono: '🎣',
     puntos: 50,
@@ -821,29 +1199,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Si pescás 4 peces rojos y 4 peces azules, ¿cuántos peces sacaste en total?',
+        texto: '¿Cómo se llama el principio físico que explica por qué los barcos flotan ("Todo cuerpo sumergido recibe un empuje de abajo hacia arriba...")?',
         opciones: [
-          { id: 'a', texto: '8 peces' },
-          { id: 'b', texto: '6 peces' },
-          { id: 'c', texto: '10 peces' }
+          { id: 'a', texto: 'Principio de Arquímedes' },
+          { id: 'b', texto: 'Principio de Pascal' },
+          { id: 'c', texto: 'Teorema de Bernoulli' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'En los Evangelios, Jesús llamó a unos pescadores y les dijo: "Vengan conmigo y los haré pescadores de..."',
+        texto: '¿Qué elemento químico es un líquido rojizo a temperatura ambiente y tiene el símbolo "Br" en la Tabla Periódica?',
         opciones: [
-          { id: 'a', texto: 'Hombres / Personas' },
-          { id: 'b', texto: 'Tiburones' },
-          { id: 'c', texto: 'Tesoros' }
+          { id: 'a', texto: 'Boro' },
+          { id: 'b', texto: 'Bromo' },
+          { id: 'c', texto: 'Bario' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: '¿En qué estadio mítico de Londres ganó Argentina la "Finalissima" 2022 por 3-0 frente a Italia?',
+        opciones: [
+          { id: 'a', texto: 'En el Estadio de Wembley' },
+          { id: 'b', texto: 'En Old Trafford' },
+          { id: 'c', texto: 'En Anfield' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Dónde viven naturalmente los peces?',
+        texto: 'Si en una pecera hay 6 peces rojos y 4 peces azules, ¿cuál es la probabilidad de pescar al azar un pez azul en el primer intento?',
         opciones: [
-          { id: 'a', texto: 'En el agua' },
-          { id: 'b', texto: 'En los árboles' },
-          { id: 'c', texto: 'En el desierto' }
+          { id: 'a', texto: '4/10 (40%)' },
+          { id: 'b', texto: '4/6 (66%)' },
+          { id: 'c', texto: '1/4 (25%)' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'En la Tabla Periódica, ¿qué símbolo tiene el elemento Cloro?',
+        opciones: [
+          { id: 'a', texto: 'Cl' },
+          { id: 'b', texto: 'Cr' },
+          { id: 'c', texto: 'Co' }
         ],
         correcta: 'a'
       }
@@ -852,7 +1248,8 @@ export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 21,
     codigoQR: 'qr-21',
-    aliases: ['qr-enhebralo', '21', 'enhebralo'],
+    aliases: ['qr-enhebralo', 'enhebralo'],
+    codigoEncargado: 'HILO12',
     titulo: 'Enhebralo',
     icono: '🧵',
     puntos: 40,
@@ -863,29 +1260,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Si cada botón tiene 2 agujeritos y enhebraste 5 botones, ¿cuántos agujeritos tienen esos 5 botones en total?',
+        texto: 'En una circunferencia, ¿cuál es la relación exacta entre el Diámetro (D) y el Radio (r)?',
         opciones: [
-          { id: 'a', texto: '10 agujeritos' },
-          { id: 'b', texto: '5 agujeritos' },
-          { id: 'c', texto: '12 agujeritos' }
+          { id: 'a', texto: 'D = 2 · r (el doble del radio)' },
+          { id: 'b', texto: 'D = r² (el radio al cuadrado)' },
+          { id: 'c', texto: 'D = π · r' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Para qué se usan principalmente los botones en una camisa?',
+        texto: '¿Qué elemento semiconductor, cuyo símbolo es "Si", es el componente principal de los microchips y del vidrio?',
         opciones: [
-          { id: 'a', texto: 'Para abrocharla / cerrarla' },
-          { id: 'b', texto: 'Para plancharla' },
-          { id: 'c', texto: 'Para mojarla' }
+          { id: 'a', texto: 'Silicio' },
+          { id: 'b', texto: 'Sodio' },
+          { id: 'c', texto: 'Azufre' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Qué necesitás pasar por el ojo de una aguja para poder coser?',
+        texto: '¿Qué futbolista argentino hizo goles en la final de la Copa América 2021, en la Finalissima 2022 y en la final del Mundial 2022?',
         opciones: [
-          { id: 'a', texto: 'El hilo' },
-          { id: 'b', texto: 'Una tijera' },
-          { id: 'c', texto: 'Un dedal' }
+          { id: 'a', texto: 'Ángel Di María' },
+          { id: 'b', texto: 'Rodrigo De Paul' },
+          { id: 'c', texto: 'Nicolás Otamendi' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿Cuál es el Mínimo Común Múltiplo (MCM) entre los números 4 y 6?',
+        opciones: [
+          { id: 'a', texto: '12' },
+          { id: 'b', texto: '24' },
+          { id: 'c', texto: '2' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'En el Sistema Internacional de Unidades, ¿en qué unidad se mide la frecuencia de una onda?',
+        opciones: [
+          { id: 'a', texto: 'En Hercios (Hz)' },
+          { id: 'b', texto: 'En Julios (J)' },
+          { id: 'c', texto: 'En Newtons (N)' }
         ],
         correcta: 'a'
       }
@@ -894,7 +1309,8 @@ export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 22,
     codigoQR: 'qr-22',
-    aliases: ['qr-pong', '22', 'pong'],
+    aliases: ['qr-pong', 'pong'],
+    codigoEncargado: 'AGUA45',
     titulo: 'Pong Acuático',
     icono: '🏓',
     puntos: 40,
@@ -905,29 +1321,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Si hay 6 vasos de un lado de la mesa y 6 vasos del otro lado, ¿cuántos vasos hay en la mesa en total?',
+        texto: 'Cuando lanzás una pelotita por el aire formando un arco, ¿qué forma geométrica describe su trayectoria (tiro oblicuo)?',
         opciones: [
-          { id: 'a', texto: '12 vasos' },
-          { id: 'b', texto: '10 vasos' },
-          { id: 'c', texto: '16 vasos' }
+          { id: 'a', texto: 'Una parábola' },
+          { id: 'b', texto: 'Una hipérbola' },
+          { id: 'c', texto: 'Una asíntota' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Cómo es por dentro una pelotita reglamentaria de ping-pong?',
+        texto: '¿Cuál es la densidad del agua pura en condiciones estándar?',
         opciones: [
-          { id: 'a', texto: 'Hueca (llena de aire)' },
-          { id: 'b', texto: 'Maciza de hierro' },
-          { id: 'c', texto: 'Rellena de arena' }
+          { id: 'a', texto: '1 g/cm³ (o 1 kg/litro)' },
+          { id: 'b', texto: '10 g/cm³' },
+          { id: 'c', texto: '0,1 g/cm³' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'Si tu equipo tenía que embocar en 6 vasos y ya embocó en 5, ¿cuántos vasos le quedan por acertar?',
+        texto: '¿Cuál es el símbolo químico del Azufre en la Tabla Periódica?',
         opciones: [
-          { id: 'a', texto: '1 solo vaso' },
-          { id: 'b', texto: '2 vasos' },
-          { id: 'c', texto: 'Ninguno' }
+          { id: 'a', texto: 'S' },
+          { id: 'b', texto: 'Az' },
+          { id: 'c', texto: 'Zf' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: '¿Contra qué selección europea empató Argentina 2-2 y luego venció por penales en los cuartos de final de Qatar 2022?',
+        opciones: [
+          { id: 'a', texto: 'Países Bajos (Holanda)' },
+          { id: 'b', texto: 'Croacia' },
+          { id: 'c', texto: 'Polonia' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'En trigonometría, ¿cuánto vale el Seno de 90° (sen 90°)?',
+        opciones: [
+          { id: 'a', texto: '1' },
+          { id: 'b', texto: '0' },
+          { id: 'c', texto: '0,5' }
         ],
         correcta: 'a'
       }
@@ -936,7 +1370,8 @@ export const LISTA_JUEGOS_OFICIAL = [
   {
     id: 23,
     codigoQR: 'qr-23',
-    aliases: ['qr-jenga', '23', 'jenga'],
+    aliases: ['qr-jenga', 'jenga'],
+    codigoEncargado: 'TORRE90',
     titulo: 'Jenga Reverso',
     icono: '🧱',
     puntos: 50,
@@ -947,29 +1382,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿De qué material son las piezas del juego Jenga clásico?',
+        texto: 'En física estática, ¿qué condición debe cumplirse con el Centro de Gravedad de una torre para que NO se derrumbe?',
         opciones: [
-          { id: 'a', texto: 'De madera' },
-          { id: 'b', texto: 'De vidrio' },
-          { id: 'c', texto: 'De tela' }
+          { id: 'a', texto: 'Su proyección vertical debe caer dentro de la base de apoyo' },
+          { id: 'b', texto: 'Su masa debe ser igual a cero' },
+          { id: 'c', texto: 'Su altura debe superar el metro' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'En una torre de Jenga tradicional se arman pisos de 3 bloquecitos. ¿Cuántos bloques hay en 4 pisos?',
+        texto: '¿Con qué fórmula se calcula el volumen de un prisma rectangular (como un bloque de Jenga) de largo "a", ancho "b" y alto "c"?',
         opciones: [
-          { id: 'a', texto: '12 bloques' },
-          { id: 'b', texto: '9 bloques' },
-          { id: 'c', texto: '15 bloques' }
+          { id: 'a', texto: 'V = a · b · c' },
+          { id: 'b', texto: 'V = a + b + c' },
+          { id: 'c', texto: 'V = (a · b) / c' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Qué pasa en el Jenga cuando la torre pierde el equilibrio y se cae?',
+        texto: '¿Qué elemento de la Tabla Periódica tiene el símbolo "Zn"?',
         opciones: [
-          { id: 'a', texto: 'Se derrumba y termina el turno' },
-          { id: 'b', texto: 'Suma puntos dobles' },
-          { id: 'c', texto: 'Flota en el aire' }
+          { id: 'a', texto: 'Zirconio' },
+          { id: 'b', texto: 'Zinc' },
+          { id: 'c', texto: 'Xenón' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: '¿Qué club brasileño ganó la Copa Libertadores 2023 tras vencer a Boca Juniors en el estadio Maracaná?',
+        opciones: [
+          { id: 'a', texto: 'Palmeiras' },
+          { id: 'b', texto: 'Fluminense' },
+          { id: 'c', texto: 'Flamengo' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: '¿Cuál es el resultado de elevar 3 a la cuarta potencia (3⁴)?',
+        opciones: [
+          { id: 'a', texto: '81' },
+          { id: 'b', texto: '12' },
+          { id: 'c', texto: '27' }
         ],
         correcta: 'a'
       }
@@ -981,6 +1434,7 @@ export const LISTA_JUEGOS_OFICIAL = [
 const CODIGOS_ESPECIALES = {
   'qr-secreto-1': {
     id: 101,
+    codigoEncargado: 'BONUS101',
     titulo: 'QR Secreto #1',
     puntos: 100,
     tipo: 'bonus',
@@ -989,6 +1443,7 @@ const CODIGOS_ESPECIALES = {
   },
   'qr-secreto-2': {
     id: 102,
+    codigoEncargado: 'BONUS102',
     titulo: 'QR Secreto #2',
     puntos: 100,
     tipo: 'bonus',
@@ -997,6 +1452,7 @@ const CODIGOS_ESPECIALES = {
   },
   'qr-trampa': {
     id: 103,
+    codigoEncargado: 'TRAMPA99',
     titulo: 'SISTEMA COMPROMETIDO',
     puntos: -50,
     tipo: 'trampa',
@@ -1005,8 +1461,8 @@ const CODIGOS_ESPECIALES = {
   }
 };
 
-// Buscador universal de juegos (encuentra por QR nuevo, QR viejo o número del 1 al 23)
-const buscarJuegoPorCodigo = (codigoCrudo) => {
+// 1. Buscador exclusivo para LECTURA DE CÁMARA QR
+const buscarJuegoPorQR = (codigoCrudo) => {
   if (!codigoCrudo) return null;
   const limpio = codigoCrudo.toString().trim().toLowerCase();
 
@@ -1017,8 +1473,61 @@ const buscarJuegoPorCodigo = (codigoCrudo) => {
       j.codigoQR.toLowerCase() === limpio ||
       `juego_${j.id}` === limpio ||
       `juego-${j.id}` === limpio ||
-      j.aliases.some((alias) => alias.toLowerCase() === limpio)
+      j.aliases.some((alias) => alias.toLowerCase() === limpio) ||
+      j.codigoEncargado.toLowerCase() === limpio
   ) || null;
+};
+
+// 2. Buscador exclusivo para CUADRO MANUAL (ANTI-TRAMPA: solo acepta el código del encargado)
+const buscarJuegoPorClaveEncargado = (claveCruda) => {
+  if (!claveCruda) return null;
+  const limpio = claveCruda.toString().trim().toUpperCase();
+
+  const especial = Object.values(CODIGOS_ESPECIALES).find(
+    (esp) => esp.codigoEncargado.toUpperCase() === limpio
+  );
+  if (especial) return especial;
+
+  return LISTA_JUEGOS_OFICIAL.find(
+    (j) => j.codigoEncargado.toUpperCase() === limpio
+  ) || null;
+};
+
+// ============================================================================
+// ROTACIÓN INTELIGENTE DE LAS 5 PREGUNTAS SIN REPETIR
+// ============================================================================
+const sortearPreguntaSinRepetir = (juego) => {
+  const total = juego.preguntas.length;
+  const storageKey = `brillando_rotacion_juego_${juego.id}`;
+  let usados = [];
+
+  try {
+    usados = JSON.parse(localStorage.getItem(storageKey) || '[]');
+  } catch (_) {
+    usados = [];
+  }
+
+  let disponibles = juego.preguntas
+    .map((_, idx) => idx)
+    .filter((idx) => !usados.includes(idx));
+
+  // Si ya vieron las 5 preguntas de ese juego, reiniciamos el mazo evitando repetir la última
+  if (disponibles.length === 0) {
+    const ultimaUsada = usados[usados.length - 1];
+    usados = ultimaUsada !== undefined ? [ultimaUsada] : [];
+    disponibles = juego.preguntas
+      .map((_, idx) => idx)
+      .filter((idx) => !usados.includes(idx));
+  }
+
+  const elegido = disponibles[Math.floor(Math.random() * disponibles.length)];
+  usados.push(elegido);
+
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(usados));
+  } catch (_) {}
+
+  return juego.preguntas[elegido];
 };
 
 // ============================================================================
@@ -1034,7 +1543,7 @@ const obtenerDeviceId = () => {
 };
 
 // ============================================================================
-// HELPER 2: TIMEOUT CON REINTENTO AUTOMÁTICO (EVITA FALLOS POR SEÑAL DÉBIL)
+// HELPER 2: TIMEOUT CON REINTENTO AUTOMÁTICO
 // ============================================================================
 const ejecutarConTimeout = async (fnPromesa, ms = 7000, reintentos = 2) => {
   for (let intento = 0; intento <= reintentos; intento++) {
@@ -1072,11 +1581,14 @@ export default function Juego() {
   const [scannerCooldown, setScannerCooldown] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Solución a Android sin cámara: estado de error de cámara y código manual
+  // Cámara y código del encargado
   const [cameraError, setCameraError] = useState(false);
   const [codigoManualInput, setCodigoManualInput] = useState('');
 
-  // Caché persistente del grupo (Evita el "CARGANDO..." infinito)
+  // Modal de aviso cuando el escáner está bloqueado antes de las 16:30hs
+  const [modalBloqueoHorario, setModalBloqueoHorario] = useState(false);
+
+  // Caché persistente del grupo
   const [grupoDataCache, setGrupoDataCache] = useState(() => {
     try {
       const guardado = localStorage.getItem('brillando_grupo_cache');
@@ -1088,10 +1600,6 @@ export default function Juego() {
   const [grupoDocRef, setGrupoDocRef] = useState(null);
   const [rankingActual, setRankingActual] = useState('-');
 
-  // ============================================================================
-  // HELPER CRÍTICO: OBTENER REFERENCIA DEL GRUPO AUNQUE SE HAYA CORTADO LA RED
-  // Soluciona la falla del Ta-Te-Ti donde `grupoDocRef` era null
-  // ============================================================================
   const asegurarGrupoDocRef = async () => {
     if (grupoDocRef) return grupoDocRef;
     if (!activePin) return null;
@@ -1357,10 +1865,17 @@ export default function Juego() {
   };
 
   // ============================================================================
-  // 7. APERTURA DE CÁMARA SEGURA
+  // 7. APERTURA DE CÁMARA SEGURA (CON BLOQUEO HASTA EL SÁBADO 16:30 HS)
   // ============================================================================
   const handleAbrirEscanerSeguro = () => {
     if (scannerCooldown || isProcessing) return;
+
+    // Verifica si ya son las 16:30 hs del sábado (o si desbloqueaste manualmente)
+    if (!estaEscanerHabilitado()) {
+      setModalBloqueoHorario(true);
+      return;
+    }
+
     setScannerCooldown(true);
     setCameraError(false);
     setCodigoManualInput('');
@@ -1369,14 +1884,14 @@ export default function Juego() {
   };
 
   // ============================================================================
-  // 8. PROCESAR CÓDIGO DE JUEGO (DESDE QR O DESDE TECLADO MANUAL EN ANDROID)
+  // 8. INICIAR DESAFÍO (RECIBE EL JUEGO VALIDADO POR CÁMARA O CLAVE DE ENCARGADO)
   // ============================================================================
-  const procesarCodigoJuego = async (textoCrudo) => {
-    if (!textoCrudo || isProcessing) return;
+  const iniciarDesafioValidado = async (baseJuego) => {
+    if (!baseJuego || isProcessing) return;
 
-    const baseJuego = buscarJuegoPorCodigo(textoCrudo);
-    if (!baseJuego) {
-      alert(`El código "${textoCrudo}" no corresponde a ningún juego activo.`);
+    if (!estaEscanerHabilitado()) {
+      setModalBloqueoHorario(true);
+      setView('dashboard');
       return;
     }
 
@@ -1387,10 +1902,9 @@ export default function Juego() {
       return;
     }
 
-    // Aseguramos la referencia de Firebase antes de continuar
     const refSegura = await asegurarGrupoDocRef();
     if (!refSegura) {
-      alert("Reconectando con tu escuadrón... Tocá nuevamente para escanear.");
+      alert("Reconectando con tu escuadrón... Tocá nuevamente.");
       return;
     }
 
@@ -1449,9 +1963,8 @@ export default function Juego() {
       return;
     }
 
-    // CASO NORMAL: Sorteamos pregunta y abrimos la Trivia
-    const randomIndex = Math.floor(Math.random() * baseJuego.preguntas.length);
-    const preguntaSorteada = baseJuego.preguntas[randomIndex];
+    // CASO NORMAL: Rotación inteligente entre las 5 preguntas sin repetir
+    const preguntaSorteada = sortearPreguntaSinRepetir(baseJuego);
 
     setMostrarOpciones(false);
     setTimeLeft(20);
@@ -1469,14 +1982,35 @@ export default function Juego() {
     setView('trivia');
   };
 
+  // Lectura óptica desde la cámara QR
   const handleScan = (resultado) => {
     if (!resultado || isProcessing) return;
     const textoQR = Array.isArray(resultado) ? resultado[0]?.rawValue : (resultado?.text || resultado);
-    if (textoQR) procesarCodigoJuego(textoQR);
+    if (!textoQR) return;
+
+    const juegoEncontrado = buscarJuegoPorQR(textoQR);
+    if (!juegoEncontrado) {
+      alert(`Código QR no reconocido en el sistema.`);
+      return;
+    }
+    iniciarDesafioValidado(juegoEncontrado);
+  };
+
+  // Ingreso manual (SOLO acepta el código secreto del encargado, bloqueando trampas)
+  const handleValidarClaveEncargado = (e) => {
+    e.preventDefault();
+    if (!codigoManualInput.trim() || isProcessing) return;
+
+    const juegoAutorizado = buscarJuegoPorClaveEncargado(codigoManualInput);
+    if (!juegoAutorizado) {
+      alert("🔒 CÓDIGO INVÁLIDO.\nSolo el encargado de la posta tiene la clave de desbloqueo luego de ganar el juego.");
+      return;
+    }
+    iniciarDesafioValidado(juegoAutorizado);
   };
 
   // ============================================================================
-  // 9. VALIDACIÓN DE TRIVIA BLINDADA (NUNCA PIERDE PUNTOS NI ESTADO)
+  // 9. VALIDACIÓN DE TRIVIA BLINDADA
   // ============================================================================
   const validarRespuesta = async (opcionSeleccionada, agotadoTiempo = false) => {
     if (isProcessing || !juegoActivo) return;
@@ -1510,7 +2044,6 @@ export default function Juego() {
           })
         );
         
-        // Actualización optimista inmediata en la memoria local
         setGrupoDataCache((prev) => prev ? ({
           ...prev,
           puntos: Number(prev.puntos || 0) + puntosDelJuego,
@@ -1624,28 +2157,63 @@ export default function Juego() {
     );
   }
   
-  // ================= VISTA: DASHBOARD DEL JUGADOR + CATÁLOGO DE 23 JUEGOS =================
+  // ================= VISTA: DASHBOARD DEL JUGADOR =================
   if (view === 'dashboard') {
     return (
-      <DashboardJugador 
-        grupoData={grupoDataCache}
-        catalogoJuegos={LISTA_JUEGOS_OFICIAL}
-        rankingEnVivo={rankingActual}
-        onEscanear={handleAbrirEscanerSeguro} 
-        onSalir={() => { 
-          localStorage.removeItem('miGrupoPIN'); 
-          localStorage.removeItem('brillando_grupo_cache');
-          setActivePin('');
-          setPinGenerado('');
-          setPinInput('');
-          setNombreEquipo('');
-          setView('inicio'); 
-        }} 
-      />
+      <>
+        <DashboardJugador 
+          grupoData={grupoDataCache}
+          catalogoJuegos={LISTA_JUEGOS_OFICIAL}
+          rankingEnVivo={rankingActual}
+          onEscanear={handleAbrirEscanerSeguro} 
+          onSalir={() => { 
+            localStorage.removeItem('miGrupoPIN'); 
+            localStorage.removeItem('brillando_grupo_cache');
+            setActivePin('');
+            setPinGenerado('');
+            setPinInput('');
+            setNombreEquipo('');
+            setView('inicio'); 
+          }} 
+        />
+
+        {/* MODAL DE BLOQUEO HORARIO (HASTA EL SÁBADO 16:30 HS) */}
+        {modalBloqueoHorario && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-5"
+            onClick={() => setModalBloqueoHorario(false)}
+          >
+            <div
+              className="w-full max-w-sm rounded-3xl border-2 border-yellow-400 bg-[#0e0e12] p-6 text-center text-white shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-yellow-400/15 border border-yellow-400/40 text-4xl">
+                🔒
+              </div>
+              <span className="inline-block rounded-full bg-yellow-400/20 px-3 py-1 font-mono text-[10px] font-black uppercase tracking-widest text-yellow-400 mb-2">
+                Escáner en espera
+              </span>
+              <h3 className="text-2xl font-black uppercase tracking-tight mb-2">
+                ¡Se habilita a las 16:30 hs!
+              </h3>
+              <p className="text-xs text-gray-300 leading-relaxed mb-6">
+                Ya tienen su escuadrón listo y registrado. El escáner de códigos QR se activará mañana <b>sábado a las 16:30 hs</b> cuando comiencen los juegos en el Congreso.
+              </p>
+              <button
+                type="button"
+                onClick={() => setModalBloqueoHorario(false)}
+                className="w-full rounded-full bg-yellow-400 py-3.5 text-xs font-black uppercase tracking-widest text-black"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        )}
+      </>
     );
   }
 
-  // ================= VISTA: ESCÁNER QR BLINDADO PARA ANDROID + CÓDIGO MANUAL =================
+  // ================= VISTA: ESCÁNER QR + CÓDIGO DEL ENCARGADO (ANTI-TRAMPA) =================
   if (view === 'escaner') {
     return (
       <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center p-5">
@@ -1666,7 +2234,7 @@ export default function Juego() {
           <div className="w-full max-w-sm rounded-2xl border-2 border-red-500 bg-red-950/30 p-5 text-center mb-5">
             <p className="font-black text-red-400 uppercase text-sm mb-2">⚠️ Tu navegador bloqueó la cámara</p>
             <p className="text-xs text-gray-300 leading-relaxed mb-3">
-              Si abriste el link desde WhatsApp o Instagram, tocá los 3 puntitos arriba a la derecha y elegí <b>"Abrir en Chrome"</b>, o ingresá el código manual abajo:
+              Si abriste el link desde WhatsApp o Instagram, tocá los 3 puntitos arriba a la derecha y elegí <b>"Abrir en Chrome"</b>, o pedile el código al encargado del juego:
             </p>
             <button
               type="button"
@@ -1678,18 +2246,18 @@ export default function Juego() {
           </div>
         )}
 
-        {/* PLAN B INFALIBLE PARA ANDROID: INGRESO MANUAL DE CÓDIGO */}
+        {/* CUADRO ANTI-TRAMPA: SOLO ACEPTA CLAVE DEL ENCARGADO DEL JUEGO */}
         <form 
-          onSubmit={(e) => { e.preventDefault(); procesarCodigoJuego(codigoManualInput); }}
+          onSubmit={handleValidarClaveEncargado}
           className="w-full max-w-sm bg-white/5 border border-white/15 rounded-2xl p-4 mb-6"
         >
-          <label className="block font-mono text-[11px] uppercase tracking-wider text-yellow-400 font-bold mb-2">
-            ⌨️ ¿No abre la cámara? Ingresá el código del QR:
+          <label className="block font-mono text-[11px] uppercase tracking-wider text-yellow-400 font-bold mb-2 text-center">
+            🔑 PREGUNTAR CODIGO A ENCARGADO DEL JUEGO
           </label>
           <div className="flex gap-2">
             <input
               type="text"
-              placeholder="Ej: qr-14 o qr-tateti"
+              placeholder="Ingresar clave del encargado..."
               value={codigoManualInput}
               onChange={(e) => setCodigoManualInput(e.target.value)}
               className="flex-1 bg-black border border-white/25 rounded-xl px-3 py-2.5 text-sm text-white font-mono uppercase focus:outline-none focus:border-yellow-400"
@@ -1698,7 +2266,7 @@ export default function Juego() {
               type="submit"
               className="bg-yellow-400 text-black font-black px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider"
             >
-              Entrar
+              Validar
             </button>
           </div>
         </form>
@@ -1713,7 +2281,7 @@ export default function Juego() {
     );
   }
 
-  // ================= VISTA: TRIVIA LIMPIA (SIN BOTÓN "i", YA QUE ESTÁ EN EL MODAL) =================
+  // ================= VISTA: TRIVIA =================
   if (view === 'trivia' && juegoActivo) {
     const vidasMostradas = grupoDataCache?.vidas !== undefined ? grupoDataCache.vidas : 3;
 
