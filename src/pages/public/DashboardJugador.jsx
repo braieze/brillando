@@ -10,7 +10,6 @@ import {
   Sparkles,
   AlertTriangle,
   CheckCircle2,
-  Lock,
   X,
   Package,
   UsersRound
@@ -336,14 +335,13 @@ const COLOR_ESTILOS = {
 };
 
 // ============================================================================
-// TARJETA DE JUEGO (SIN BOTÓN "i": TOCAR LA TARJETA ABRE EL MODAL SI NO SE GANÓ)
+// TARJETA DE JUEGO (SIN BOTÓN "i")
 // ============================================================================
 function DesafioCard({ desafio, numeroOrden, isDone, onSelect }) {
   const esTrampa = desafio.tipo === 'trampa';
   const paleta = COLOR_ESTILOS[desafio.color] || COLOR_ESTILOS.azul;
 
   const handleCardClick = () => {
-    // Si ya lo ganaron/completaron, NO se abre el modal
     if (isDone) return;
     onSelect(desafio);
   };
@@ -369,7 +367,6 @@ function DesafioCard({ desafio, numeroOrden, isDone, onSelect }) {
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3.5 min-w-0">
-          {/* Ícono del juego con número de estación */}
           <div
             className={`relative flex size-12 shrink-0 items-center justify-center rounded-xl border bg-gradient-to-br ${
               isDone
@@ -385,7 +382,6 @@ function DesafioCard({ desafio, numeroOrden, isDone, onSelect }) {
             )}
           </div>
 
-          {/* Título y etiquetas de modalidad/estado */}
           <div className="min-w-0">
             <h3 className={`text-sm font-black uppercase tracking-wide truncate ${isDone ? 'text-gray-300 line-through decoration-emerald-400/60' : 'text-white'}`}>
               {desafio.titulo}
@@ -411,7 +407,6 @@ function DesafioCard({ desafio, numeroOrden, isDone, onSelect }) {
           </div>
         </div>
 
-        {/* Puntaje a la derecha */}
         <div className="text-right shrink-0 pl-2">
           <span
             className={`inline-block rounded-xl px-2.5 py-1 font-mono text-sm font-black ${
@@ -440,7 +435,6 @@ export default function DashboardJugador({
   onSalir,
   rankingEnVivo
 }) {
-  // Inicialización instantánea desde props o caché local (NUNCA MÁS QUEDA EN "CARGANDO...")
   const [grupoLocal, setGrupoLocal] = useState(() => {
     if (grupoData) return grupoData;
     try {
@@ -450,24 +444,20 @@ export default function DashboardJugador({
     return null;
   });
 
-  // Juego seleccionado para mostrar en el Modal Explicativo
   const [juegoModal, setJuegoModal] = useState(null);
-
-  // Filtro rápido de misiones ('TODAS' | 'PENDIENTES' | 'GANADAS')
   const [filtroMisiones, setFiltroMisiones] = useState('TODAS');
-
   const [abriendoCamara, setAbriendoCamara] = useState(false);
+  
   const miRolLocal = localStorage.getItem('miRolCapitan') || '';
   const pinGuardado = localStorage.getItem('miGrupoPIN') || '----';
 
-  // Sincroniza inmediatamente cuando Juego.jsx actualiza `grupoData`
   useEffect(() => {
     if (grupoData) {
       setGrupoLocal(grupoData);
     }
   }, [grupoData]);
 
-  // Listener de respaldo únicamente si `grupoData` aún no llegó desde el padre
+  // Listener de emergencia local (solo para asegurar su propia vida)
   useEffect(() => {
     if (grupoData || !pinGuardado || pinGuardado === '----') return;
 
@@ -485,7 +475,6 @@ export default function DashboardJugador({
     return () => unsubscribe();
   }, [grupoData, pinGuardado]);
 
-  // Normalización segura de los datos del grupo
   const grupoActual = useMemo(() => {
     const raw = grupoData || grupoLocal || {};
     const completadosNumeros = Array.isArray(raw.juegosCompletados)
@@ -499,12 +488,10 @@ export default function DashboardJugador({
       capitan2: raw.capitan2 || 'PENDIENTE',
       puntosTotales: Number(raw.puntos || 0),
       vidas: raw.vidas !== undefined ? Number(raw.vidas) : 3,
-      ranking: raw.ranking || '-',
       juegosCompletados: completadosNumeros
     };
   }, [grupoData, grupoLocal, pinGuardado]);
 
-  // Lista combinada de los 23 juegos oficiales + los 3 códigos especiales
   const todosLosDesafios = useMemo(() => {
     const base = Array.isArray(catalogoJuegos) && catalogoJuegos.length > 0
       ? catalogoJuegos
@@ -521,14 +508,12 @@ export default function DashboardJugador({
     });
   }, [todosLosDesafios, grupoActual.juegosCompletados, filtroMisiones]);
 
-  // Si el otro capitán completa el juego mientras este capitán tenía el modal abierto, lo cierra automáticamente
   useEffect(() => {
     if (juegoModal && grupoActual.juegosCompletados.includes(Number(juegoModal.id))) {
       setJuegoModal(null);
     }
   }, [grupoActual.juegosCompletados, juegoModal]);
 
-  // Compartir PIN por WhatsApp
   const handleCompartirWhatsapp = async () => {
     const mensaje = 
 `⚡ *¡SUMATE A MI ESCUADRÓN "${grupoActual.nombre}" EN BRILLANDO!* ⚡
@@ -561,10 +546,6 @@ Entrá al link, tocá *"Ya tengo un PIN"* e ingresá el código *${grupoActual.p
     onEscanear();
     setTimeout(() => setAbriendoCamara(false), 900);
   };
-
-  const puestoFinal = rankingEnVivo && rankingEnVivo !== '-'
-    ? rankingEnVivo
-    : grupoActual.ranking;
 
   const totalJuegosNormales = 23;
   const completadosNormales = grupoActual.juegosCompletados.filter((id) => id <= 23).length;
@@ -599,7 +580,6 @@ Entrá al link, tocá *"Ya tengo un PIN"* e ingresá el código *${grupoActual.p
         <div className="relative mb-7 overflow-hidden rounded-3xl border border-blue-500/25 bg-gradient-to-b from-[#0b1326] to-[#070709] p-5 shadow-2xl shadow-blue-950/30">
           <div className="absolute -right-10 -top-10 size-32 rounded-full bg-blue-500/10 blur-2xl pointer-events-none" />
           
-          {/* Cabecera: PIN, Nombre del Escuadrón y Ranking en Vivo */}
           <div className="flex justify-between items-start gap-2 mb-4 relative z-10">
             <div className="min-w-0">
               <p className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-blue-400">
@@ -609,17 +589,15 @@ Entrá al link, tocá *"Ya tengo un PIN"* e ingresá el código *${grupoActual.p
                 {grupoActual.nombre}
               </h2>
             </div>
+            {/* RANKING ESTÁTICO DE AHORRO */}
             <div className="text-right shrink-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Posición</p>
-              <p className="text-xl font-black text-yellow-400">
-                {puestoFinal !== '-' && puestoActualValido(puestoFinal, grupoActual.puntosTotales)
-                  ? `TOP #${puestoFinal}`
-                  : 'EN JUEGO'}
+              <p className="text-[11px] mt-1 text-center font-black uppercase text-yellow-400 bg-yellow-400/10 border border-yellow-400/30 px-2 py-1 rounded-md">
+                En Pantalla<br/>Gigante
               </p>
             </div>
           </div>
 
-          {/* Bloque de Capitanes + Botón Compartir PIN */}
           <div className="relative z-10 mb-5 flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-white/[0.04] border border-white/10 px-3.5 py-2.5">
             <div className="flex items-center gap-2 text-[11px] font-mono">
               <Users className="size-4 text-blue-400 shrink-0" />
@@ -644,7 +622,6 @@ Entrá al link, tocá *"Ya tengo un PIN"* e ingresá el código *${grupoActual.p
             </button>
           </div>
 
-          {/* Contador de Energía Total y Vidas Restantes */}
           <div className="flex flex-col items-center justify-center rounded-2xl bg-black/60 py-5 ring-1 ring-white/10 relative z-10">
             <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-400 mb-1">
               Puntaje del Escuadrón
@@ -674,7 +651,6 @@ Entrá al link, tocá *"Ya tengo un PIN"* e ingresá el código *${grupoActual.p
           </div>
         </div>
 
-        {/* CABECERA Y FILTROS DE LOS 23 JUEGOS */}
         <div className="mb-3 flex items-end justify-between">
           <div>
             <h2 className="text-sm font-black uppercase tracking-widest text-white">
@@ -689,7 +665,6 @@ Entrá al link, tocá *"Ya tengo un PIN"* e ingresá el código *${grupoActual.p
           </span>
         </div>
 
-        {/* Píldoras de filtro para encontrar rápido qué juegos faltan */}
         <div className="mb-4 grid grid-cols-3 gap-2">
           <button
             type="button"
@@ -726,7 +701,6 @@ Entrá al link, tocá *"Ya tengo un PIN"* e ingresá el código *${grupoActual.p
           </button>
         </div>
         
-        {/* GRILLA DE TARJETAS */}
         <div className="flex flex-col gap-3">
           {desafíosFiltrados.map((desafio) => {
             const isDone = grupoActual.juegosCompletados.includes(Number(desafio.id));
@@ -744,9 +718,6 @@ Entrá al link, tocá *"Ya tengo un PIN"* e ingresá el código *${grupoActual.p
 
       </div>
 
-      {/* ========================================================================
-          MODAL EXPLICATIVO AL HACER CLIC EN UN JUEGO PENDIENTE
-          ======================================================================== */}
       {juegoModal && (
         <div
           className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fadeIn"
@@ -756,7 +727,6 @@ Entrá al link, tocá *"Ya tengo un PIN"* e ingresá el código *${grupoActual.p
             className="w-full max-w-md overflow-hidden rounded-3xl border-2 border-white/15 bg-[#0e0e12] text-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Cabecera del Modal */}
             <div
               className={`flex items-start justify-between gap-3 border-b bg-gradient-to-br p-5 ${
                 (COLOR_ESTILOS[juegoModal.color] || COLOR_ESTILOS.azul).modalHeader
@@ -786,7 +756,6 @@ Entrá al link, tocá *"Ya tengo un PIN"* e ingresá el código *${grupoActual.p
               </button>
             </div>
 
-            {/* Cuerpo del Modal: Modalidad, Materiales y Explicación */}
             <div className="p-5 space-y-4">
               {juegoModal.modalidad && (
                 <div className="flex items-center gap-2.5 rounded-xl bg-white/[0.04] border border-white/10 px-3.5 py-2.5">
@@ -817,7 +786,6 @@ Entrá al link, tocá *"Ya tengo un PIN"* e ingresá el código *${grupoActual.p
                 </p>
               </div>
 
-              {/* Botones de Acción del Modal */}
               <div className="pt-2 flex flex-col gap-2.5">
                 {juegoModal.tipo !== 'trampa' && (
                   <button
@@ -842,7 +810,6 @@ Entrá al link, tocá *"Ya tengo un PIN"* e ingresá el código *${grupoActual.p
         </div>
       )}
 
-      {/* BOTÓN FLOTANTE INFERIOR DE ESCÁNER */}
       <div className="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-[#050505] via-[#050505]/95 to-transparent p-4 pb-6">
         <div className="max-w-xl mx-auto">
           <button 
@@ -858,8 +825,4 @@ Entrá al link, tocá *"Ya tengo un PIN"* e ingresá el código *${grupoActual.p
 
     </main>
   );
-}
-
-function puestoActualValido(puesto, puntos) {
-  return puesto && puesto !== '-' && Number(puntos) > 0;
 }
