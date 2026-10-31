@@ -14,7 +14,7 @@ const FORZAR_DESBLOQUEO_ESCANER = true;
 const FECHA_APERTURA_ESCANER = new Date('2026-10-31T16:30:00-03:00');
 
 const estaEscanerHabilitado = () => {
-  if (FORZAR_DESBLOQUEO_ESCANER) return true;
+  if (FORZAR_DESBLOQUEO_ESCANER) return false;
   return new Date() >= FECHA_APERTURA_ESCANER;
 };
 
@@ -40,49 +40,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'En matemática, ¿cómo se llama la famosa fórmula x = [-b ± √(b² - 4ac)] / (2a) usada para resolver ecuaciones de segundo grado?',
+        texto: 'En las películas de Toy Story, ¿cómo se llama el vaquero protagonista?',
         opciones: [
-          { id: 'a', texto: 'Fórmula de Bhaskara (o Resolvente)' },
-          { id: 'b', texto: 'Teorema de Thales' },
-          { id: 'c', texto: 'Regla de Ruffini' }
+          { id: 'a', texto: 'Woody' },
+          { id: 'b', texto: 'Buzz Lightyear' },
+          { id: 'c', texto: 'Jessie' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'En la Tabla Periódica de los elementos, ¿qué elemento químico tiene el símbolo "Au"?',
+        texto: 'Matemática: Si vas al kiosco, comprás 3 alfajores de $600 cada uno y pagás con $2000, ¿cuánto te tienen que dar de vuelto?',
         opciones: [
-          { id: 'a', texto: 'Plata' },
-          { id: 'b', texto: 'Oro' },
-          { id: 'c', texto: 'Aluminio' }
-        ],
-        correcta: 'b'
-      },
-      {
-        texto: 'En la final del Mundial de Qatar 2022 entre Argentina y Francia, ¿cómo salió el partido al terminar los 120 minutos (antes de los penales)?',
-        opciones: [
-          { id: 'a', texto: '2 a 2' },
-          { id: 'b', texto: '3 a 3' },
-          { id: 'c', texto: '4 a 3' }
-        ],
-        correcta: 'b'
-      },
-      {
-        texto: 'En física cinemática, ¿qué magnitud se calcula con la fórmula d = v · t (velocidad multiplicada por tiempo)?',
-        opciones: [
-          { id: 'a', texto: 'La aceleración' },
-          { id: 'b', texto: 'La distancia recorrida' },
-          { id: 'c', texto: 'La energía cinética' }
-        ],
-        correcta: 'b'
-      },
-      {
-        texto: '¿Cuál es el resultado exacto de la operación combinada: 2³ + √144 ÷ 3 ?',
-        opciones: [
-          { id: 'a', texto: '12' },
-          { id: 'b', texto: '10' },
-          { id: 'c', texto: '6' }
+          { id: 'a', texto: '$200' },
+          { id: 'b', texto: '$800' },
+          { id: 'c', texto: '$400' }
         ],
         correcta: 'a'
+      },
+      {
+        texto: 'Fútbol: ¿Qué país le ganó la final del Mundial 2014 a la Selección Argentina?',
+        opciones: [
+          { id: 'a', texto: 'Brasil' },
+          { id: 'b', texto: 'Francia' },
+          { id: 'c', texto: 'Alemania' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Geografía: ¿Cuál es el río más caudaloso y ancho del mundo, que pasa por Brasil?',
+        opciones: [
+          { id: 'a', texto: 'Río Nilo' },
+          { id: 'b', texto: 'Río Amazonas' },
+          { id: 'c', texto: 'Río Paraná' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'Lógica: Si estás participando en una carrera y lográs pasar al corredor que va en segundo lugar, ¿en qué posición quedás?',
+        opciones: [
+          { id: 'a', texto: 'Primero' },
+          { id: 'b', texto: 'Tercero' },
+          { id: 'c', texto: 'Segundo' }
+        ],
+        correcta: 'c'
       }
     ]
   },
@@ -101,47 +101,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'En geometría, ¿a qué figura corresponde la fórmula de área A = π · r² (Pi por radio al cuadrado)?',
+        texto: 'En la película de Disney/Pixar "Intensa-Mente", ¿cuál de estas emociones NO estaba en la mente de Riley en la primera película?',
         opciones: [
-          { id: 'a', texto: 'Al área de un círculo' },
-          { id: 'b', texto: 'Al volumen de una esfera' },
-          { id: 'c', texto: 'Al perímetro de un triángulo' }
+          { id: 'a', texto: 'Furia' },
+          { id: 'b', texto: 'Desagrado' },
+          { id: 'c', texto: 'Envidia' }
         ],
-        correcta: 'a'
+        correcta: 'c'
       },
       {
-        texto: '¿Cuál es el símbolo químico del Sodio en la Tabla Periódica?',
+        texto: 'Matemática rápida: ¿Cuál es el resultado correcto de la operación 5 + 5 x 2?',
         opciones: [
-          { id: 'a', texto: 'So' },
-          { id: 'b', texto: 'Na' },
-          { id: 'c', texto: 'Sd' }
-        ],
-        correcta: 'b'
-      },
-      {
-        texto: '¿Qué club europeo ganó la UEFA Champions League de la temporada 2022/2023 venciendo al Inter en la final con gol de Rodri?',
-        opciones: [
-          { id: 'a', texto: 'Real Madrid' },
-          { id: 'b', texto: 'Manchester City' },
-          { id: 'c', texto: 'Bayern Múnich' }
+          { id: 'a', texto: '20' },
+          { id: 'b', texto: '15' },
+          { id: 'c', texto: '10' }
         ],
         correcta: 'b'
       },
       {
-        texto: 'En básquet profesional (FIBA), ¿a qué altura reglamentaria del suelo se encuentra el aro?',
+        texto: 'Fútbol: ¿Cómo es el apodo de Emiliano Martínez, el arquero campeón del mundo con Argentina?',
         opciones: [
-          { id: 'a', texto: 'A 3,05 metros' },
-          { id: 'b', texto: 'A 2,75 metros' },
-          { id: 'c', texto: 'A 3,50 metros' }
+          { id: 'a', texto: 'El Dibu' },
+          { id: 'b', texto: 'El Cuti' },
+          { id: 'c', texto: 'El Fideo' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'En un triángulo rectángulo cuyos catetos miden 3 cm y 4 cm, ¿cuánto mide su hipotenusa según Pitágoras?',
+        texto: 'Entretenimiento: ¿En qué famoso videojuego los personajes tienen forma de cubo y el objetivo es sobrevivir construyendo cosas?',
         opciones: [
-          { id: 'a', texto: '7 cm' },
-          { id: 'b', texto: '5 cm' },
-          { id: 'c', texto: '6 cm' }
+          { id: 'a', texto: 'Roblox' },
+          { id: 'b', texto: 'Fortnite' },
+          { id: 'c', texto: 'Minecraft' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Geografía: ¿En qué continente se encuentra el gigantesco desierto del Sahara?',
+        opciones: [
+          { id: 'a', texto: 'Asia' },
+          { id: 'b', texto: 'África' },
+          { id: 'c', texto: 'Oceanía' }
         ],
         correcta: 'b'
       }
@@ -162,47 +162,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿Qué ley fundamental de la física se expresa mediante la fórmula F = m · a (Fuerza = masa por aceleración)?',
+        texto: 'Animación: ¿Qué animal es el mejor amigo parlanchín de Shrek en las películas de Dreamworks?',
         opciones: [
-          { id: 'a', texto: 'La Segunda Ley de Newton' },
-          { id: 'b', texto: 'El Principio de Arquímedes' },
-          { id: 'c', texto: 'La Ley de Ohm' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿Cuál es el símbolo químico del Hierro en la Tabla Periódica?',
-        opciones: [
-          { id: 'a', texto: 'Hi' },
-          { id: 'b', texto: 'Fe' },
-          { id: 'c', texto: 'Ir' }
+          { id: 'a', texto: 'Un dragón' },
+          { id: 'b', texto: 'Un burro' },
+          { id: 'c', texto: 'Un gato' }
         ],
         correcta: 'b'
       },
       {
-        texto: '¿Quién es el máximo goleador histórico de la Selección Argentina de fútbol?',
+        texto: 'Matemática: Si el radio de un círculo mide exactamente 4 cm, ¿cuánto mide su diámetro total?',
         opciones: [
-          { id: 'a', texto: 'Gabriel Batistuta' },
-          { id: 'b', texto: 'Lionel Messi' },
-          { id: 'c', texto: 'Sergio Agüero' }
+          { id: 'a', texto: '2 cm' },
+          { id: 'b', texto: '8 cm' },
+          { id: 'c', texto: '16 cm' }
         ],
         correcta: 'b'
       },
       {
-        texto: 'Si despejás la "x" en la ecuación 3x - 7 = 20, ¿cuál es el valor de x?',
+        texto: 'Fútbol: ¿Qué club argentino de Primera División hace de local en el estadio conocido como "El Monumental"?',
         opciones: [
-          { id: 'a', texto: 'x = 9' },
-          { id: 'b', texto: 'x = 7' },
-          { id: 'c', texto: 'x = 11' }
+          { id: 'a', texto: 'Boca Juniors' },
+          { id: 'b', texto: 'Independiente' },
+          { id: 'c', texto: 'River Plate' }
         ],
-        correcta: 'a'
+        correcta: 'c'
       },
       {
-        texto: '¿Cuál es el único metal que se encuentra en estado líquido a temperatura ambiente?',
+        texto: 'Geografía: ¿Cuál es la ciudad capital de Japón?',
         opciones: [
-          { id: 'a', texto: 'El Plomo (Pb)' },
-          { id: 'b', texto: 'El Mercurio (Hg)' },
-          { id: 'c', texto: 'El Titanio (Ti)' }
+          { id: 'a', texto: 'Pekín' },
+          { id: 'b', texto: 'Tokio' },
+          { id: 'c', texto: 'Seúl' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'Lógica: Algunos meses del año tienen 31 días y otros tienen 30. ¿Cuántos meses tienen 28 días?',
+        opciones: [
+          { id: 'a', texto: 'Solo febrero' },
+          { id: 'b', texto: 'Todos los 12 meses' },
+          { id: 'c', texto: 'Ninguno' }
         ],
         correcta: 'b'
       }
@@ -223,47 +223,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿Cuál es el símbolo químico del Potasio en la Tabla Periódica?',
+        texto: 'Disney: En la película "El Rey León", ¿cómo se llama el tío malvado de Simba que quiere robarle el trono?',
         opciones: [
-          { id: 'a', texto: 'Po' },
-          { id: 'b', texto: 'K' },
-          { id: 'c', texto: 'Pt' }
+          { id: 'a', texto: 'Mufasa' },
+          { id: 'b', texto: 'Timón' },
+          { id: 'c', texto: 'Scar' }
         ],
-        correcta: 'b'
+        correcta: 'c'
       },
       {
-        texto: 'En trigonometría, dentro de un triángulo rectángulo, ¿cómo se define el Seno de un ángulo (sen α)?',
+        texto: 'Matemática: Si un pantalón cuesta $10.000 y te hacen un 20% de descuento, ¿cuánto te descuentan en pesos?',
         opciones: [
-          { id: 'a', texto: 'Cateto Opuesto sobre Hipotenusa' },
-          { id: 'b', texto: 'Cateto Adyacente sobre Hipotenusa' },
-          { id: 'c', texto: 'Cateto Opuesto sobre Cateto Adyacente' }
+          { id: 'a', texto: '$2.000' },
+          { id: 'b', texto: '$1.000' },
+          { id: 'c', texto: '$200' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Qué selección ganó la Copa América 2024 disputada en Estados Unidos con gol de Lautaro Martínez en el alargue?',
+        texto: 'Fútbol: En un partido de fútbol 11 profesional, ¿cuántos jugadores de un mismo equipo pueden estar en la cancha al mismo tiempo?',
         opciones: [
-          { id: 'a', texto: 'Colombia' },
-          { id: 'b', texto: 'Argentina' },
-          { id: 'c', texto: 'Uruguay' }
+          { id: 'a', texto: '10 jugadores' },
+          { id: 'b', texto: '11 jugadores' },
+          { id: 'c', texto: '12 jugadores' }
         ],
         correcta: 'b'
       },
       {
-        texto: '¿A qué compuesto químico corresponde la fórmula molecular CO₂?',
+        texto: 'Entretenimiento: ¿Cómo se llama el famoso productor argentino que hace las "Music Sessions" con números?',
         opciones: [
-          { id: 'a', texto: 'Monóxido de carbono' },
-          { id: 'b', texto: 'Dióxido de carbono' },
-          { id: 'c', texto: 'Agua oxigenada' }
+          { id: 'a', texto: 'Duki' },
+          { id: 'b', texto: 'Wos' },
+          { id: 'c', texto: 'Bizarrap' }
         ],
-        correcta: 'b'
+        correcta: 'c'
       },
       {
-        texto: 'En probabilidad, si tirás dos monedas al aire al mismo tiempo, ¿cuál es la probabilidad de que ambas salgan "Cara"?',
+        texto: 'Geografía: ¿En qué país europeo se encuentra la famosísima Torre Eiffel?',
         opciones: [
-          { id: 'a', texto: '1/2 (50%)' },
-          { id: 'b', texto: '1/4 (25%)' },
-          { id: 'c', texto: '1/3 (33,3%)' }
+          { id: 'a', texto: 'España' },
+          { id: 'b', texto: 'Francia' },
+          { id: 'c', texto: 'Italia' }
         ],
         correcta: 'b'
       }
@@ -284,49 +284,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'En electricidad, ¿cómo se llama la ley cuya fórmula es V = I · R (Voltaje = Intensidad de corriente por Resistencia)?',
+        texto: 'Marvel: ¿Qué superhéroe usa un escudo indestructible de color rojo, azul y blanco con una estrella en el medio?',
         opciones: [
-          { id: 'a', texto: 'Ley de Ohm' },
-          { id: 'b', texto: 'Ley de Coulomb' },
-          { id: 'c', texto: 'Ley de Faraday' }
+          { id: 'a', texto: 'Iron Man' },
+          { id: 'b', texto: 'Thor' },
+          { id: 'c', texto: 'Capitán América' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Matemática: En la ecuación X + 15 = 40, ¿qué número tiene que ser la X?',
+        opciones: [
+          { id: 'a', texto: '15' },
+          { id: 'b', texto: '25' },
+          { id: 'c', texto: '35' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'Fútbol: ¿En qué país asiático se jugó el Mundial del año 2022 donde la Selección Argentina salió campeona?',
+        opciones: [
+          { id: 'a', texto: 'Rusia' },
+          { id: 'b', texto: 'Japón' },
+          { id: 'c', texto: 'Qatar' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Geografía: ¿Cuál de estos océanos es el más grande de todo el planeta Tierra?',
+        opciones: [
+          { id: 'a', texto: 'Océano Pacífico' },
+          { id: 'b', texto: 'Océano Atlántico' },
+          { id: 'c', texto: 'Océano Índico' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Cuál es el primer elemento de la Tabla Periódica (con número atómico 1)?',
+        texto: 'Lógica: ¿Qué cosa es tan pero tan frágil que si decís su nombre, la rompés?',
         opciones: [
-          { id: 'a', texto: 'Helio (He)' },
-          { id: 'b', texto: 'Hidrógeno (H)' },
-          { id: 'c', texto: 'Litio (Li)' }
+          { id: 'a', texto: 'El cristal' },
+          { id: 'b', texto: 'El viento' },
+          { id: 'c', texto: 'El silencio' }
         ],
-        correcta: 'b'
-      },
-      {
-        texto: '¿En qué club de Estados Unidos juega Lionel Messi tras su paso por el PSG?',
-        opciones: [
-          { id: 'a', texto: 'Los Angeles Galaxy' },
-          { id: 'b', texto: 'Inter Miami' },
-          { id: 'c', texto: 'New York City FC' }
-        ],
-        correcta: 'b'
-      },
-      {
-        texto: 'En álgebra, ¿a qué es igual el desarrollo del binomio al cuadrado (a + b)² ?',
-        opciones: [
-          { id: 'a', texto: 'a² + b²' },
-          { id: 'b', texto: 'a² + 2ab + b²' },
-          { id: 'c', texto: '2a + 2b' }
-        ],
-        correcta: 'b'
-      },
-      {
-        texto: '¿Cuántos grados suman siempre los tres ángulos interiores de cualquier triángulo?',
-        opciones: [
-          { id: 'a', texto: '180°' },
-          { id: 'b', texto: '360°' },
-          { id: 'c', texto: '90°' }
-        ],
-        correcta: 'a'
+        correcta: 'c'
       }
     ]
   },
@@ -345,49 +345,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿Qué elemento químico tiene el símbolo "Ag" en la Tabla Periódica?',
+        texto: 'Disney: En la película "Frozen", ¿cómo se llama el simpático muñeco de nieve que cobra vida?',
         opciones: [
-          { id: 'a', texto: 'Argón' },
-          { id: 'b', texto: 'Plata' },
-          { id: 'c', texto: 'Azufre' }
+          { id: 'a', texto: 'Sven' },
+          { id: 'b', texto: 'Kristoff' },
+          { id: 'c', texto: 'Olaf' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Matemática: ¿Cuánto te da si calculás la raíz cuadrada de 64 (√64)?',
+        opciones: [
+          { id: 'a', texto: '6' },
+          { id: 'b', texto: '8' },
+          { id: 'c', texto: '12' }
         ],
         correcta: 'b'
       },
       {
-        texto: '¿Con qué fórmula se calcula el área de un triángulo de base "b" y altura "h"?',
+        texto: 'Fútbol: ¿Qué gigantesco club español juega sus partidos de local en el estadio "Santiago Bernabéu"?',
         opciones: [
-          { id: 'a', texto: '(b · h) / 2' },
-          { id: 'b', texto: 'b · h' },
-          { id: 'c', texto: '2 · (b + h)' }
+          { id: 'a', texto: 'Barcelona' },
+          { id: 'b', texto: 'Real Madrid' },
+          { id: 'c', texto: 'Atlético de Madrid' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'Entretenimiento: ¿En qué famosa plataforma de streaming podés ver la serie "Stranger Things"?',
+        opciones: [
+          { id: 'a', texto: 'Netflix' },
+          { id: 'b', texto: 'Disney+' },
+          { id: 'c', texto: 'Amazon Prime Video' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Qué número de camiseta usó Emiliano "Dibu" Martínez al consagrarse campeón del mundo en Qatar 2022?',
+        texto: 'Geografía: ¿En qué provincia argentina tenés que viajar para ir a ver las Cataratas del Iguazú?',
         opciones: [
-          { id: 'a', texto: 'El 1' },
-          { id: 'b', texto: 'El 23' },
-          { id: 'c', texto: 'El 12' }
+          { id: 'a', texto: 'Salta' },
+          { id: 'b', texto: 'Mendoza' },
+          { id: 'c', texto: 'Misiones' }
         ],
-        correcta: 'b'
-      },
-      {
-        texto: 'En matemática, ¿cuál es el valor del logaritmo en base 10 de 1000 (log₁₀ 1000)?',
-        opciones: [
-          { id: 'a', texto: '3' },
-          { id: 'b', texto: '10' },
-          { id: 'c', texto: '100' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿Cuál es el gas más abundante en la atmósfera de la Tierra (aproximadamente el 78% del aire)?',
-        opciones: [
-          { id: 'a', texto: 'Oxígeno (O₂)' },
-          { id: 'b', texto: 'Nitrógeno (N₂)' },
-          { id: 'c', texto: 'Dióxido de carbono (CO₂)' }
-        ],
-        correcta: 'b'
+        correcta: 'c'
       }
     ]
   },
@@ -406,49 +406,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'En un dado estándar de 6 caras, las caras opuestas siempre suman el mismo número. ¿Cuánto suman dos caras opuestas?',
+        texto: 'Disney Pixar: En la película "Buscando a Nemo", ¿cómo se llama el pez azul que siempre sufre de pérdida de memoria a corto plazo?',
         opciones: [
-          { id: 'a', texto: 'Suman 7' },
-          { id: 'b', texto: 'Suman 6' },
-          { id: 'c', texto: 'Suman 8' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿Cuál es la fórmula para calcular el volumen de un cubo de arista "L"?',
-        opciones: [
-          { id: 'a', texto: 'V = 6 · L²' },
-          { id: 'b', texto: 'V = L³' },
-          { id: 'c', texto: 'V = L · 3' }
+          { id: 'a', texto: 'Marlin' },
+          { id: 'b', texto: 'Dory' },
+          { id: 'c', texto: 'Crush' }
         ],
         correcta: 'b'
       },
       {
-        texto: '¿Qué elemento de la Tabla Periódica tiene el símbolo "Cu"?',
+        texto: 'Matemática: Un triángulo equilátero es aquel que se caracteriza por tener...',
         opciones: [
-          { id: 'a', texto: 'Carbono' },
-          { id: 'b', texto: 'Cobre' },
-          { id: 'c', texto: 'Calcio' }
+          { id: 'a', texto: 'Sus tres lados completamente iguales' },
+          { id: 'b', texto: 'Todos sus lados distintos' },
+          { id: 'c', texto: 'Dos lados iguales y uno diferente' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'Fútbol: ¿Qué jugador argentino ganó el premio Balón de Oro en el año 2023 por octava vez en su carrera?',
+        opciones: [
+          { id: 'a', texto: 'Lautaro Martínez' },
+          { id: 'b', texto: 'Julián Álvarez' },
+          { id: 'c', texto: 'Lionel Messi' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Geografía: Mirando el mapa del mundo, ¿cuál es el país más grande de todos en extensión territorial?',
+        opciones: [
+          { id: 'a', texto: 'Canadá' },
+          { id: 'b', texto: 'Estados Unidos' },
+          { id: 'c', texto: 'Rusia' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Lógica: ¿Qué cosa es esa que cuanto más te seca el cuerpo, más húmeda se vuelve?',
+        opciones: [
+          { id: 'a', texto: 'El agua' },
+          { id: 'b', texto: 'Una toalla' },
+          { id: 'c', texto: 'El viento' }
         ],
         correcta: 'b'
-      },
-      {
-        texto: '¿Qué jugador argentino convirtió el penal definitivo en la tanda contra Francia en la final del Mundial 2022?',
-        opciones: [
-          { id: 'a', texto: 'Gonzalo Montiel' },
-          { id: 'b', texto: 'Leandro Paredes' },
-          { id: 'c', texto: 'Paulo Dybala' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: 'En matemática, ¿cuánto vale el factorial de 5 (escrito como 5!, es decir 5×4×3×2×1)?',
-        opciones: [
-          { id: 'a', texto: '120' },
-          { id: 'b', texto: '60' },
-          { id: 'c', texto: '25' }
-        ],
-        correcta: 'a'
       }
     ]
   },
@@ -467,49 +467,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿Qué físico formuló la famosa ecuación de equivalencia entre masa y energía E = m · c²?',
+        texto: 'Marvel: ¿De qué dos colores principales es el traje clásico de Spiderman (El Hombre Araña)?',
         opciones: [
-          { id: 'a', texto: 'Isaac Newton' },
-          { id: 'b', texto: 'Albert Einstein' },
-          { id: 'c', texto: 'Nikola Tesla' }
+          { id: 'a', texto: 'Negro y Blanco' },
+          { id: 'b', texto: 'Rojo y Amarillo' },
+          { id: 'c', texto: 'Rojo y Azul' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Matemática: Si dibujás un rectángulo que tiene 5 cm de base y 4 cm de altura, ¿cuál es su área total (base por altura)?',
+        opciones: [
+          { id: 'a', texto: '18 cm²' },
+          { id: 'b', texto: '20 cm²' },
+          { id: 'c', texto: '9 cm²' }
         ],
         correcta: 'b'
       },
       {
-        texto: 'En la Tabla Periódica, ¿a qué grupo pertenecen el Helio (He), el Neón (Ne) y el Argón (Ar)?',
+        texto: 'Fútbol: Por regla general de la FIFA, ¿cada cuántos años se organiza un Mundial de Fútbol masculino?',
         opciones: [
-          { id: 'a', texto: 'Gases Nobles' },
-          { id: 'b', texto: 'Metales Alcalinos' },
-          { id: 'c', texto: 'Halógenos' }
+          { id: 'a', texto: 'Cada 2 años' },
+          { id: 'b', texto: 'Cada 5 años' },
+          { id: 'c', texto: 'Cada 4 años' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Entretenimiento: Al principio de una partida del videojuego Fortnite, ¿desde dónde saltan los jugadores para caer en la isla?',
+        opciones: [
+          { id: 'a', texto: 'Desde un micro o autobús volador' },
+          { id: 'b', texto: 'Desde un tren en movimiento' },
+          { id: 'c', texto: 'Nacen directamente en el piso' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Cuál es el club con más títulos de la UEFA Champions League en toda la historia?',
+        texto: 'Geografía: ¿Cuál es el país largo y angosto con el que Argentina comparte frontera en todo el lado Oeste de la Cordillera?',
         opciones: [
-          { id: 'a', texto: 'AC Milan' },
-          { id: 'b', texto: 'Real Madrid' },
-          { id: 'c', texto: 'FC Barcelona' }
+          { id: 'a', texto: 'Uruguay' },
+          { id: 'b', texto: 'Chile' },
+          { id: 'c', texto: 'Bolivia' }
         ],
         correcta: 'b'
-      },
-      {
-        texto: '¿Cómo se calcula el perímetro (longitud de la circunferencia) de un círculo de radio "r"?',
-        opciones: [
-          { id: 'a', texto: 'P = 2 · π · r' },
-          { id: 'b', texto: 'P = π · r²' },
-          { id: 'c', texto: 'P = 4 · π · r' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿Cuál es el resultado de (3² + 4²) ÷ 5 ?',
-        opciones: [
-          { id: 'a', texto: '5' },
-          { id: 'b', texto: '7' },
-          { id: 'c', texto: '25' }
-        ],
-        correcta: 'a'
       }
     ]
   },
@@ -528,49 +528,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿Cuál es la fórmula química de la sal de mesa común?',
+        texto: 'Disney: ¿Cómo se llama la famosa princesa que huye a las 12 de la noche y pierde un zapato de cristal en la escalera?',
         opciones: [
-          { id: 'a', texto: 'NaCl (Cloruro de sodio)' },
-          { id: 'b', texto: 'H₂SO₄' },
-          { id: 'c', texto: 'CaCO₃' }
+          { id: 'a', texto: 'Cenicienta' },
+          { id: 'b', texto: 'Blancanieves' },
+          { id: 'c', texto: 'Ariel (La Sirenita)' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'En geometría, ¿con qué fórmula se calcula el volumen de un cilindro de radio "r" y altura "h"?',
+        texto: 'Matemática: ¿Cuánto es el resultado de calcular 3 elevado al cubo (es decir, 3 x 3 x 3)?',
         opciones: [
-          { id: 'a', texto: 'V = π · r² · h' },
-          { id: 'b', texto: 'V = 2 · π · r · h' },
-          { id: 'c', texto: 'V = (π · r² · h) / 3' }
+          { id: 'a', texto: '9' },
+          { id: 'b', texto: '12' },
+          { id: 'c', texto: '27' }
         ],
-        correcta: 'a'
+        correcta: 'c'
       },
       {
-        texto: '¿En qué club inglés brilló Julián Álvarez antes de ser transferido al Atlético de Madrid en 2024?',
+        texto: 'Fútbol: ¿A qué Selección le convirtió Diego Maradona el histórico gol esquivando jugadores conocido como el "Gol del Siglo"?',
         opciones: [
-          { id: 'a', texto: 'Liverpool' },
-          { id: 'b', texto: 'Manchester City' },
-          { id: 'c', texto: 'Chelsea' }
+          { id: 'a', texto: 'Brasil' },
+          { id: 'b', texto: 'Inglaterra' },
+          { id: 'c', texto: 'Italia' }
         ],
         correcta: 'b'
       },
       {
-        texto: 'En la escala de pH químico (que va de 0 a 14), ¿qué valor corresponde a una sustancia neutra como el agua pura?',
+        texto: 'Geografía: ¿En qué país europeo moderno se encuentra la ciudad de Roma y las ruinas del Coliseo?',
         opciones: [
-          { id: 'a', texto: 'pH = 7' },
-          { id: 'b', texto: 'pH = 0' },
-          { id: 'c', texto: 'pH = 14' }
+          { id: 'a', texto: 'En Italia' },
+          { id: 'b', texto: 'En Grecia' },
+          { id: 'c', texto: 'En España' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'Si el 20% de un número es 30, ¿cuál es ese número?',
+        texto: 'Lógica: El padre de Juan tiene 4 hijos varones: Lucas, Marcos, Mateo y... ¿Cómo se llama el cuarto hijo?',
         opciones: [
-          { id: 'a', texto: '150' },
-          { id: 'b', texto: '120' },
-          { id: 'c', texto: '600' }
+          { id: 'a', texto: 'Pedro' },
+          { id: 'b', texto: 'Juan' },
+          { id: 'c', texto: 'No se dice' }
         ],
-        correcta: 'a'
+        correcta: 'b'
       }
     ]
   },
@@ -589,47 +589,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿Con qué gas noble (cuyo símbolo es "He") se inflan los globos para que floten hacia el techo?',
+        texto: 'Disney: En la película "Monsters, Inc.", ¿cómo se llama el monstruo principal que es gigante, peludo, celeste y con manchas púrpuras?',
         opciones: [
-          { id: 'a', texto: 'Hidrógeno' },
-          { id: 'b', texto: 'Helio' },
-          { id: 'c', texto: 'Nitrógeno' }
+          { id: 'a', miketexto: 'Mike Wazowski' },
+          { id: 'b', texto: 'Randall' },
+          { id: 'c', texto: 'James P. Sullivan (Sulley)' }
         ],
-        correcta: 'b'
+        correcta: 'c'
       },
       {
-        texto: 'En la Tierra, ¿cuál es el valor aproximado de la aceleración de la gravedad (g)?',
+        texto: 'Matemática: Si una pizza grande viene cortada en 8 porciones iguales y vos te comés 2, ¿qué fracción de la pizza comiste?',
         opciones: [
-          { id: 'a', texto: '9,8 m/s²' },
-          { id: 'b', texto: '3,14 m/s²' },
-          { id: 'c', texto: '15,2 m/s²' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: 'En una función lineal de fórmula y = m·x + b, ¿qué representa la letra "m"?',
-        opciones: [
-          { id: 'a', texto: 'La pendiente de la recta' },
-          { id: 'b', texto: 'La ordenada al origen' },
-          { id: 'c', texto: 'El vértice de la parábola' }
+          { id: 'a', texto: 'Un cuarto (1/4)' },
+          { id: 'b', texto: 'La mitad (1/2)' },
+          { id: 'c', texto: 'Un tercio (1/3)' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Cuántas Copas del Mundo de la FIFA tiene la Selección de Brasil en su historia?',
+        texto: 'Fútbol: En la televisión actual de fútbol, ¿qué significa exactamente la sigla del "VAR"?',
         opciones: [
-          { id: 'a', texto: '4 Mundiales' },
-          { id: 'b', texto: '5 Mundiales' },
-          { id: 'c', texto: '3 Mundiales' }
+          { id: 'a', texto: 'Visual Action Replay' },
+          { id: 'b', texto: 'Video Assistant Referee' },
+          { id: 'c', texto: 'Virtual Arbitro Review' }
         ],
         correcta: 'b'
       },
       {
-        texto: 'En la ecuación de los gases ideales P · V = n · R · T, ¿qué representan las letras P y V?',
+        texto: 'Música: ¿Qué famosa cantante de pop internacional rompió récords globales recientemente con su gira "The Eras Tour"?',
         opciones: [
-          { id: 'a', texto: 'Peso y Velocidad' },
-          { id: 'b', texto: 'Presión y Volumen' },
-          { id: 'c', texto: 'Potencia y Voltaje' }
+          { id: 'a', texto: 'Dua Lipa' },
+          { id: 'b', texto: 'Ariana Grande' },
+          { id: 'c', texto: 'Taylor Swift' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Geografía: ¿Cuál es el nombre de la enorme cordillera montañosa que atraviesa todo el lado oeste de América del Sur?',
+        opciones: [
+          { id: 'a', texto: 'Los Alpes' },
+          { id: 'b', texto: 'Cordillera de los Andes' },
+          { id: 'c', texto: 'Las Montañas Rocosas' }
         ],
         correcta: 'b'
       }
@@ -650,49 +650,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿A qué compuesto orgánico fundamental para la energía del cuerpo corresponde la fórmula C₆H₁₂O₆?',
+        texto: 'Disney: ¿Cómo se llama el famosísimo ratón con pantalones rojos creado por Walt Disney que es la cara de la compañía?',
         opciones: [
-          { id: 'a', texto: 'A la Glucosa' },
-          { id: 'b', texto: 'Al Etanol' },
-          { id: 'c', texto: 'Al Metano' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿Cuál es el único número primo que además es un número par?',
-        opciones: [
-          { id: 'a', texto: 'El 2' },
-          { id: 'b', texto: 'El 4' },
-          { id: 'c', texto: 'El 0' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿En qué club italiano fue capitán y goleador Lautaro Martínez al consagrarse campeón de la Serie A 2023/2024?',
-        opciones: [
-          { id: 'a', texto: 'AC Milan' },
-          { id: 'b', texto: 'Inter de Milán' },
-          { id: 'c', texto: 'Juventus' }
+          { id: 'a', texto: 'Pato Donald' },
+          { id: 'b', texto: 'Mickey Mouse' },
+          { id: 'c', texto: 'Goofy' }
         ],
         correcta: 'b'
       },
       {
-        texto: '¿Qué elemento de la Tabla Periódica tiene el símbolo "Ca" y es clave para los huesos?',
+        texto: 'Matemática: En geometría básica, si tenés un "ángulo recto" perfecto, ¿cuántos grados de inclinación mide?',
         opciones: [
-          { id: 'a', texto: 'Carbono' },
-          { id: 'b', texto: 'Calcio' },
-          { id: 'c', texto: 'Cadmio' }
+          { id: 'a', texto: '45 grados' },
+          { id: 'b', texto: '180 grados' },
+          { id: 'c', texto: '90 grados' }
         ],
-        correcta: 'b'
+        correcta: 'c'
       },
       {
-        texto: 'En análisis matemático, ¿cuál es la derivada de la función f(x) = x² ?',
+        texto: 'Fútbol: ¿Cuáles son los dos colores principales que componen la camiseta del club Boca Juniors?',
         opciones: [
-          { id: 'a', texto: "f'(x) = 2x" },
-          { id: 'b', texto: "f'(x) = x" },
-          { id: 'c', texto: "f'(x) = x³ / 3" }
+          { id: 'a', texto: 'Azul y Oro (Amarillo)' },
+          { id: 'b', texto: 'Rojo y Blanco' },
+          { id: 'c', texto: 'Celeste y Blanco' }
         ],
         correcta: 'a'
+      },
+      {
+        texto: 'Geografía: ¿En qué país sudamericano se encuentra la famosa y gigante estatua conocida como el "Cristo Redentor"?',
+        opciones: [
+          { id: 'a', texto: 'Colombia' },
+          { id: 'b', texto: 'Argentina' },
+          { id: 'c', texto: 'Brasil' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Lógica: Te planteo un acertijo. "Tengo agujas pero no sé coser, tengo números pero no sé leer". ¿Qué soy?',
+        opciones: [
+          { id: 'a', texto: 'Un erizo' },
+          { id: 'b', texto: 'Una calculadora' },
+          { id: 'c', texto: 'Un reloj analógico' }
+        ],
+        correcta: 'c'
       }
     ]
   },
@@ -711,49 +711,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'En álgebra, ¿cómo se llama la identidad notable a² - b² = (a - b) · (a + b)?',
+        texto: 'Disney Pixar: En la emotiva película "Coco", ¿qué instrumento musical toca el pequeño Miguel a escondidas?',
         opciones: [
-          { id: 'a', texto: 'Diferencia de cuadrados' },
-          { id: 'b', texto: 'Trinomio cuadrado perfecto' },
-          { id: 'c', texto: 'Factor común por grupos' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿Qué elemento químico tiene el símbolo "Pb" en la Tabla Periódica?',
-        opciones: [
-          { id: 'a', texto: 'Platino' },
-          { id: 'b', texto: 'Plomo' },
-          { id: 'c', texto: 'Potasio' }
+          { id: 'a', texto: 'El violín' },
+          { id: 'b', texto: 'La guitarra' },
+          { id: 'c', texto: 'La trompeta' }
         ],
         correcta: 'b'
       },
       {
-        texto: '¿Qué selección europea ganó la Eurocopa 2024 tras vencer 2-1 a Inglaterra en la final?',
+        texto: 'Matemática: Los números primos son los que solo se pueden dividir por 1 y por sí mismos. ¿Cuál de estos es Primo?',
         opciones: [
-          { id: 'a', texto: 'Francia' },
-          { id: 'b', texto: 'España' },
-          { id: 'c', texto: 'Alemania' }
+          { id: 'a', texto: 'El 9' },
+          { id: 'b', texto: 'El 15' },
+          { id: 'c', texto: 'El 7' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Fútbol: Mirando hacia el futuro, ¿en qué continente se va a organizar el Mundial de Fútbol de la FIFA del año 2026?',
+        opciones: [
+          { id: 'a', texto: 'Norteamérica (EEUU, Canadá, México)' },
+          { id: 'b', texto: 'Europa' },
+          { id: 'c', texto: 'Asia' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'Entretenimiento: ¿Cuál es la red social donde se suben mayormente videos en formato vertical bailando "trends" con canciones virales?',
+        opciones: [
+          { id: 'a', texto: 'X (Twitter)' },
+          { id: 'b', texto: 'TikTok' },
+          { id: 'c', texto: 'LinkedIn' }
         ],
         correcta: 'b'
       },
       {
-        texto: 'Si una matriz cuadrada de 2x2 tiene filas [3, 1] y [2, 4], ¿cuál es su determinante (3·4 - 1·2)?',
+        texto: 'Geografía: ¿Cuál es la ciudad que es la Capital Oficial de la República Argentina?',
         opciones: [
-          { id: 'a', texto: '10' },
-          { id: 'b', texto: '14' },
-          { id: 'c', texto: '12' }
+          { id: 'a', texto: 'Córdoba' },
+          { id: 'b', texto: 'Rosario' },
+          { id: 'c', texto: 'Ciudad de Buenos Aires (CABA)' }
         ],
-        correcta: 'a'
-      },
-      {
-        texto: 'En física, ¿a qué magnitud corresponde la fórmula Ec = ½ · m · v²?',
-        opciones: [
-          { id: 'a', texto: 'Energía Cinética' },
-          { id: 'b', texto: 'Energía Potencial Gravitatoria' },
-          { id: 'c', texto: 'Trabajo Mecánico' }
-        ],
-        correcta: 'a'
+        correcta: 'c'
       }
     ]
   },
@@ -772,49 +772,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'El acero es una aleación formada principalmente por Hierro (Fe) y un pequeño porcentaje de... ¿qué otro elemento?',
+        texto: 'Disney: En la película "Lilo & Stitch", ¿de qué color principal es la piel de Stitch (el experimento 626)?',
         opciones: [
-          { id: 'a', texto: 'Carbono (C)' },
-          { id: 'b', texto: 'Calcio (Ca)' },
-          { id: 'c', texto: 'Cloro (Cl)' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: 'En física, ¿cómo se calcula el Torque o Momento de una fuerza (τ) aplicado con una llave sobre una tuerca?',
-        opciones: [
-          { id: 'a', texto: 'Fuerza por distancia al eje (F · d)' },
-          { id: 'b', texto: 'Masa dividido volumen (m / V)' },
-          { id: 'c', texto: 'Velocidad sobre tiempo (v / t)' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿Qué delantero noruego del Manchester City rompió el récord de goles en una sola temporada de Premier League en 2023?',
-        opciones: [
-          { id: 'a', texto: 'Martin Ødegaard' },
-          { id: 'b', texto: 'Erling Haaland' },
-          { id: 'c', texto: 'Alexander Sørloth' }
+          { id: 'a', texto: 'Rojo' },
+          { id: 'b', texto: 'Azul' },
+          { id: 'c', texto: 'Verde' }
         ],
         correcta: 'b'
       },
       {
-        texto: '¿Cuántos lados tiene un hexágono regular (la forma clásica de una tuerca)?',
+        texto: 'Matemática: Si tu familia viaja en auto a una velocidad constante de 100 km por hora, ¿cuántos kilómetros van a recorrer si manejan 2 horas seguidas?',
         opciones: [
-          { id: 'a', texto: '6 lados' },
-          { id: 'b', texto: '8 lados' },
-          { id: 'c', texto: '5 lados' }
+          { id: 'a', texto: '150 kilómetros' },
+          { id: 'b', texto: '100 kilómetros' },
+          { id: 'c', texto: '200 kilómetros' }
         ],
-        correcta: 'a'
+        correcta: 'c'
       },
       {
-        texto: 'En matemática, todo número (distinto de cero) elevado a la potencia 0 (por ejemplo, 25⁰) da como resultado:',
+        texto: 'Fútbol: Si en un mismo partido un árbitro le muestra dos veces la tarjeta amarilla a un mismo jugador, ¿qué pasa?',
         opciones: [
-          { id: 'a', texto: '0' },
-          { id: 'b', texto: '1' },
-          { id: 'c', texto: 'El mismo número' }
+          { id: 'a', texto: 'Lo suspenden 5 minutos' },
+          { id: 'b', texto: 'Le muestran la tarjeta roja y es expulsado' },
+          { id: 'c', texto: 'Debe pagar una multa ahí mismo' }
         ],
         correcta: 'b'
+      },
+      {
+        texto: 'Geografía: ¿Cuál es el único país de toda América del Sur donde el idioma oficial es el portugués?',
+        opciones: [
+          { id: 'a', texto: 'Uruguay' },
+          { id: 'b', texto: 'Perú' },
+          { id: 'c', texto: 'Brasil' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Lógica: Entrás a una cabaña muy fría y a oscuras. Tenés UN solo fósforo. Adentro hay una vela y una estufa a leña. ¿Qué encendés primero?',
+        opciones: [
+          { id: 'a', texto: 'El fósforo' },
+          { id: 'b', texto: 'La vela' },
+          { id: 'c', texto: 'La estufa' }
+        ],
+        correcta: 'a'
       }
     ]
   },
@@ -833,49 +833,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿Cuál es el nombre del teorema cuya fórmula es a² + b² = c² para triángulos rectángulos?',
+        texto: 'Disney: ¿Qué princesa de los cuentos de Disney está encerrada en una torre y tiene una larga trenza de pelo mágico súper rubio?',
         opciones: [
-          { id: 'a', texto: 'Teorema de Pitágoras' },
-          { id: 'b', texto: 'Teorema de Euclides' },
-          { id: 'c', texto: 'Teorema de Gauss' }
+          { id: 'a', texto: 'Mérida' },
+          { id: 'b', texto: 'Mulán' },
+          { id: 'c', texto: 'Rapunzel' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Matemática: Esta es regla de oro. Si multiplicás CUALQUIER número (por más gigante que sea) por 0 (cero), el resultado siempre es...',
+        opciones: [
+          { id: 'a', texto: 'Cero (0)' },
+          { id: 'b', texto: 'Uno (1)' },
+          { id: 'c', texto: 'El mismo número gigante' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'En la Tabla Periódica, ¿qué elemento tiene el símbolo "W" (conocido también como Wolframio)?',
+        texto: 'Fútbol: ¿Qué famosísimo jugador de fútbol de Portugal salta, se da vuelta y grita "¡Siuuu!" cada vez que festeja un gol?',
         opciones: [
-          { id: 'a', texto: 'Tungsteno' },
-          { id: 'b', texto: 'Bismuto' },
-          { id: 'c', texto: 'Vanadio' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿Cuántos Balones de Oro ganó Lionel Messi a lo largo de su carrera hasta 2024?',
-        opciones: [
-          { id: 'a', texto: '7 Balones de Oro' },
-          { id: 'b', texto: '8 Balones de Oro' },
-          { id: 'c', texto: '6 Balones de Oro' }
+          { id: 'a', texto: 'Joao Félix' },
+          { id: 'b', texto: 'Cristiano Ronaldo' },
+          { id: 'c', texto: 'Pepe' }
         ],
         correcta: 'b'
       },
       {
-        texto: 'En la famosa sucesión de Fibonacci (1, 1, 2, 3, 5, 8, 13...), ¿qué número sigue después del 13?',
+        texto: 'Entretenimiento: ¿En qué famoso juego de aventuras y construcción absolutamente todo, desde los cerdos hasta la tierra, está hecho con formas cuadradas?',
         opciones: [
-          { id: 'a', texto: '21' },
-          { id: 'b', texto: '18' },
-          { id: 'c', texto: '26' }
+          { id: 'a', texto: 'Lego Digital' },
+          { id: 'b', texto: 'Roblox' },
+          { id: 'c', texto: 'Minecraft' }
         ],
-        correcta: 'a'
+        correcta: 'c'
       },
       {
-        texto: '¿A qué es igual la raíz cúbica de 27 (∛27)?',
+        texto: 'Geografía: Si mirás el mapa de los países de Europa, hay uno muy famoso que tiene una forma perfecta de "bota". ¿Cuál es?',
         opciones: [
-          { id: 'a', texto: '3' },
-          { id: 'b', texto: '9' },
-          { id: 'c', texto: '6' }
+          { id: 'a', texto: 'Grecia' },
+          { id: 'b', texto: 'Italia' },
+          { id: 'c', texto: 'España' }
         ],
-        correcta: 'a'
+        correcta: 'b'
       }
     ]
   },
@@ -894,47 +894,47 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿Qué elemento químico es la base fundamental de toda la química orgánica y de los diamantes (símbolo "C")?',
+        texto: 'Disney: En la famosa película "El Rey León", ¿qué tipo de animal salvaje es el protagonista principal Simba?',
         opciones: [
-          { id: 'a', texto: 'Carbono' },
-          { id: 'b', texto: 'Cobalto' },
-          { id: 'c', texto: 'Cromo' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: 'En geometría, ¿cuánto suman los ángulos interiores de cualquier cuadrilátero (como un rectángulo o un rombo)?',
-        opciones: [
-          { id: 'a', texto: '180°' },
-          { id: 'b', texto: '360°' },
-          { id: 'c', texto: '270°' }
+          { id: 'a', texto: 'Un tigre' },
+          { id: 'b', texto: 'Un león' },
+          { id: 'c', texto: 'Un leopardo' }
         ],
         correcta: 'b'
       },
       {
-        texto: '¿Qué mediocampista argentino fue elegido "Mejor Jugador Joven" del Mundial de Qatar 2022?',
+        texto: 'Matemática: En geometría, sin importar el tamaño del triángulo que dibujes, ¿cuánto suman siempre sus tres ángulos internos?',
         opciones: [
-          { id: 'a', texto: 'Enzo Fernández' },
-          { id: 'b', texto: 'Alexis Mac Allister' },
-          { id: 'c', texto: 'Thiago Almada' }
+          { id: 'a', texto: '360° grados' },
+          { id: 'b', texto: '180° grados' },
+          { id: 'c', texto: '90° grados' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'Fútbol: ¿A qué poderosísimo club de España se fue a jugar el delantero francés Kylian Mbappé en el año 2024?',
+        opciones: [
+          { id: 'a', texto: 'Real Madrid' },
+          { id: 'b', texto: 'París Saint-Germain (PSG)' },
+          { id: 'c', texto: 'Manchester City' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Con qué fórmula se calcula el área de un trapecio de base mayor "B", base menor "b" y altura "h"?',
+        texto: 'Geografía: ¿Cuál es la ciudad que es la Capital Oficial del país de España, donde reside el rey?',
         opciones: [
-          { id: 'a', texto: '[(B + b) · h] / 2' },
-          { id: 'b', texto: 'B · b · h' },
-          { id: 'c', texto: '(B - b) / h' }
+          { id: 'a', texto: 'Sevilla' },
+          { id: 'b', texto: 'Barcelona' },
+          { id: 'c', texto: 'Madrid' }
         ],
-        correcta: 'a'
+        correcta: 'c'
       },
       {
-        texto: '¿En qué parte del átomo se encuentran los protones y los neutrones?',
+        texto: 'Lógica: Te planteo un acertijo. "Tengo llaves pero no puedo abrir ninguna cerradura". ¿Qué objeto soy?',
         opciones: [
-          { id: 'a', texto: 'En el núcleo atómico' },
-          { id: 'b', texto: 'En la nube electrónica exterior' },
-          { id: 'c', texto: 'Fuera del átomo' }
+          { id: 'a', texto: 'Un teclado / un piano' },
+          { id: 'b', texto: 'Un llavero' },
+          { id: 'c', texto: 'Una caja fuerte' }
         ],
         correcta: 'a'
       }
@@ -951,53 +951,53 @@ export const LISTA_JUEGOS_OFICIAL = [
     color: 'azul',
     modalidad: 'Individual',
     materiales: '28 vasos mínimo (base de 7) y mesa.',
-    info: 'El jugador debe armar la pirámide completa de vasos (con base de 7) y luego volver a juntar todos los vasos en una sola pila usando únicamente 1 mano (o con ambas manos usando guantes de boxeo).',
+    info: 'El jugador debe armar la pirámide completa de vasos (con base de 7) y luego volver a juntar todos los vasos en una sola pila usando únicamente 1 mano.',
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'En geometría espacial, ¿cuál es la fórmula para calcular el volumen de una pirámide con área de base "Ab" y altura "h"?',
+        texto: 'Disney Pixar: En la primera película de "Buscando a Nemo", ¿cómo se llama el pez payaso que es el padre súper protector de Nemo?',
         opciones: [
-          { id: 'a', texto: 'V = (Ab · h) / 3' },
-          { id: 'b', texto: 'V = Ab · h' },
-          { id: 'c', texto: 'V = (Ab · h) / 2' }
+          { id: 'a', texto: 'Bruce' },
+          { id: 'b', texto: 'Gill' },
+          { id: 'c', texto: 'Marlin' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Matemática: En geometría, a la figura plana cerrada que tiene exactamente 6 (seis) lados se la conoce como...',
+        opciones: [
+          { id: 'a', texto: 'Hexágono' },
+          { id: 'b', texto: 'Pentágono' },
+          { id: 'c', texto: 'Octágono' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'Usando la fórmula de Gauss n·(n+1)/2, ¿cuánto da la suma de los números del 1 al 7 (1+2+3+4+5+6+7)?',
+        texto: 'Fútbol: En un partido profesional, ¿cómo se le llama al árbitro que corre por el costado de la cancha levantando una bandera de colores?',
         opciones: [
-          { id: 'a', texto: '28' },
-          { id: 'b', texto: '21' },
-          { id: 'c', texto: '35' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿Qué elemento químico tiene el símbolo "Sn" en la Tabla Periódica?',
-        opciones: [
-          { id: 'a', texto: 'Selenio' },
-          { id: 'b', texto: 'Estaño' },
-          { id: 'c', texto: 'Estroncio' }
+          { id: 'a', texto: 'Veedor del partido' },
+          { id: 'b', texto: 'Juez de línea (Linesman)' },
+          { id: 'c', texto: 'Comisario deportivo' }
         ],
         correcta: 'b'
       },
       {
-        texto: '¿Qué selección sudamericana es la máxima ganadora histórica de la Copa América junto con Argentina?',
+        texto: 'Música: ¿Qué artista boricua compuso y cantó la canción hiper viral "Despacito" junto a Daddy Yankee?',
         opciones: [
-          { id: 'a', texto: 'Uruguay' },
-          { id: 'b', texto: 'Brasil' },
-          { id: 'c', texto: 'Chile' }
+          { id: 'a', texto: 'Luis Fonsi' },
+          { id: 'b', texto: 'Maluma' },
+          { id: 'c', texto: 'Ricky Martin' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'En trigonometría, ¿cuánto vale el Coseno de 0° (cos 0°)?',
+        texto: 'Geografía: ¿A qué país del mundo pertenece el famosísimo monumento conocido como la "Estatua de la Libertad"?',
         opciones: [
-          { id: 'a', texto: '1' },
-          { id: 'b', texto: '0' },
-          { id: 'c', texto: '-1' }
+          { id: 'a', texto: 'A Francia' },
+          { id: 'b', texto: 'Al Reino Unido' },
+          { id: 'c', texto: 'A los Estados Unidos' }
         ],
-        correcta: 'a'
+        correcta: 'c'
       }
     ]
   },
@@ -1016,49 +1016,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿Cuáles son los primeros 5 dígitos decimales del número irracional Pi (π = 3, ...)?',
+        texto: 'Disney: En la película "Encanto", donde todos tienen poderes, ¿cuál es el don o súper poder de la hermana musculosa Luisa?',
         opciones: [
-          { id: 'a', texto: '3,14159...' },
-          { id: 'b', texto: '3,14951...' },
-          { id: 'c', texto: '3,15149...' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿Qué elemento químico tiene el símbolo "P" en la Tabla Periódica?',
-        opciones: [
-          { id: 'a', texto: 'Potasio' },
-          { id: 'b', texto: 'Fósforo' },
-          { id: 'c', texto: 'Plata' }
+          { id: 'a', texto: 'Hacer florecer las plantas' },
+          { id: 'b', texto: 'Tener una súper fuerza' },
+          { id: 'c', texto: 'Curar con arepas de queso' }
         ],
         correcta: 'b'
       },
       {
-        texto: '¿En qué año ganó Argentina su segundo Mundial de fútbol en México con Diego Maradona como capitán?',
+        texto: 'Matemática: Pensá rápido en las tablas de multiplicar. ¿Cuánto es exactamente 8 multiplicado por 7 (8 x 7)?',
         opciones: [
-          { id: 'a', texto: 'En 1978' },
-          { id: 'b', texto: 'En 1986' },
-          { id: 'c', texto: 'En 1990' }
+          { id: 'a', texto: '56' },
+          { id: 'b', texto: '54' },
+          { id: 'c', texto: '64' }
+        ],
+        correcta: 'a'
+      },
+      {
+        texto: 'Fútbol: ¿En qué país sudamericano nació Lionel Andrés Messi, el astro del fútbol mundial?',
+        opciones: [
+          { id: 'a', texto: 'Nació en España' },
+          { id: 'b', texto: 'Nació en Brasil' },
+          { id: 'c', texto: 'Nació en Argentina' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Geografía: ¿Cómo se llama el río hiper ancho y amarronado que separa a la Argentina del país vecino Uruguay?',
+        opciones: [
+          { id: 'a', texto: 'El Río Paraná' },
+          { id: 'b', texto: 'El Río de la Plata' },
+          { id: 'c', texto: 'El Río Colorado' }
         ],
         correcta: 'b'
       },
       {
-        texto: 'En informática y matemática binaria, ¿a qué número decimal equivale el código binario 1010?',
+        texto: 'Lógica: Te planteo un acertijo. "Es tuyo desde que nacés, pero todas las demás personas lo usan muchísimo más que vos". ¿Qué es?',
         opciones: [
-          { id: 'a', texto: 'Al número 10' },
-          { id: 'b', texto: 'Al número 8' },
-          { id: 'c', texto: 'Al número 12' }
+          { id: 'a', texto: 'Tu ropa' },
+          { id: 'b', texto: 'Tu celular' },
+          { id: 'c', texto: 'Tu nombre propio' }
         ],
-        correcta: 'a'
-      },
-      {
-        texto: 'En combinatoria, ¿de cuántas formas distintas se pueden ordenar en fila 3 pelotitas de colores diferentes (3!)?',
-        opciones: [
-          { id: 'a', texto: 'De 6 formas' },
-          { id: 'b', texto: 'De 3 formas' },
-          { id: 'c', texto: 'De 9 formas' }
-        ],
-        correcta: 'a'
+        correcta: 'c'
       }
     ]
   },
@@ -1077,49 +1077,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Las bananas son ricas en Potasio. ¿Cuál es el número atómico del Potasio (K) en la Tabla Periódica?',
+        texto: 'Marvel: Dentro del grupo de Los Vengadores, ¿quién es el poderoso dios del trueno que usa un martillo pesado llamado Mjolnir?',
         opciones: [
-          { id: 'a', texto: '19' },
-          { id: 'b', texto: '11' },
-          { id: 'c', texto: '8' }
+          { id: 'a', texto: 'Iron Man' },
+          { id: 'b', texto: 'Hulk' },
+          { id: 'c', texto: 'Thor' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Matemática: Tenés 100 pesos (o caramelos) y tenés que dividirlos exactamente entre 4 amigos. ¿Cuánto le toca a cada uno?',
+        opciones: [
+          { id: 'a', texto: '25 a cada uno' },
+          { id: 'b', texto: '20 a cada uno' },
+          { id: 'c', texto: '50 a cada uno' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Quién es el autor de la Ley de Gravitación Universal cuya fórmula es F = G · (m₁ · m₂) / r² ?',
+        texto: 'Fútbol: En un partido de fútbol profesional de 90 minutos, ¿cuánto tiempo debe durar el descanso o entretiempo en el medio?',
         opciones: [
-          { id: 'a', texto: 'Isaac Newton' },
-          { id: 'b', texto: 'Galileo Galilei' },
-          { id: 'c', texto: 'Johannes Kepler' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿Qué jugador francés convirtió los 3 goles de su selección en la final del Mundial de Qatar 2022?',
-        opciones: [
-          { id: 'a', texto: 'Antoine Griezmann' },
-          { id: 'b', texto: 'Kylian Mbappé' },
-          { id: 'c', texto: 'Olivier Giroud' }
+          { id: 'a', texto: '10 minutos exactos' },
+          { id: 'b', texto: '15 minutos exactos' },
+          { id: 'c', texto: '20 minutos exactos' }
         ],
         correcta: 'b'
       },
       {
-        texto: 'En trigonometría, ¿a qué es igual siempre la identidad fundamental sen²(x) + cos²(x) ?',
+        texto: 'Animación: ¿En qué queridísima película de DreamWorks el protagonista es un ogro verde gigante y bastante enojón que vive en un pantano?',
         opciones: [
-          { id: 'a', texto: 'Es igual a 1' },
-          { id: 'b', texto: 'Es igual a 0' },
-          { id: 'c', texto: 'Es igual a π' }
+          { id: 'a', texto: 'Mi Villano Favorito' },
+          { id: 'b', texto: 'Toy Story' },
+          { id: 'c', texto: 'Shrek' }
         ],
-        correcta: 'a'
+        correcta: 'c'
       },
       {
-        texto: '¿Cuál es el hueso más largo del cuerpo humano?',
+        texto: 'Geografía: Si viajás a los Estados Unidos (USA), ¿qué idioma vas a necesitar hablar mayormente para que te entiendan?',
         opciones: [
-          { id: 'a', texto: 'El fémur' },
-          { id: 'b', texto: 'El húmero' },
-          { id: 'c', texto: 'La tibia' }
+          { id: 'a', texto: 'El español' },
+          { id: 'b', texto: 'El inglés' },
+          { id: 'c', texto: 'El francés' }
         ],
-        correcta: 'a'
+        correcta: 'b'
       }
     ]
   },
@@ -1138,49 +1138,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'En física, ¿cómo se define la Cantidad de Movimiento Lineal (o Momento Lineal "p") de una bola en movimiento?',
+        texto: 'Cine: En la saga de Piratas del Caribe, ¿cómo se llama el aterrador villano que tiene tentáculos de pulpo o calamar en la cara?',
         opciones: [
-          { id: 'a', texto: 'p = masa · velocidad (m · v)' },
-          { id: 'b', texto: 'p = fuerza / área (F / A)' },
-          { id: 'c', texto: 'p = masa / tiempo (m / t)' }
+          { id: 'a', texto: 'Jack Sparrow' },
+          { id: 'b', texto: 'El Capitán Barbossa' },
+          { id: 'c', texto: 'Davy Jones' }
         ],
-        correcta: 'a'
+        correcta: 'c'
       },
       {
-        texto: '¿Qué diferencia la fórmula química del Agua Oxigenada (H₂O₂) de la del Agua común (H₂O)?',
+        texto: 'Matemática: Si estás leyendo los números Romanos antiguos, ¿qué número representa la letra "X" mayúscula?',
         opciones: [
-          { id: 'a', texto: 'Tiene un átomo extra de Oxígeno por molécula' },
-          { id: 'b', texto: 'Tiene un átomo extra de Hidrógeno' },
-          { id: 'c', texto: 'Contiene átomos de Carbono' }
+          { id: 'a', texto: 'El número 5' },
+          { id: 'b', texto: 'El número 10' },
+          { id: 'c', texto: 'El número 50' }
         ],
-        correcta: 'a'
+        correcta: 'b'
       },
       {
-        texto: '¿Qué director técnico argentino sacó campeón a la Selección en la Copa América 2021, Finalissima 2022, Mundial 2022 y Copa América 2024?',
+        texto: 'Fútbol: En la liga de Inglaterra (Premier League), ¿qué club poderoso viste camiseta celeste y es dirigido por Pep Guardiola?',
         opciones: [
-          { id: 'a', texto: 'Lionel Scaloni' },
-          { id: 'b', texto: 'Marcelo Gallardo' },
-          { id: 'c', texto: 'Diego Simeone' }
+          { id: 'a', texto: 'Manchester United' },
+          { id: 'b', texto: 'Manchester City' },
+          { id: 'c', texto: 'Chelsea' }
         ],
-        correcta: 'a'
+        correcta: 'b'
       },
       {
-        texto: '¿Cuáles son las dos soluciones (raíces) de la ecuación cuadrática x² - 5x + 6 = 0 ?',
+        texto: 'Geografía: Si querés ir a ver las famosas Pirámides de Egipto y caminar por el desierto, ¿a qué continente tenés que viajar?',
         opciones: [
-          { id: 'a', texto: 'x = 2 y x = 3' },
-          { id: 'b', texto: 'x = 1 y x = 6' },
-          { id: 'c', texto: 'x = -2 y x = -3' }
+          { id: 'a', texto: 'A Asia' },
+          { id: 'b', texto: 'A Europa' },
+          { id: 'c', texto: 'A África' }
         ],
-        correcta: 'a'
+        correcta: 'c'
       },
       {
-        texto: '¿Con qué fórmula se calcula el volumen de una esfera de radio "r"?',
+        texto: 'Lógica: Te planteo un acertijo. "Cuanto más le quitás o excavás, más grande se vuelve". ¿Qué es?',
         opciones: [
-          { id: 'a', texto: 'V = (4/3) · π · r³' },
-          { id: 'b', texto: 'V = 4 · π · r²' },
-          { id: 'c', texto: 'V = 2 · π · r³' }
+          { id: 'a', texto: 'Una nube' },
+          { id: 'b', texto: 'Un agujero / Un pozo' },
+          { id: 'c', texto: 'Un árbol' }
         ],
-        correcta: 'a'
+        correcta: 'b'
       }
     ]
   },
@@ -1199,49 +1199,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: '¿Cómo se llama el principio físico que explica por qué los barcos flotan ("Todo cuerpo sumergido recibe un empuje de abajo hacia arriba...")?',
+        texto: 'Disney: En la clásica película animada "Aladdín", ¿cuántos deseos exactos le promete cumplir el Genio de la lámpara a quien la frote?',
         opciones: [
-          { id: 'a', texto: 'Principio de Arquímedes' },
-          { id: 'b', texto: 'Principio de Pascal' },
-          { id: 'c', texto: 'Teorema de Bernoulli' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿Qué elemento químico es un líquido rojizo a temperatura ambiente y tiene el símbolo "Br" en la Tabla Periódica?',
-        opciones: [
-          { id: 'a', texto: 'Boro' },
-          { id: 'b', texto: 'Bromo' },
-          { id: 'c', texto: 'Bario' }
+          { id: 'a', texto: 'Le concede 1 solo deseo' },
+          { id: 'b', texto: 'Le concede 3 deseos' },
+          { id: 'c', texto: 'Le concede 5 deseos' }
         ],
         correcta: 'b'
       },
       {
-        texto: '¿En qué estadio mítico de Londres ganó Argentina la "Finalissima" 2022 por 3-0 frente a Italia?',
+        texto: 'Matemática: Sin usar la calculadora, ¿cuánto te da si dividís 250 a la mitad exacta?',
         opciones: [
-          { id: 'a', texto: 'En el Estadio de Wembley' },
-          { id: 'b', texto: 'En Old Trafford' },
-          { id: 'c', texto: 'En Anfield' }
+          { id: 'a', texto: '100' },
+          { id: 'b', texto: '125' },
+          { id: 'c', texto: '150' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'Fútbol: En un Mundial, si los dos equipos empatan en un partido de "mata-mata" (eliminación), y siguen empatados tras el tiempo extra, ¿qué pasa?',
+        opciones: [
+          { id: 'a', texto: 'Se define tirando una moneda' },
+          { id: 'b', texto: 'Gana el que menos faltas haya hecho' },
+          { id: 'c', texto: 'Se define por tanda de Penales' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Música: ¿Qué famosísima cantante joven argentina es apodada por ella misma y sus fans como "La Nena de Argentina"?',
+        opciones: [
+          { id: 'a', texto: 'Maria Becerra' },
+          { id: 'b', texto: 'Lali Espósito' },
+          { id: 'c', texto: 'Tini Stoessel' }
         ],
         correcta: 'a'
       },
       {
-        texto: 'Si en una pecera hay 6 peces rojos y 4 peces azules, ¿cuál es la probabilidad de pescar al azar un pez azul en el primer intento?',
+        texto: 'Geografía: ¿Cuál es el nombre de la gigante cordillera de montañas nevadas que atraviesa Argentina y sigue por todo el oeste de Sudamérica?',
         opciones: [
-          { id: 'a', texto: '4/10 (40%)' },
-          { id: 'b', texto: '4/6 (66%)' },
-          { id: 'c', texto: '1/4 (25%)' }
+          { id: 'a', texto: 'Los Alpes' },
+          { id: 'b', texto: 'Los Pirineos' },
+          { id: 'c', texto: 'Cordillera de los Andes' }
         ],
-        correcta: 'a'
-      },
-      {
-        texto: 'En la Tabla Periódica, ¿qué símbolo tiene el elemento Cloro?',
-        opciones: [
-          { id: 'a', texto: 'Cl' },
-          { id: 'b', texto: 'Cr' },
-          { id: 'c', texto: 'Co' }
-        ],
-        correcta: 'a'
+        correcta: 'c'
       }
     ]
   },
@@ -1260,49 +1260,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'En una circunferencia, ¿cuál es la relación exacta entre el Diámetro (D) y el Radio (r)?',
+        texto: 'Disney Pixar: ¿Qué emotiva película animada se desarrolla durante la festividad del "Día de los Muertos" con calaveras coloridas en México?',
         opciones: [
-          { id: 'a', texto: 'D = 2 · r (el doble del radio)' },
-          { id: 'b', texto: 'D = r² (el radio al cuadrado)' },
-          { id: 'c', texto: 'D = π · r' }
+          { id: 'a', texto: 'Up: Una aventura de altura' },
+          { id: 'b', texto: 'Soul' },
+          { id: 'c', texto: 'Coco' }
+        ],
+        correcta: 'c'
+      },
+      {
+        texto: 'Matemática: Si un combo de hamburguesas sale $4.000, y vos pedís 2 combos iguales, ¿cuántos pesos tenés que pagar en total?',
+        opciones: [
+          { id: 'a', texto: '$6.000' },
+          { id: 'b', texto: '$8.000' },
+          { id: 'c', texto: '$4.000 (hay 2x1)' }
+        ],
+        correcta: 'b'
+      },
+      {
+        texto: 'Fútbol: En la Selección y en los clubes de nuestro país, ¿qué significan las históricas tres letras de la sigla "AFA"?',
+        opciones: [
+          { id: 'a', texto: 'Asociación de Fútbol Argentino' },
+          { id: 'b', texto: 'Asociación de Futbolistas Asociados' },
+          { id: 'c', texto: 'Agrupación Futbolística Argentina' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Qué elemento semiconductor, cuyo símbolo es "Si", es el componente principal de los microchips y del vidrio?',
+        texto: 'Geografía: Si te vas de vacaciones a Mar del Plata en el verano, ¿en qué gran océano te vas a meter a nadar?',
         opciones: [
-          { id: 'a', texto: 'Silicio' },
-          { id: 'b', texto: 'Sodio' },
-          { id: 'c', texto: 'Azufre' }
+          { id: 'a', texto: 'Océano Pacífico' },
+          { id: 'b', texto: 'Océano Índico' },
+          { id: 'c', texto: 'Océano Atlántico' }
         ],
-        correcta: 'a'
+        correcta: 'c'
       },
       {
-        texto: '¿Qué futbolista argentino hizo goles en la final de la Copa América 2021, en la Finalissima 2022 y en la final del Mundial 2022?',
+        texto: 'Lógica: Escuchá bien esta adivinanza: "Blancas son, en la mesa las ponen, las cortan o mezclan... pero no se comen". ¿Qué son?',
         opciones: [
-          { id: 'a', texto: 'Ángel Di María' },
-          { id: 'b', texto: 'Rodrigo De Paul' },
-          { id: 'c', texto: 'Nicolás Otamendi' }
+          { id: 'a', texto: 'Las cucharas' },
+          { id: 'b', texto: 'Las cartas (baraja francesa)' },
+          { id: 'c', texto: 'Las servilletas de papel' }
         ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿Cuál es el Mínimo Común Múltiplo (MCM) entre los números 4 y 6?',
-        opciones: [
-          { id: 'a', texto: '12' },
-          { id: 'b', texto: '24' },
-          { id: 'c', texto: '2' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: 'En el Sistema Internacional de Unidades, ¿en qué unidad se mide la frecuencia de una onda?',
-        opciones: [
-          { id: 'a', texto: 'En Hercios (Hz)' },
-          { id: 'b', texto: 'En Julios (J)' },
-          { id: 'c', texto: 'En Newtons (N)' }
-        ],
-        correcta: 'a'
+        correcta: 'b'
       }
     ]
   },
@@ -1317,53 +1317,53 @@ export const LISTA_JUEGOS_OFICIAL = [
     color: 'amarillo',
     modalidad: '2 Grupos en simultáneo',
     materiales: '12 vasos con agua, pelotitas de ping-pong y 1 mesa larga.',
-    info: 'Se colocan 6 vasos llenos de agua en cada extremo opuesto de la mesa. Turnándose para lanzar, gana quien emboque más pelotitas de ping-pong en 1 minuto o complete todos los vasos del oponente primero.',
+    info: 'Se colocan 6 vasos llenos de agua en cada extremo opuesto de la mesa. Turnándose para lanzar, gana quien emboque más pelotitas de ping-pong en 1 minuto.',
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'Cuando lanzás una pelotita por el aire formando un arco, ¿qué forma geométrica describe su trayectoria (tiro oblicuo)?',
+        texto: 'Disney Pixar: En la película "Cars", ¿cómo se llama el auto de carreras rojo, rápido y un poco creído que es el protagonista principal?',
         opciones: [
-          { id: 'a', texto: 'Una parábola' },
-          { id: 'b', texto: 'Una hipérbola' },
-          { id: 'c', texto: 'Una asíntota' }
+          { id: 'a', texto: 'Rayo McQueen' },
+          { id: 'b', texto: 'El Rey' },
+          { id: 'c', texto: 'Tom Mate' }
         ],
         correcta: 'a'
       },
       {
-        texto: '¿Cuál es la densidad del agua pura en condiciones estándar?',
+        texto: 'Matemática: Si sumás el número quince consigo mismo tres veces seguidas (15 + 15 + 15), ¿qué resultado obtenés?',
         opciones: [
-          { id: 'a', texto: '1 g/cm³ (o 1 kg/litro)' },
-          { id: 'b', texto: '10 g/cm³' },
-          { id: 'c', texto: '0,1 g/cm³' }
+          { id: 'a', texto: '30' },
+          { id: 'b', texto: '60' },
+          { id: 'c', texto: '45' }
         ],
-        correcta: 'a'
+        correcta: 'c'
       },
       {
-        texto: '¿Cuál es el símbolo químico del Azufre en la Tabla Periódica?',
+        texto: 'Fútbol: Si en un partido un jugador recibe la pelota cuando está más adelantado que toda la defensa rival, el árbitro anula la jugada cobrando...',
         opciones: [
-          { id: 'a', texto: 'S' },
-          { id: 'b', texto: 'Az' },
-          { id: 'c', texto: 'Zf' }
+          { id: 'a', texto: 'Falta ofensiva' },
+          { id: 'b', texto: 'Córner o tiro de esquina' },
+          { id: 'c', texto: 'Offside (Fuera de juego)' }
         ],
-        correcta: 'a'
+        correcta: 'c'
       },
       {
-        texto: '¿Contra qué selección europea empató Argentina 2-2 y luego venció por penales en los cuartos de final de Qatar 2022?',
+        texto: 'Redes Sociales: ¿Qué famosísima aplicación tiene de logo el dibujo de una camarita colorida que va del rosa al naranja y violeta?',
         opciones: [
-          { id: 'a', texto: 'Países Bajos (Holanda)' },
-          { id: 'b', texto: 'Croacia' },
-          { id: 'c', texto: 'Polonia' }
+          { id: 'a', texto: 'Snapchat' },
+          { id: 'b', texto: 'Facebook' },
+          { id: 'c', texto: 'Instagram' }
         ],
-        correcta: 'a'
+        correcta: 'c'
       },
       {
-        texto: 'En trigonometría, ¿cuánto vale el Seno de 90° (sen 90°)?',
+        texto: 'Geografía: Considerando toda la población mundial, ¿cuál es el país que tiene la mayor cantidad de habitantes en el mundo, compitiendo con India?',
         opciones: [
-          { id: 'a', texto: '1' },
-          { id: 'b', texto: '0' },
-          { id: 'c', texto: '0,5' }
+          { id: 'a', texto: 'Rusia' },
+          { id: 'b', texto: 'China' },
+          { id: 'c', texto: 'Estados Unidos' }
         ],
-        correcta: 'a'
+        correcta: 'b'
       }
     ]
   },
@@ -1382,49 +1382,49 @@ export const LISTA_JUEGOS_OFICIAL = [
     tipo: 'normal',
     preguntas: [
       {
-        texto: 'En física estática, ¿qué condición debe cumplirse con el Centro de Gravedad de una torre para que NO se derrumbe?',
+        texto: 'Disney Pixar: En la película "Up: Una aventura de altura", ¿con qué locura logra el abuelito Fredricksen hacer volar toda su casa por los aires?',
         opciones: [
-          { id: 'a', texto: 'Su proyección vertical debe caer dentro de la base de apoyo' },
-          { id: 'b', texto: 'Su masa debe ser igual a cero' },
-          { id: 'c', texto: 'Su altura debe superar el metro' }
+          { id: 'a', texto: 'Con un motor de cohete' },
+          { id: 'b', texto: 'Con magia de hadas' },
+          { id: 'c', texto: 'Con muchísimos globos atados' }
         ],
-        correcta: 'a'
+        correcta: 'c'
       },
       {
-        texto: '¿Con qué fórmula se calcula el volumen de un prisma rectangular (como un bloque de Jenga) de largo "a", ancho "b" y alto "c"?',
+        texto: 'Matemática: Tenés un billete de 100 pesos y gastás exactamente 45 en golosinas. ¿Cuánto te queda en el bolsillo (100 - 45)?',
         opciones: [
-          { id: 'a', texto: 'V = a · b · c' },
-          { id: 'b', texto: 'V = a + b + c' },
-          { id: 'c', texto: 'V = (a · b) / c' }
-        ],
-        correcta: 'a'
-      },
-      {
-        texto: '¿Qué elemento de la Tabla Periódica tiene el símbolo "Zn"?',
-        opciones: [
-          { id: 'a', texto: 'Zirconio' },
-          { id: 'b', texto: 'Zinc' },
-          { id: 'c', texto: 'Xenón' }
+          { id: 'a', texto: '65' },
+          { id: 'b', texto: '55' },
+          { id: 'c', texto: '45' }
         ],
         correcta: 'b'
       },
       {
-        texto: '¿Qué club brasileño ganó la Copa Libertadores 2023 tras vencer a Boca Juniors en el estadio Maracaná?',
+        texto: 'Fútbol: En la jerga futbolera, ¿cómo se le llama a la falta brutal que un defensor comete adentro de su propia "área grande"?',
         opciones: [
-          { id: 'a', texto: 'Palmeiras' },
-          { id: 'b', texto: 'Fluminense' },
-          { id: 'c', texto: 'Flamengo' }
+          { id: 'a', texto: 'Un tiro libre directo' },
+          { id: 'b', texto: 'Un Penal' },
+          { id: 'c', texto: 'Un Lateral' }
         ],
         correcta: 'b'
       },
       {
-        texto: '¿Cuál es el resultado de elevar 3 a la cuarta potencia (3⁴)?',
+        texto: 'Geografía: Si viajás al país limítrofe de Uruguay cruzando "el charco", ¿cuál es su capital oficial?',
         opciones: [
-          { id: 'a', texto: '81' },
-          { id: 'b', texto: '12' },
-          { id: 'c', texto: '27' }
+          { id: 'a', texto: 'Montevideo' },
+          { id: 'b', texto: 'Asunción' },
+          { id: 'c', texto: 'Punta del Este' }
         ],
         correcta: 'a'
+      },
+      {
+        texto: 'Lógica: Te planteo el último acertijo. "Tiene dos manecillas o manos, se la pasa girando todo el día, pero jamás puede aplaudir". ¿Qué es?',
+        opciones: [
+          { id: 'a', texto: 'Un mono enjaulado' },
+          { id: 'b', texto: 'Un ventilador de techo' },
+          { id: 'c', texto: 'Un reloj analógico' }
+        ],
+        correcta: 'c'
       }
     ]
   }
@@ -2003,7 +2003,7 @@ export default function Juego() {
 
     const juegoAutorizado = buscarJuegoPorClaveEncargado(codigoManualInput);
     if (!juegoAutorizado) {
-      alert("🔒 CÓDIGO INVÁLIDO.\nSolo el encargado de la posta tiene la clave de desbloqueo luego de ganar el juego.");
+      alert("🔒 CÓDIGO INVÁLIDO.\nSolo el encargado del juego tiene la clave de desbloqueo luego de ganar el juego.");
       return;
     }
     iniciarDesafioValidado(juegoAutorizado);
