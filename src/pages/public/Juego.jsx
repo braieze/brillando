@@ -10,7 +10,7 @@ import './Juego.css';
 // - Se desbloquea automáticamente el Sábado 31/10 a las 16:30 hs.
 // - Si querés desbloquearlo antes manualmente, cambiá `false` por `true` acá abajo:
 // ============================================================================
-const FORZAR_DESBLOQUEO_ESCANER = false;
+const FORZAR_DESBLOQUEO_ESCANER = true;
 const FECHA_APERTURA_ESCANER = new Date('2026-10-31T16:30:00-03:00');
 
 const estaEscanerHabilitado = () => {
