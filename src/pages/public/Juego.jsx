@@ -6,9 +6,7 @@ import DashboardJugador from './DashboardJugador';
 import './Juego.css';
 
 // ============================================================================
-// 🔒 BLOQUEO HORARIO DEL ESCÁNER QR (CONTROL RÁPIDO)
-// - Se desbloquea automáticamente el Sábado 31/10 a las 16:30 hs.
-// - Si querés desbloquearlo antes manualmente, cambiá `false` por `true` acá abajo:
+// 🔒 BLOQUEO HORARIO DEL ESCÁNER QR
 // ============================================================================
 const FORZAR_DESBLOQUEO_ESCANER = true;
 const FECHA_APERTURA_ESCANER = new Date('2026-10-31T16:30:00-03:00');
@@ -20,9 +18,6 @@ const estaEscanerHabilitado = () => {
 
 // ============================================================================
 // CATÁLOGO OFICIAL DE LOS 23 JUEGOS DEL CONGRESO
-// - `codigoQR` y `aliases`: SOLO funcionan escaneando con la cámara.
-// - `codigoEncargado`: Clave secreta que SOLO sabe el encargado de la mesa
-//   para dársela al grupo si no les abre la cámara (Anti-Trampa).
 // ============================================================================
 export const LISTA_JUEGOS_OFICIAL = [
   {
@@ -591,7 +586,7 @@ export const LISTA_JUEGOS_OFICIAL = [
       {
         texto: 'Disney: En la película "Monsters, Inc.", ¿cómo se llama el monstruo principal que es gigante, peludo, celeste y con manchas púrpuras?',
         opciones: [
-          { id: 'a', miketexto: 'Mike Wazowski' },
+          { id: 'a', texto: 'Mike Wazowski' },
           { id: 'b', texto: 'Randall' },
           { id: 'c', texto: 'James P. Sullivan (Sulley)' }
         ],
@@ -1461,7 +1456,6 @@ const CODIGOS_ESPECIALES = {
   }
 };
 
-// 1. Buscador exclusivo para LECTURA DE CÁMARA QR
 const buscarJuegoPorQR = (codigoCrudo) => {
   if (!codigoCrudo) return null;
   const limpio = codigoCrudo.toString().trim().toLowerCase();
@@ -1478,7 +1472,6 @@ const buscarJuegoPorQR = (codigoCrudo) => {
   ) || null;
 };
 
-// 2. Buscador exclusivo para CUADRO MANUAL (ANTI-TRAMPA: solo acepta el código del encargado)
 const buscarJuegoPorClaveEncargado = (claveCruda) => {
   if (!claveCruda) return null;
   const limpio = claveCruda.toString().trim().toUpperCase();
@@ -1493,11 +1486,7 @@ const buscarJuegoPorClaveEncargado = (claveCruda) => {
   ) || null;
 };
 
-// ============================================================================
-// ROTACIÓN INTELIGENTE DE LAS 5 PREGUNTAS SIN REPETIR
-// ============================================================================
 const sortearPreguntaSinRepetir = (juego) => {
-  const total = juego.preguntas.length;
   const storageKey = `brillando_rotacion_juego_${juego.id}`;
   let usados = [];
 
@@ -1511,7 +1500,6 @@ const sortearPreguntaSinRepetir = (juego) => {
     .map((_, idx) => idx)
     .filter((idx) => !usados.includes(idx));
 
-  // Si ya vieron las 5 preguntas de ese juego, reiniciamos el mazo evitando repetir la última
   if (disponibles.length === 0) {
     const ultimaUsada = usados[usados.length - 1];
     usados = ultimaUsada !== undefined ? [ultimaUsada] : [];
@@ -1530,9 +1518,6 @@ const sortearPreguntaSinRepetir = (juego) => {
   return juego.preguntas[elegido];
 };
 
-// ============================================================================
-// HELPER 1: IDENTIDAD DE DISPOSITIVO
-// ============================================================================
 const obtenerDeviceId = () => {
   let deviceId = localStorage.getItem('brillando_device_id');
   if (!deviceId) {
@@ -1542,9 +1527,6 @@ const obtenerDeviceId = () => {
   return deviceId;
 };
 
-// ============================================================================
-// HELPER 2: TIMEOUT CON REINTENTO AUTOMÁTICO
-// ============================================================================
 const ejecutarConTimeout = async (fnPromesa, ms = 7000, reintentos = 2) => {
   for (let intento = 0; intento <= reintentos; intento++) {
     let timeoutId;
@@ -1573,7 +1555,6 @@ export default function Juego() {
   const [nombreCapitan2, setNombreCapitan2] = useState('');
   const [loading, setLoading] = useState(false);
   
-  // Estados de Trivia y Cámara
   const [juegoActivo, setJuegoActivo] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [mostrarOpciones, setMostrarOpciones] = useState(false);
@@ -1581,14 +1562,10 @@ export default function Juego() {
   const [scannerCooldown, setScannerCooldown] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Cámara y código del encargado
   const [cameraError, setCameraError] = useState(false);
   const [codigoManualInput, setCodigoManualInput] = useState('');
-
-  // Modal de aviso cuando el escáner está bloqueado antes de las 16:30hs
   const [modalBloqueoHorario, setModalBloqueoHorario] = useState(false);
 
-  // Caché persistente del grupo
   const [grupoDataCache, setGrupoDataCache] = useState(() => {
     try {
       const guardado = localStorage.getItem('brillando_grupo_cache');
@@ -1598,7 +1575,6 @@ export default function Juego() {
     }
   });
   const [grupoDocRef, setGrupoDocRef] = useState(null);
-  const [rankingActual, setRankingActual] = useState('-');
 
   const asegurarGrupoDocRef = async () => {
     if (grupoDocRef) return grupoDocRef;
@@ -1614,9 +1590,6 @@ export default function Juego() {
     return null;
   };
 
-  // ============================================================================
-  // 1. ESCUCHADOR PERMANENTE DEL GRUPO EN TIEMPO REAL + CACHÉ LOCAL
-  // ============================================================================
   useEffect(() => {
     if (!activePin) {
       setGrupoDataCache(null);
@@ -1641,48 +1614,6 @@ export default function Juego() {
     return () => unsubscribe();
   }, [activePin]);
 
-  // ============================================================================
-  // 2. ESCUCHADOR DE RANKING GLOBAL CON DESEMPATE POR TIEMPO
-  // ============================================================================
-  useEffect(() => {
-    if (!activePin) return;
-
-    const qTodos = query(collection(db, "grupos"));
-    const unsubscribeRanking = onSnapshot(qTodos, (snap) => {
-      const listaGrupos = snap.docs.map(doc => {
-        const data = doc.data();
-        return {
-          pin: data.pin,
-          puntos: Number(data.puntos || 0),
-          tiempo: Number(data.ultimaActualizacionPuntos || Number.MAX_SAFE_INTEGER),
-          rankingGuardado: data.ranking
-        };
-      });
-
-      listaGrupos.sort((a, b) => {
-        if (b.puntos !== a.puntos) return b.puntos - a.puntos;
-        return a.tiempo - b.tiempo;
-      });
-
-      const index = listaGrupos.findIndex(g => g.pin === activePin);
-      if (index !== -1 && listaGrupos[index].puntos > 0) {
-        const puestoCalculado = index + 1;
-        setRankingActual(puestoCalculado);
-
-        if (grupoDocRef && listaGrupos[index].rankingGuardado !== puestoCalculado) {
-          updateDoc(grupoDocRef, { ranking: puestoCalculado }).catch(() => {});
-        }
-      } else {
-        setRankingActual('-');
-      }
-    });
-
-    return () => unsubscribeRanking();
-  }, [activePin, grupoDocRef]);
-
-  // ============================================================================
-  // 3. DETECTOR DE CONCURRENCIA ENTRE CAPITÁN 1 Y CAPITÁN 2
-  // ============================================================================
   useEffect(() => {
     if (view === 'trivia' && juegoActivo && !isProcessing && !feedback) {
       const completados = (grupoDataCache?.juegosCompletados || []).map(Number);
@@ -1712,9 +1643,6 @@ export default function Juego() {
     }
   }, [grupoDataCache, view, juegoActivo, isProcessing, feedback]);
 
-  // ============================================================================
-  // TEMPORIZADOR DE 20 SEGUNDOS
-  // ============================================================================
   useEffect(() => {
     let timerId;
     if (view === 'trivia' && juegoActivo && !isProcessing && !feedback) {
@@ -1729,9 +1657,6 @@ export default function Juego() {
     return () => clearTimeout(timerId);
   }, [view, juegoActivo, isProcessing, feedback, timeLeft]);
 
-  // ============================================================================
-  // 4. CREAR GRUPO (CAPITÁN 1)
-  // ============================================================================
   const handleCrearGrupo = async (e) => {
     e.preventDefault();
     if (!nombreEquipo.trim()) return alert("Ingresá un nombre para tu escuadrón.");
@@ -1773,9 +1698,6 @@ export default function Juego() {
     setLoading(false);
   };
 
-  // ============================================================================
-  // 5. COMPARTIR PIN POR WHATSAPP
-  // ============================================================================
   const handleCompartirPin = async (pinParaCompartir) => {
     const codigo = pinParaCompartir || pinGenerado || activePin;
     const equipo = nombreEquipo ? nombreEquipo.trim().toUpperCase() : (grupoDataCache?.nombre || 'NUESTRO ESCUADRÓN');
@@ -1800,9 +1722,6 @@ export default function Juego() {
     }
   };
 
-  // ============================================================================
-  // 6. UNIRSE AL GRUPO (CAPITÁN 2)
-  // ============================================================================
   const handleUnirse = async (e) => {
     if (e) e.preventDefault();
     if (pinInput.length !== 4) return;
@@ -1864,13 +1783,9 @@ export default function Juego() {
     setLoading(false);
   };
 
-  // ============================================================================
-  // 7. APERTURA DE CÁMARA SEGURA (CON BLOQUEO HASTA EL SÁBADO 16:30 HS)
-  // ============================================================================
   const handleAbrirEscanerSeguro = () => {
     if (scannerCooldown || isProcessing) return;
 
-    // Verifica si ya son las 16:30 hs del sábado (o si desbloqueaste manualmente)
     if (!estaEscanerHabilitado()) {
       setModalBloqueoHorario(true);
       return;
@@ -1883,9 +1798,6 @@ export default function Juego() {
     setTimeout(() => setScannerCooldown(false), 800);
   };
 
-  // ============================================================================
-  // 8. INICIAR DESAFÍO (RECIBE EL JUEGO VALIDADO POR CÁMARA O CLAVE DE ENCARGADO)
-  // ============================================================================
   const iniciarDesafioValidado = async (baseJuego) => {
     if (!baseJuego || isProcessing) return;
 
@@ -1908,7 +1820,6 @@ export default function Juego() {
       return;
     }
 
-    // CASO ESPECIAL 1: QR BONUS (+100 PTS)
     if (baseJuego.tipo === 'bonus') {
       setIsProcessing(true);
       try {
@@ -1934,7 +1845,6 @@ export default function Juego() {
       return;
     }
 
-    // CASO ESPECIAL 2: QR TRAMPA (-50 PTS)
     if (baseJuego.tipo === 'trampa') {
       setIsProcessing(true);
       try {
@@ -1963,7 +1873,6 @@ export default function Juego() {
       return;
     }
 
-    // CASO NORMAL: Rotación inteligente entre las 5 preguntas sin repetir
     const preguntaSorteada = sortearPreguntaSinRepetir(baseJuego);
 
     setMostrarOpciones(false);
@@ -1982,7 +1891,6 @@ export default function Juego() {
     setView('trivia');
   };
 
-  // Lectura óptica desde la cámara QR
   const handleScan = (resultado) => {
     if (!resultado || isProcessing) return;
     const textoQR = Array.isArray(resultado) ? resultado[0]?.rawValue : (resultado?.text || resultado);
@@ -1996,7 +1904,6 @@ export default function Juego() {
     iniciarDesafioValidado(juegoEncontrado);
   };
 
-  // Ingreso manual (SOLO acepta el código secreto del encargado, bloqueando trampas)
   const handleValidarClaveEncargado = (e) => {
     e.preventDefault();
     if (!codigoManualInput.trim() || isProcessing) return;
@@ -2009,9 +1916,6 @@ export default function Juego() {
     iniciarDesafioValidado(juegoAutorizado);
   };
 
-  // ============================================================================
-  // 9. VALIDACIÓN DE TRIVIA BLINDADA
-  // ============================================================================
   const validarRespuesta = async (opcionSeleccionada, agotadoTiempo = false) => {
     if (isProcessing || !juegoActivo) return;
     setIsProcessing(true);
@@ -2031,7 +1935,6 @@ export default function Juego() {
         return;
       }
 
-      // RESPUESTA CORRECTA
       if (!agotadoTiempo && opcionSeleccionada === juegoActivo.correcta) {
         const puntosDelJuego = Number(juegoActivo.puntos || 40);
         const idNumerico = Number(juegoActivo.id);
@@ -2057,7 +1960,6 @@ export default function Juego() {
         }, 2600);
 
       } else {
-        // RESPUESTA INCORRECTA O TIEMPO AGOTADO
         const vidasActuales = grupoDataCache?.vidas !== undefined ? Number(grupoDataCache.vidas) : 3;
 
         if (vidasActuales <= 1) {
@@ -2095,9 +1997,6 @@ export default function Juego() {
     }
   };
 
-  // ============================================================================
-  // 10. REINICIO MANUAL DESPUÉS DE GAME OVER
-  // ============================================================================
   const handleReiniciarMision = async () => {
     if (isProcessing) return;
     setIsProcessing(true);
@@ -2121,7 +2020,6 @@ export default function Juego() {
     }
   };
 
-  // ================= VISTAS DE FEEDBACK =================
   if (feedback) {
     if (feedback.type === 'gameover') {
       return (
@@ -2157,14 +2055,13 @@ export default function Juego() {
     );
   }
   
-  // ================= VISTA: DASHBOARD DEL JUGADOR =================
   if (view === 'dashboard') {
     return (
       <>
         <DashboardJugador 
           grupoData={grupoDataCache}
           catalogoJuegos={LISTA_JUEGOS_OFICIAL}
-          rankingEnVivo={rankingActual}
+          rankingEnVivo={'-'} 
           onEscanear={handleAbrirEscanerSeguro} 
           onSalir={() => { 
             localStorage.removeItem('miGrupoPIN'); 
@@ -2177,7 +2074,6 @@ export default function Juego() {
           }} 
         />
 
-        {/* MODAL DE BLOQUEO HORARIO (HASTA EL SÁBADO 16:30 HS) */}
         {modalBloqueoHorario && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-5"
@@ -2197,7 +2093,7 @@ export default function Juego() {
                 ¡Se habilita a las 16:30 hs!
               </h3>
               <p className="text-xs text-gray-300 leading-relaxed mb-6">
-                Ya tienen su escuadrón listo y registrado. El escáner de códigos QR se activará mañana <b>sábado a las 16:30 hs</b> cuando comiencen los juegos en el Congreso.
+                Ya tienen su escuadrón listo y registrado. El escáner de códigos QR se activará hoy a las <b>16:30 hs</b> cuando comiencen los juegos en el Congreso.
               </p>
               <button
                 type="button"
@@ -2213,7 +2109,6 @@ export default function Juego() {
     );
   }
 
-  // ================= VISTA: ESCÁNER QR + CÓDIGO DEL ENCARGADO (ANTI-TRAMPA) =================
   if (view === 'escaner') {
     return (
       <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center p-5">
@@ -2246,7 +2141,6 @@ export default function Juego() {
           </div>
         )}
 
-        {/* CUADRO ANTI-TRAMPA: SOLO ACEPTA CLAVE DEL ENCARGADO DEL JUEGO */}
         <form 
           onSubmit={handleValidarClaveEncargado}
           className="w-full max-w-sm bg-white/5 border border-white/15 rounded-2xl p-4 mb-6"
@@ -2281,7 +2175,6 @@ export default function Juego() {
     );
   }
 
-  // ================= VISTA: TRIVIA =================
   if (view === 'trivia' && juegoActivo) {
     const vidasMostradas = grupoDataCache?.vidas !== undefined ? grupoDataCache.vidas : 3;
 
@@ -2361,7 +2254,6 @@ export default function Juego() {
     );
   }
 
-  // ================= VISTAS DE ONBOARDING (INICIO / CREAR / UNIR) =================
   return (
     <div className="onb-screen">
       <div className="onb-visual-area">
